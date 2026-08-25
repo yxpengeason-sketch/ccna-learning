@@ -730,7 +730,7 @@ const quiz=[
 {m:1,q:'RSTP 的埠狀態有哪三種？',o:['Blocking/Learning/Forwarding','Discarding/Learning/Forwarding','Listening/Learning/Forwarding','Disabled/Blocking/Forwarding'],a:1,e:'RSTP 以 Discarding 取代 STP 的 Blocking+Listening，三態制。'},
 {m:1,q:'RSTP 中提供通往根橋備援路徑的埠角色是？',o:['Backup Port','Alternate Port','Designated Port','Edge Port'],a:1,e:'Alternate=根橋路徑備胎；Backup=同一鏈路上 Designated 的備胎。'},
 {m:1,q:'Trunk 兩端 Native VLAN 不一致會導致？',o:['Trunk 自動關閉','流量在 VLAN 間洩漏（安全風險）','自動協商修正','僅 Syslog 警告無影響'],a:1,e:'Native VLAN 明文不打標籤，不一致造成 VLAN Hopping/洩漏；建議改閒置 VLAN 999。'},
-{m:1,q:'LACP passive 模式可與下列何者成功組成 EtherChannel？',o:['on','desirable','active 或 passive','auto'],a:2,e:'passive↔active 可成；passive↔passive 不行；on/desirable/auto 屬其他模式不相通。'},
+{m:1,q:'LACP passive 模式可與下列何者成功組成 EtherChannel？',o:['on','desirable','active','auto'],a:2,e:'passive↔active 可成；passive↔passive 不行；on/desirable/auto 屬其他模式不相通。'},
 {m:1,q:'Port Security 違規模式預設值為？',o:['protect','restrict','shutdown','log'],a:2,e:'預設 shutdown → err-disabled，需 shutdown+no shutdown 或 errdisable recovery 恢復。'},
 {m:1,q:'交換器收到目的 MAC 不在 MAC Table 的單播影格時會？',o:['丟棄','送往所有埠（Flood）','送回來源埠','觸發 ARP'],a:1,e:'未知單播 Flood 至同 VLAN 所有埠（除來源埠）。'},
 {m:1,q:'混合 Cisco 與 Juniper 設備的環境，鄰居發現應啟用？',o:['CDP only','LLDP only','兩者皆可但 LLDP 必要','STP'],a:1,e:'LLDP 是 IEEE 802.1AB 開放標準；CDP 為 Cisco 專屬。'},
