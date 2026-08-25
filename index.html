@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CCNA 200-301 考前 30 天衝刺儀表板</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:"Microsoft JhengHei","PingFang TC",sans-serif}
+body{background:#0f172a;color:#e2e8f0;min-height:100vh}
+header{background:linear-gradient(135deg,#1e3a8a,#0ea5e9);padding:24px;text-align:center}
+header h1{font-size:1.6rem}header p{opacity:.85;margin-top:4px}
+nav{display:flex;flex-wrap:wrap;background:#1e293b;position:sticky;top:0;z-index:10}
+nav button{flex:1;min-width:110px;padding:12px;border:none;background:none;color:#94a3b8;font-size:.95rem;cursor:pointer;border-bottom:3px solid transparent}
+nav button.active{color:#38bdf8;border-bottom-color:#38bdf8;background:#0f172a}
+main{max-width:1100px;margin:auto;padding:20px}
+section{display:none}.section.active{display:block}
+h2{color:#38bdf8;margin:16px 0 12px;border-left:5px solid #38bdf8;padding-left:10px}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.9rem}
+th{background:#1e40af;color:#fff;padding:8px;text-align:left}
+td{padding:8px;border-bottom:1px solid #334155;vertical-align:top}
+tr:nth-child(even){background:#16213a}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.module-title,.cmp-module{color:#fbbf24;margin:24px 0 10px;padding-bottom:6px;border-bottom:1px solid #475569;font-size:1.15rem}
+.module-title:first-child{margin-top:8px}
+.kt-filter,.cmp-tools{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.kt-filter button,.cmp-tools button{padding:8px 12px;border:1px solid #475569;border-radius:6px;background:#1e293b;color:#cbd5e1;cursor:pointer}
+.kt-filter button.active,.kt-filter button:hover,.cmp-tools button.active,.cmp-tools button:hover{border-color:#38bdf8;color:#7dd3fc}
+#kt-progress{color:#94a3b8;font-size:.9rem;margin:8px 0}
+.module-title .cnt,.cmp-module .cnt{float:right;color:#94a3b8;font-size:.8rem;font-weight:normal}
+.cmp-tools input{flex:1;min-width:220px}
+.flip{perspective:1000px;height:150px;cursor:pointer}
+.flip-inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
+.flip.flipped .flip-inner{transform:rotateY(180deg)}
+.face{position:absolute;width:100%;height:100%;backface-visibility:hidden;border-radius:10px;padding:14px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:.88rem}
+.front{background:#1e293b;border:1px solid #334155}
+.back{background:#065f46;transform:rotateY(180deg)}
+details{background:#1e293b;border-radius:8px;margin:8px 0;border:1px solid #334155}
+summary{padding:12px;cursor:pointer;font-weight:bold;color:#7dd3fc}
+details .body{padding:0 14px 14px}
+pre{background:#0b1120;padding:12px;border-radius:6px;overflow-x:auto;font-family:Consolas,monospace;font-size:.82rem;color:#a5f3fc;margin:8px 0}
+.tag{display:inline-block;background:#7c2d12;color:#fdba74;padding:2px 8px;border-radius:4px;font-size:.75rem;margin-right:6px}
+.quiz-q{background:#1e293b;border-radius:8px;padding:16px;margin:12px 0;border:1px solid #334155}
+.opt{display:block;width:100%;text-align:left;padding:10px;margin:6px 0;background:#0f172a;border:1px solid #334155;border-radius:6px;color:#e2e8f0;cursor:pointer;font-size:.9rem}
+.opt:hover{border-color:#38bdf8}
+.opt.correct{background:#065f46;border-color:#22c55e}
+.opt.wrong{background:#7f1d1d;border-color:#ef4444}
+#score-bar{position:sticky;top:49px;background:#1e293b;padding:10px;border-radius:8px;display:flex;justify-content:space-between;z-index:5}
+.btn{background:#0ea5e9;color:#fff;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-size:1rem;margin-top:10px}
+.btn:hover{background:#0284c7}
+input,select{padding:8px;border-radius:6px;border:1px solid #334155;background:#0f172a;color:#e2e8f0}
+.calc-result{background:#065f46;border-radius:8px;padding:14px;margin-top:12px;line-height:1.8}
+.pitfall{border-left:4px solid #f59e0b}
+.explain{margin-top:8px;padding:10px;background:#0b1120;border-radius:6px;font-size:.85rem;display:none}
+.day-row:hover{background:#1e3a5f!important}
+.progress-cell input[type=checkbox]{width:18px;height:18px;cursor:pointer}
+footer{text-align:center;padding:20px;color:#64748b;font-size:.85rem}
+@media(max-width:600px){header h1{font-size:1.2rem}}
+
+/* ── Key Takeaways 優化樣式 ── */
+.module-title{color:#fbbf24;font-size:1.1rem;margin:26px 0 12px;padding:8px 14px;
+ background:#1e293b;border-left:5px solid #fbbf24;border-radius:6px;display:flex;justify-content:space-between;align-items:center}
+.module-title .cnt{font-size:.8rem;color:#94a3b8;background:#0f172a;padding:2px 10px;border-radius:10px}
+.kt-filter{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.kt-filter button{padding:7px 16px;border-radius:20px;border:1px solid #334155;background:#1e293b;color:#94a3b8;cursor:pointer;font-size:.85rem}
+.kt-filter button.active{background:#0ea5e9;border-color:#0ea5e9;color:#fff}
+.flip{height:auto;min-height:150px}
+.face{flex-direction:column;justify-content:center;gap:8px;padding:16px}
+.front{background:linear-gradient(145deg,#1e293b,#16213a);border:1px solid #38bdf855;font-weight:bold;font-size:.92rem;line-height:1.4}
+.front .num{position:absolute;top:8px;left:12px;font-size:.7rem;color:#64748b;font-weight:normal}
+.front .hint{font-size:.72rem;color:#38bdf8;font-weight:normal;margin-top:auto}
+.back{background:linear-gradient(145deg,#065f46,#064e3b);border:1px solid #22c55e66;font-size:.82rem;line-height:1.6;text-align:left;overflow-y:auto}
+#kt-progress{text-align:center;color:#94a3b8;font-size:.85rem;margin-bottom:12px}
+
+/* ── Subnetting 考題模組 ── */
+.quiz-tabs{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+.quiz-tabs button{padding:8px 16px;border-radius:20px;border:1px solid #334155;background:#1e293b;color:#94a3b8;cursor:pointer;font-size:.85rem}
+.quiz-tabs button.active{background:#0ea5e9;border-color:#0ea5e9;color:#fff}
+#quiz-q{font-size:1.15rem;color:#7dd3fc;margin:12px 0;line-height:1.6}
+.btn-ans{padding:10px 26px;font-size:1rem;border:none;border-radius:8px;cursor:pointer;color:#fff;margin-right:8px}
+.btn-yes{background:#059669}.btn-no{background:#dc2626}
+.btn-yes:hover{background:#047857}.btn-no:hover{background:#b91c1c}
+#quiz-out{background:#0f172a;border-radius:8px;padding:14px;margin-top:14px;line-height:1.9;display:none}
+.ok{color:#4ade80}.bad{color:#f87171}.warn{color:#fbbf24}.dim{color:#94a3b8}
+.score-line{font-size:1.05rem;color:#fbbf24;margin-top:12px}
+pre.bin{color:#7dd3fc;font-family:Consolas,monospace;font-size:.82rem;line-height:1.5;margin:6px 0;white-space:pre-wrap}
+
+/* ── 測驗篩選與進度條 ── */
+.quiz-filter{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+.quiz-filter button{padding:7px 16px;border-radius:20px;border:1px solid #334155;
+ background:#1e293b;color:#94a3b8;cursor:pointer;font-size:.85rem}
+.quiz-filter button.active{background:#0ea5e9;border-color:#0ea5e9;color:#fff}
+#quiz-progress-bar{background:#0f172a;border-radius:8px;height:10px;overflow:hidden;margin-bottom:12px}
+#quiz-progress-fill{height:100%;width:0%;background:linear-gradient(90deg,#22c55e,#0ea5e9);transition:width .3s}
+.score-panel{background:#1e293b;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:.95rem}
+
+</style>
+
+</head>
+<body>
+<header>
+<h1>🚀 CCNA 200-301 考前 30 天高效衝刺儀表板</h1>
+<p>離線互動版 v1.0｜配速表 · 翻卡記憶 · 對照表 · IOS指令 · 陷阱避坑 · 模擬測驗 · 子網路計算機</p>
+</header>
+
+<nav id="nav">
+<button class="active" data-s="schedule">📅 30天配速</button>
+<button data-s="takeaways">⭐ 翻卡記憶</button>
+<button data-s="tables">🔄 易混淆對照</button>
+<button data-s="labs">🧪 IOS指令</button>
+<button data-s="pitfalls">⚠️ 陷阱避坑</button>
+<button data-s="quiz">📝 模擬測驗</button>
+<button data-s="calc">🧮 子網路計算機</button>
+<button data-s="final">🎯 考前小提醒</button>
+</nav>
+
+<main>
+
+<!-- ============ 配速表 ============ -->
+<section class="section active" id="schedule">
+<h2>30 天衝刺配速表 <span class="tag">勾選追蹤進度，自動存於瀏覽器</span></h2>
+<table id="sched-table"><thead><tr><th>Day</th><th>階段</th><th>核心複習重點</th><th>理論:實作</th><th>✓</th></tr></thead><tbody></tbody></table>
+<div style="margin-top:12px">總進度：<div style="background:#0f172a;border-radius:6px;height:22px;width:100%;max-width:400px;display:inline-block;vertical-align:middle"><div id="prog" style="background:linear-gradient(90deg,#22c55e,#0ea5e9);height:100%;width:0%;border-radius:6px;text-align:center;font-size:.8rem;line-height:22px"></div></div></div>
+</section>
+
+<!-- ============ Key Takeaways 翻卡 ============ -->
+<section class="section" id="takeaways">
+<h2>CCNA 模組重點翻卡 <span class="tag">點擊卡片翻面看答案</span></h2>
+<div class="card-grid" id="kt-cards"></div>
+</section>
+
+<!-- ============ 易混淆對照表 ============ -->
+<section class="section" id="tables">
+<h2>易混淆概念對照表</h2>
+<div id="cmp-list"></div>
+</section>
+
+<!-- ============ IOS指令 ============ -->
+<section class="section" id="labs">
+<h2>Packet Tracer Lab 情境與排錯指令</h2>
+<div id="lab-list"></div>
+</section>
+
+<!-- ============ 陷阱避坑 ============ -->
+<section class="section" id="pitfalls">
+<h2>高頻觀念陷阱與破解邏輯</h2>
+<div id="pit-list"></div>
+</section>
+
+<!-- ============ 模擬測驗 ============ -->
+<section class="section" id="quiz">
+<h2>模擬測驗 <span class="tag">單選 ≤60 秒/題，Lab 觀念題 ≤8 分鐘</span></h2>
+<div id="score-bar"><span>已答：<b id="answered">0</b>/<span id="total"></span></span><span>答對：<b id="correct" style="color:#22c55e">0</b></span><button class="btn" onclick="resetQuiz()" style="margin:0;padding:6px 14px">重新開始</button></div>
+<div id="quiz-area"></div>
+<div id="final-score" style="display:none;text-align:center;margin-top:20px"></div>
+</section>
+
+<!-- ============ 子網路計算機 ============ -->
+<section class="section" id="calc">
+<h2>IPv4 Subnetting 計算機 <span class="tag">每日 20 題練習的好幫手</span></h2>
+<p>輸入 IP 位址與 CIDR 前綴：</p>
+<input type="text" id="ip" placeholder="例：192.168.1.77" value="192.168.1.77">
+<select id="cidr"></select>
+<button class="btn" onclick="calcSubnet()">計算</button>
+<div class="calc-result" id="calc-out" style="display:none"></div>
+
+<!-- ----- Subnetting 隨機考題訓練 ----- -->
+<h3 style="color:#fbbf24;margin-top:28px;padding-bottom:6px;border-bottom:1px solid #475569">
+ 🎯 Subnetting 隨機考題訓練 <span class="tag">CCNA 實戰演練</span>
+</h3>
+<div class="quiz-tabs" id="sq-tabs">
+ <button data-t="net" class="active">① 是否為網路位址？</button>
+ <button data-t="hosts">② 求可用主機數</button>
+ <button data-t="mask">③ 反向：給主機數求遮罩</button>
+</div>
+<div id="quiz-q"></div>
+<div id="quiz-btns"></div>
+<button onclick="newQuiz()" style="margin-left:8px">🔄 換一題</button>
+<div id="quiz-out"></div>
+<p class="score-line">📊 答對：<span id="s-ok">0</span>　答錯：<span id="s-ng">0</span>　正確率：<span id="s-rate">—</span></p>
+</section>
+
+<!-- ============ 考前提醒 ============ -->
+<section class="section" id="final">
+<h2>考前最終提醒</h2>
+<ul style="line-height:2;padding-left:20px">
+<li>考前 48 小時只做三件事：<b>重跑錯題 Lab、背誦 Key Takeaways、確認考試日帶齊身份證件</b>。</li>
+<li>時間分配：單選題 ≤ 60 秒/題；Lab 題 ≤ 8 分鐘/題；不確定先 Flag 跳過。</li>
+<li>Lab 答題技巧：先 <code>show running-config</code> 掌握現況 → 找出缺失 → 修改後務必驗證再提交。</li>
+</ul>
+<table><thead><tr><th>模組</th><th>權重</th><th>自我檢核</th></tr></thead><tbody>
+<tr><td>Network Fundamentals</td><td>20%</td><td>Subnetting 秒殺？IPv6 縮寫無誤？</td></tr>
+<tr><td>Network Access</td><td>20%</td><td>VLAN/Trunk/EtherChannel/STP/Wireless 全通？</td></tr>
+<tr><td>IP Connectivity</td><td>25%</td><td>OSPF/Static Route/ACL/NAT 配置熟練？</td></tr>
+<tr><td>IP Services</td><td>10%</td><td>NTP/DHCP/Syslog/QoS/HSRP 概念清楚？</td></tr>
+<tr><td>Security Fundamentals</td><td>15%</td><td>Port Security/AAA/VPN/WPA3 掌握？</td></tr>
+<tr><td>Automation & Programmability</td><td>10%</td><td>JSON/REST/SDN/自動化工具定位明確？</td></tr>
+</tbody></table>
+<p style="text-align:center;font-size:1.3rem;margin-top:20px">💪 祝一次通過！</p>
+</section>
+
+</main>
+<footer>CCNA 200-30x Offline Study Dashboard · 進度自動儲存於 localStorage</footer>
+
+<script>
+/* ================= 導航 ================= */
+document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>{
+ document.querySelectorAll('#nav button').forEach(x=>x.classList.remove('active'));
+ document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));
+ b.classList.add('active');document.getElementById(b.dataset.s).classList.add('active');
+});
+
+/* ================= 30 天配速表 ================= */
+const sched=[
+[1,'打地基','網路拓撲、實體層纜線（UTP / 單模光纖）','60:40'],
+[2,'打地基','TCP/IP 與 OSI 七層對照、TCP 三向交握','60:40'],
+[3,'打地基','IPv4 子網路劃分 — 每日 20 題','60:40'],
+[4,'打地基','IPv6 位址類型與縮寫規則','60:40'],
+[5,'打地基','交換原理：MAC Address Table、VLAN','60:40'],
+[6,'打地基','靜態路由 / 預設路由','60:40'],
+[7,'打地基','第一輪模擬測驗（50 題檢視弱點）','60:40'],
+[8,'路由深潛','OSPFv2 鄰居狀態機、Hello/Dead Timer','50:50'],
+[9,'路由深潛','OSPF 網路類型、Router ID、DR/BDR 選舉','50:50'],
+[10,'路由深潛','FHRP（HSRP）、First Hop 冗餘','50:50'],
+[11,'路由深潛','ACL 基本語法與放置位置原則','50:50'],
+[12,'路由深潛','NAT（Static / Dynamic / PAT）完整演練','50:50'],
+[13,'路由深潛','VLAN 間路由：Router-on-a-Stick 與 SVI','50:50'],
+[14,'路由深潛','第二輪模擬測驗 + 錯題本建立','50:50'],
+[15,'存取層與安全','STP/RSTP 根橋選舉與 Port Cost','45:55'],
+[16,'存取層與安全','EtherChannel（LACP/PAgP）模式匹配矩陣','45:55'],
+[17,'存取層與安全','無線架構：Autonomous vs Controller-based、WLC/WLAN','45:55'],
+[18,'存取層與安全','無線安全（WPA2/WPA3）、CAPWAP','45:55'],
+[19,'存取層與安全','實體安全、AAA、密碼強化、Telnet vs SSH','45:55'],
+[20,'存取層與安全','VPN、DHCP Snooping、Dynamic ARP Inspection','45:55'],
+[21,'存取層與安全','第三輪模擬測驗（含 Lab 題型）','45:55'],
+[22,'衝刺收尾','NTP、SNMP v2c/v3、Syslog 嚴重度','40:60'],
+[23,'衝刺收尾','DHCP Relay、QoS 分類標記概念','40:60'],
+[24,'衝刺收尾','JSON/YAML/XML 格式比較','40:60'],
+[25,'衝刺收尾','REST API、HTTP 動詞、Northbound/Southbound API','40:60'],
+[26,'衝刺收尾','SDN 架構、Controller-based Networking、DNA Center','40:60'],
+[27,'衝刺收尾','Terraform/Ansible/Puppet 自動化工具定位','40:60'],
+[28,'衝刺收尾','全科目錯題總複習 + 弱項章節重讀','40:60'],
+[29,'衝刺收尾','完整模考（120 分鐘計時）+ Lab 快速重跑','40:60'],
+[30,'衝刺收尾','輕量複習 Key Takeaways、早睡、確認證件','40:60']];
+const st=document.querySelector('#sched-table tbody');
+sched.forEach(([d,p,t,r])=>{
+ const tr=document.createElement('tr');tr.className='day-row';
+ tr.innerHTML=`<td><b>Day ${d}</b></td><td>${p}</td><td>${t}</td><td>${r}</td><td class="progress-cell"><input type="checkbox" data-d="${d}"></td>`;
+ st.appendChild(tr);
+});
+function loadProg(){
+ let s={};
+ try{s=JSON.parse(localStorage.getItem('ccna-prog')||'{}');}
+ catch(e){localStorage.removeItem('ccna-prog');}
+ document.querySelectorAll('#sched-table input').forEach(c=>{c.checked=!!s[c.dataset.d];c.onchange=()=>{s[c.dataset.d]=c.checked;localStorage.setItem('ccna-prog',JSON.stringify(s));updateProg();};});updateProg();}
+function updateProg(){const n=document.querySelectorAll('#sched-table input:checked').length;
+ const p=Math.round(n/30*100);document.getElementById('prog').style.width=p+'%';document.getElementById('prog').textContent=p+'%';}
+loadProg();
+
+
+/* ================= Key Takeaways 翻卡（50 大極高頻考點） ================= */
+const ktModules = [
+  ['Network Fundamentals（11%）',[
+    ['OSI 七層模型與對應設備/PDU？',' L1 實體層(Hub/Bit)、<br> L2 資料鏈結層(Switch/Frame)、<br> L3 網路層(Router/Packet)、<br> L4 傳輸層(Segment)、<br> L5 Session、<br> L6 Presentation (加密/壓縮)、<br> L7 Application'],
+    ['TCP 三向交握順序？','SYN → SYN-ACK → ACK； <br> 斷線四次揮手 FIN → ACK → FIN → ACK'],
+    ['TCP vs UDP 常見埠號？','TCP：HTTP 80 / HTTPS 443 / SSH 22 / FTP 21； <br> UDP：DNS 53 / DHCP 67,68 / SNMP 161 / TFTP 69 / Syslog 514'],
+    ['IPv4 私有位址範圍？','10.0.0.0/8、172.16.0.0/12、192.168.0.0/16； <br> APIPA 自動私有位址 169.254.0.0/16（DHCP 失敗時）'],
+    ['單模 vs 多模光纖？','單模：長距離、雷射光源、黃色接頭； <br> 多模：短距離、LED 光源、橘色接頭'],
+    ['UTP 纜線類型？','直通線（不同類設備）、跳接線（同類設備）； <br> Gigabit 以上四對全用；Cat5e=1G、Cat6a=10G'],
+    ['IPv6 位址縮寫規則？',':: 每位址限一次（RFC 5952）； <br> 只能刪每組前導零，不可刪尾零'],
+    ['IPv6 位址類型？','Global Unicast (2000::/3)、 <br> Link-local (FE80::/10)、 <br> Unique Local (FC00::/7)、 <br> Multicast (FF00::/8)；無廣播'],
+    ['IPv6 取代廣播的方式？','Multicast（ff02::1 所有節點 / ff02::2 所有路由器）+ NDP 取代 ARP'],
+    ['Subnetting 可用主機數公式？','2^(主機位元數) − 2；Block Size = 256 − 最後非零遮罩值； <br> Wildcard = 255.255.255.255 − 遮罩'],
+    ['虛擬化 Type 1 vs Type 2 Hypervisor？','Type 1 裸機（ESXi/KVM）； <br> Type 2 架於 OS 上（Workstation）； <br> Container 共享 OS Kernel 更輕量']
+  ]],
+  ['Network Access（20%）',[
+    ['STP 根橋選舉順序？','最低 Bridge Priority → 最低 MAC； <br> Gigabit Port Cost 預設 4'],
+    ['RSTP 收斂機制？','Proposal/Agreement 握手 + Alternate Port 即時備援，數秒內收斂'],
+    ['RSTP 埠角色與狀態？','角色：Root/Designated/Alternate/Backup； <br> 狀態三態：Discarding/Learning/Forwarding'],
+    ['VLAN Trunk 封裝重點？','僅支援 802.1Q；Native VLAN 不打標籤明文穿越，兩端必須一致 <br> （建議改閒置 VLAN 999）'],
+    ['EtherChannel LACP 匹配矩陣？','active↔active/passive 可成； <br> on 只能↔on； <br> desirable/auto 是 PAgP 專屬； <br> LACP 不理 PAgP'],
+    ['Port Security 三種違規模式？','protect 靜默丟棄 /  <br> restrict 丟棄+計數+Syslog /  <br> shutdown err-disabled（預設）； <br> 恢復需 shutdown+no shutdown'],
+    ['MAC Address Table vs ARP Table？','MAC Table：L2 交換器「MAC→埠」； <br> ARP Cache：L3 設備「IP→MAC」，不同設備不同層級'],
+    ['CDP vs LLDP？','CDP 是 Cisco 專屬且預設啟用； <br> LLDP 是 IEEE 802.1AB 開放標準，跨廠牌必用'],
+    ['Lightweight AP 架構？','透過 CAPWAP 連回 WLC，Split-MAC 分工； <br> Autonomous AP 適合小型 1–3 台獨立設定'],
+    ['WPA2 vs WPA3？','WPA2-PSK 可離線字典攻擊、AES-CCMP；WPA3-SAE（Dragonfly 握手）抗攻擊、AES-GCMP、強制 PMF'],
+    ['2.4 GHz vs 5 GHz 無線通道？','2.4 GHz 僅 Channel 1、6、11 互不重疊； <br> 5 GHz 快但穿牆弱、覆蓋小'],
+    ['交換器三大轉發行為？','學習（記錄來源 MAC）、轉發（查表送出）、過濾（同埠不重複發送）； <br> 未知單播才 Flood']
+  ]],
+  ['IP Connectivity（25%）',[
+    ['OSPF Cost 公式？','Cost = 參考頻寬 ÷ 介面頻寬，預設參考值 100 Mbps； <br> FastE=1、GigE=1'],
+    ['OSPFv2 鄰居狀態機？','Down→Init→ExStart→Exchange→Loading→Full； <br> 卡在 ExStart 多為 MTU 不符； <br> 穩定目標為 FULL'],
+    ['OSPF DR/BDR 選舉特性？','不具搶佔性；Priority 0 不參選； <br> 順序：① 最高 Priority → ② 最高 Router ID； <br> 先到先得'],
+    ['OSPF 網路類型與計時器？','Broadcast/P2P：Hello 10/Dead 40； <br> NBMA：30/120 <br> （陷阱！）；P2P 免選舉 DR/BDR'],
+    ['路由選擇優先順序？','① Longest Prefix Match  <br> → ② AD（Static=1, EIGRP=90, OSPF=110, RIP=120） <br> → ③ Metric'],
+    ['靜態路由出介面 vs 下一跳？','乙太網是多接取網路必寫下一跳 IP；Serial/P2P 才可用純出介面寫法'],
+    ['ACL 放置黃金法則？','Standard 靠近目的地、 <br> Extended 靠近來源端； <br> 結尾隱含 deny any；「先細後粗、先拒後允」'],
+    ['Standard vs Extended ACL 編號？','Standard：1–99, 1300–1999（僅比對來源 IP）；Extended：100–199, 2000–2699（五元組）'],
+    ['NAT 三種類型比較？','Static NAT 1對1固定發布伺服器；Dynamic NAT 多對多位址池；PAT 多對一（overload=PAT）'],
+    ['HSRP 角色？','Active/Standby 提供預設閘道冗餘，Virtual IP 由主機當 Gateway；預設 Priority 100，需 preempt 才能搶回'],
+    ['SVI vs Router-on-a-Stick？','三層交換器用 interface vlan X（SVI）；單臂路由用子介面 + encapsulation dot1q'],
+    ['VLAN 間路由驗證指令？','show ip interface brief（子介面 up/up）、show vlan brief、跨 VLAN ping 通即成功']
+  ]],
+  ['IP Services（10%）',[
+    ['DHCP DORA 四步驟？','Discover→Offer→Request→Acknowledge；Discover/Request 由 Client 廣播；跨網段需 ip helper-address'],
+    ['Syslog 嚴重度範圍？','0(emergency) 最嚴重 → 7(debugging) 最輕微；logging trap 設定傳送等級門檻'],
+    ['SSH vs Telnet？','SSH：TCP 22 加密（需 RSA 金鑰 + login local）；Telnet：TCP 23 明文不安全'],
+    ['NTP stratum 意義？','數字越小越接近權威時鐘源（stratum 0 為權威源）；驗證 show ntp status 看 synchronized'],
+    ['CoS vs DSCP？','CoS 在 Layer 2（802.1Q Tag 內 3-bit，0–7）；DSCP 在 Layer 3（6-bit，0–63）；語音建議 EF(46)；信任邊界設在第一跳'],
+    ['SNMP v2c vs v3？','v2c 用 Community String 明文；v3 支援認證+加密 authPriv，是唯一具加密版本；Trap 主動告警']
+  ]],
+  ['Security Fundamentals（15%）',[
+    ['Site-to-Site vs Remote Access VPN？','Site-to-Site：閘道器間網路對網路、使用者無感免客戶端；Remote Access：個別裝置需登入'],
+    ['DHCP Snooping / DAI / IPSG 防禦目標？','Snooping 防 Rogue DHCP Server；DAI 防 ARP Spoofing；IPSG 防 IP Spoofing；Snooping 建 Binding Table 供 DAI 使用'],
+    ['實體安全與密碼強化？','service password-encryption 加密明文密碼；enable secret 優於 enable password；閒置埠 shutdown 或設 Black Hole VLAN'],
+    ['Telnet/SSH 安全遠端管理配置順序？','hostname → ip domain-name → crypto key generate rsa → username secret → line vty login local + transport input ssh'],
+    ['AAA 三要素？','Authentication 認證（你是誰）、Authorization 授權（你能做什麼）、Accounting 記錄（你做了什麼）']
+  ]],
+  ['Automation & Programmability（10%）',[
+    ['REST API 特性？','Stateless、HTTP 動詞操作資源（GET/POST/PUT/DELETE）、JSON 主流格式；Northbound 向上、Southbound（NETCONF/OpenFlow）向下'],
+    ['自動化工具定位？','Ansible：Agentless 配置管理；Terraform：Agentless IaC 佈建；Puppet/Chef：Agent-based 配置管理'],
+    ['JSON/YAML/XML 格式差異？','JSON：鍵值對+陣列、機器友善主流；YAML：縮排階層、人類可讀常用於 Ansible；XML：標籤式較冗長'],
+    ['SDN Controller-based 架構？','管理平面集中於 Controller；Northbound API 對上層應用（REST）、Southbound API 對底層設備（NETCONF/OpenFlow）；DNA Center 為 Cisco 實作']
+  ]]
+];
+
+const kc = document.getElementById('kt-cards');
+let flippedCount = 0;
+
+// 模組篩選按鈕
+const filterBar = document.createElement('div');
+filterBar.className = 'kt-filter';
+filterBar.innerHTML = `<button class="active" data-m="all">全部 (${ktModules.reduce((s, [, c]) => s + c.length, 0)})</button>` +
+  ktModules.map(([m, c], i) => `<button data-m="${i}">${m.split('（')[0]} (${c.length})</button>`).join('');
+kc.parentNode.insertBefore(filterBar, kc);
+
+const prog = document.createElement('div');
+prog.id = 'kt-progress';
+prog.textContent = '已翻卡：0 張';
+kc.parentNode.insertBefore(prog, kc);
+
+function renderCards(modIdx) {
+  kc.innerHTML = '';
+  let num = 0;
+  
+  ktModules.forEach(([moduleName, cards], i) => {
+    if (modIdx !== 'all' && modIdx !== i) return;
+    
+    // 建立模組外層區塊
+    const section = document.createElement('div');
+    section.className = 'module-section';
+
+    const heading = document.createElement('h3');
+    heading.className = 'module-title';
+    heading.innerHTML = `<span>${moduleName.split('（')[0]}</span><span class="cnt">${moduleName.match(/（.*?）/)?.[0] || ''} ${cards.length} 卡</span>`;
+    
+    const grid = document.createElement('div');
+    grid.className = 'card-grid';
+    
+    cards.forEach(([q, a]) => {
+      num++;
+      const d = document.createElement('div');
+      d.className = 'flip';
+      d.innerHTML = `
+        <div class="flip-inner">
+          <div class="face front">
+            <span class="num">#${num}</span>
+            <span>${q}</span>
+            <span class="hint">👆 點擊翻面</span>
+          </div>
+          <div class="face back">${a}</div>
+        </div>`;
+        
+      d.onclick = () => {
+        if (!d.classList.contains('flipped')) {
+          flippedCount++;
+          prog.textContent = `已翻卡：${flippedCount} 張`;
+        }
+        d.classList.toggle('flipped');
+      };
+      grid.appendChild(d);
+    });
+
+    section.appendChild(heading);
+    section.appendChild(grid);
+    kc.appendChild(section);
+  });
+}
+
+renderCards('all');
+
+filterBar.querySelectorAll('button').forEach(b => {
+  b.onclick = () => {
+    filterBar.querySelectorAll('button').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    renderCards(b.dataset.m === 'all' ? 'all' : parseInt(b.dataset.m));
+  };
+});
+
+/* ================= 易混淆對照表（38 條 · 模組分類） ================= */
+const cmpModules=[
+['Network Fundamentals',[
+['OSI L2 vs L3 設備',[['主要功能','Switch：MAC 轉發、VLAN 劃分','Router：跨網段路由、WAN','L3 Switch = 會路由的交換器'],['轉發依據','MAC Table','Routing Table','L3 Switch 兩者皆有，ASIC 硬體轉發']]],
+['TCP vs UDP',[['連線性','面向連線，三向交握','無連線','「TCP 可靠、UDP 快」'],['可靠性','ACK、重傳、排序','不保證送達','DNS/DHCP/語音走 UDP'],['常見埠','HTTP 80/HTTPS 443/SSH 22/FTP 21','DNS 53/DHCP 67,68/SNMP 161/TFTP 69/Syslog 514','埠號必背']]],
+['單模 vs 多模光纖',[['傳輸距離','長距離（數十 km）','短距離（數百 m）','長單模、短多模'],['光源與接頭','雷射 Laser / 黃色','LED / 橘色','看顏色判斷']]],
+['UTP 直通線 vs 跳接線',[['適用對象','不同類設備（PC↔Switch）','同類設備（PC↔PC、Switch↔Switch）','Gigabit 以上 Auto-MDIX 多已自動判別']]],
+['IPv4 私有位址 vs APIPA',[['範圍','10.0.0.0/8、172.16.0.0/12、192.168.0.0/16','169.254.0.0/16','APIPA = DHCP 失敗的自動配置，不可路由'],['用途','內部網路規劃','鏈路本機臨時通訊','考題見 169.254 → DHCP 有問題']]],
+['IPv6 Link-local vs Global Unicast',[['前綴','FE80::/10','2000::/3','Link-local 每介面必有一個'],['用途','鄰居發現/路由協定下一跳','網際網路可路由位址','OSPFv3 用 Link-local 建鄰居']]],
+['Hypervisor Type 1 vs Type 2',[['架構位置','直接安裝於硬體上（Bare-metal）','安裝於作業系統之上（Hosted）','裸機一型、宿主二型'],['效能用途','資料中心高效能（ESXi/KVM）','桌面測試個人使用（Workstation）','Container 共享 Kernel 更輕量']]]
+]],
+['Network Access',[
+['STP vs RSTP',[['埠角色','Root/Designated/Non-designated','增加 Alternate/Backup Port','「RSTP 有備胎」'],['埠狀態','Blocking→Listening→Learning→Forwarding','Discarding/Learning/Forwarding','三態取代四態'],['收斂時間','30–50 秒','數秒內（Proposal/Agreement）','問最快選 RSTP'],['計時器依賴','Hello/Forward Delay/Max Age','事件驅動握手','RSTP 不等計時器']]],
+['VLAN Access Port vs Trunk Port',[['承載 VLAN 數','僅 1 個','多個 VLAN','Trunk 需 802.1Q 封裝'],['連接對象','End Host（PC/印表機）','Switch↔Switch、Switch↔Router/AP','Native VLAN 不打標籤，兩端必一致']]],
+['802.1Q Native VLAN 行為',[['標籤狀態','不打標籤明文穿越','其他 VLAN 皆打標籤','兩端不一致 → VLAN 洩漏/Hopping'],['安全建議','改為閒置編號（VLAN 999）','','show interfaces trunk 驗證一致性']]],
+['EtherChannel LACP vs PAgP vs Static',[['協定','LACP（IEEE 802.3ad 開放）','PAgP（Cisco 專屬）','on = 無協商靜態'],['模式','active/passive','desirable/auto','on 只能↔on；跨協定互不相通'],['驗證','show etherchannel summary → Po 標 SU、埠 P','','SU=Layer2+Used；P=Bundle Port']]],
+['Port Security 三種違規模式',[['行為','protect：丟棄不通知','restrict：丟棄+計數+Syslog','shutdown：err-disabled（預設）'],['恢復方式','自動恢復','自動恢復','需 shutdown+no shutdown 或 errdisable recovery','protect 靜默、restrict 吵鬧、shutdown 關燈']]],
+['MAC Address Table vs ARP Table',[['所在設備','L2 交換器','L3 設備（Router/L3 Switch）','不同設備、不同層級'],['對應關係','MAC → 埠','IP → MAC','交換機找埠、路由器找 MAC']]],
+['CDP vs LLDP',[['標準','Cisco 專有','IEEE 802.1AB 開放標準','跨廠牌用 LLDP'],['預設狀態','全域啟用','多數平台需手動啟用 lldp run','混合環境必用 LLDP'],['驗證指令','show cdp neighbors [detail]','show lldp neighbors [detail]','非 Cisco 設備選 LLDP']]],
+['Autonomous AP vs Lightweight AP',[['配置方式','每台獨立設定','WLC 集中管理','Lightweight 集中管'],['協定','無隧道','CAPWAP 隧道','Split-MAC 分工'],['適用規模','小型 1–3 台','中大型企業','集中管理選 Controller-based']]],
+['WPA2 vs WPA3',[['金鑰交換','PSK（可離線字典攻擊）','SAE（Dragonfly 握手，抗離線攻擊）','最新最安全選 WPA3'],['加密演算法','AES-CCMP','AES-GCMP','WPA3 強制 PMF 保護'],['企業版','WPA2-Enterprise (802.1X)','WPA3-Enterprise','802.1X/EAP 兩代皆用']]],
+['2.4 GHz vs 5 GHz',[['通道重疊','僅 1、6、11 不重疊','通道多且互不干擾','2.4G 記 1-6-11'],['特性','穿牆強、速度慢','速度快但穿牆弱、覆蓋小','漫遊漫遊範圍考量選 2.4G']]],
+['DHCP Snooping vs DAI vs IP Source Guard',[['防禦目標','Rogue DHCP Server','ARP Spoofing','IP Spoofing'],['運作層級','監聽 DHCP 訊息建立 Binding Table','比對 Binding Table 驗證 ARP','比對 Binding Table 驗證 IP+MAC','Snooping→DAI→IPSG 層層防護，皆需 Trust Port 配置']]]
+]],
+['IP Connectivity',[
+['Static Route vs Default Route',[['目的','指定特定目的地網段','0.0.0.0/0 匹配所有未知目的地','Default = Gateway of last resort'],['AD 值','Static = 1','Static = 1','show ip route 中標 S / S*（*為候選預設）']]],
+['Longest Prefix Match vs AD vs Metric',[['仲裁順序','① 最長前綴優先','② 相同前綴才比 AD','③ 再比 Metric','/24 static（AD 1）勝過 /16 OSPF（110）']]],
+['常見路由協定 AD 值',[['AD','Static=1 / EIGRP=90 / OSPF=110','RIP=120 / External EIGRP=170','數字越小越可信；浮動靜態路由靠 AD 備援']]],
+['OSPF Broadcast vs Point-to-Point vs NBMA',[['DR/BDR','有選舉','無選舉','NBMA 有選舉','P2P 免選舉'],['Hello/Dead Timer','10/40 秒','10/40 秒','30/120 秒（陷阱！）','乙太網預設 Broadcast'],['適用介質','Ethernet 多接取','Serial/GRE Tunnel','Frame Relay','NBMA 計時器不符導致鄰居卡住']]],
+['OSPF DR/BDR 選舉 vs RSTP 根橋選舉',[['比較順序','最高 Priority（0 不參選）→ 最高 Router ID','最低 Priority → 最低 MAC','一個取最大、一個取最小，勿混！'],['搶佔性','不具搶佔性（先到先得）','根橋固定由 Priority/MAC 決定','後加入的高優先 OSPF 路由器不會搶走 DR']]],
+['Standard vs Extended ACL',[['匹配條件','僅來源 IP','來源/目的 IP+Protocol+Port','Extended 五元組'],['編號範圍','1–99, 1300–1999','100–199, 2000–2699','命名 ACL 無編號限制'],['放置位置','近目的','近來源','Stan 靠遠、Ext 靠近'],['結尾','隱含 deny any（務必補 permit any any）','','先細後粗、先拒後允']]],
+['SVI vs Router-on-a-Stick',[['適用設備','三層交換器（interface vlan X）','Router 子介面 + encapsulation dot1q','三層交換器用 SVI，單臂用子介面'],['效能','ASIC 硬體轉發較快','單一實體介面承載所有 VLAN 流量','ROAS 是瓶頸風險點']]],
+['HSRP vs VRRP vs GLBP',[['標準','Cisco 專屬','IEEE 開放標準','Cisco 專屬（可負載平衡）'],['角色名稱','Active/Standby','Master/Backup','AVG/AVF'],['Virtual MAC','0000.0C07.ACxx','0000.5E00.01xx','—','HSRP 預設 Priority 100 + preempt 才能搶回']]]
+]],
+['IP Services',[
+['Static NAT vs Dynamic NAT vs PAT',[['映射關係','1 對 1 固定','多對多（位址池）','多對一（IP+Port）'],['適用場景','內部伺服器對外發布','中型企業臨時上網','家用/大量主機共用','overload=PAT；漏寫 overload 連線失敗']]],
+['NTP Server vs Client vs Stratum',[['角色','提供時間來源（stratum 1 接權威鐘）','ntp server <ip> 向上游同步','stratum 0=權威鐘，數字越小越接近來源'],['驗證','show ntp status → synchronized','','show ntp associations 看上游狀態']]],
+['SNMP v2c vs v3',[['安全性','Community String 明文','認證+加密 authPriv','問安全必選 v3'],['功能','Get/Set/Trap','同左 + 細緻權限控制（群組/視圖）','v3 唯一具加密版本；Trap 是主動告警']]],
+['Syslog vs SNMP Trap',[['方向','設備主動推送日誌至 Syslog Server','設備主動告警事件至 NMS','兩者皆為主動通知'],['內容格式','文字訊息 + 嚴重度 0–7','MIB OID 物件資料','logging trap <level> 設傳送門檻']]],
+['CoS vs DSCP vs IP Precedence',[['所在層級','Layer 2（802.1Q Tag 內 3-bit）','Layer 3（ToS 位元組前 6-bit）','Layer 3（前 3-bit）'],['值域','0–7','0–63（EF=46 語音、AF31=26）','0–7','二層 CoS、三層 DSCP；信任邊界設第一跳'],['QoS 分類 vs 標記','分類 Classify：辨識流量','標記 Marking：寫入 CoS/DSCP','','class-map 分類、policy-map set dscp ef 標記']]]
+]],
+['Security Fundamentals',[
+['AAA Authentication vs Authorization vs Accounting',[['功能','你是誰（帳密/憑證）','你能做什麼（指令權限等級）','你做了什麼（記錄稽核）'],['常用協定','RADIUS（UDP 1812）、TACACS+（TCP 49）','TACACS+ 支援逐指令授權','802.1X = EAPoL + RADIUS 場景']]],
+['Site-to-Site vs Remote Access VPN',[['使用者','網路對網路（閘道器間）','個別使用者裝置','站對站不需客戶端軟體'],['透明性','使用者無感','需撥接/登入','分公司互連=Site-to-Site']]],
+['SSH vs Telnet 安全遠端管理',[['埠與安全','SSH：TCP 22 加密','Telnet：TCP 23 明文','一律選 SSH'],['配置前置','hostname → domain-name → RSA 金鑰 → username secret → vty login local + transport input ssh','','缺 RSA 金鑰 SSH 無法啟動']]],
+['enable password vs enable secret',[['儲存方式','明文（可用 service password-encryption 弱加密）','MD5/SCRYPT 雜湊','secret 優先且更安全'],['最佳實務','已淘汰建議不用','一律用 enable secret','username 也用 secret 非 password']]],
+]],
+['Automation & Programmability',[
+['Controller-based vs 傳統分散式管理平面',[['管理平面位置','集中於 Controller（SDN/DNA Center）','每台設備自行運作','集中式可全域視圖+自動化'],['資料平面','仍在設備本地轉發','本地','SDN 分離控制/資料平面，非全在雲端']]],
+['REST API vs CLI',[['互動方式','HTTP 動詞操作資源','文字指令逐行下達','API 可程式化、批次化'],['資料結構','結構化 JSON（鍵值對、陣列）','非結構化純文字輸出','JSON 機器看得懂'],['狀態性','Stateless（攜帶 Token）','Session 保持登入','REST 無狀態是必考定義']]],
+['HTTP 動詞 CRUD 對應',[['GET=讀取 Read / POST=建立 Create','PUT=完整更新 Update','PATCH=部分更新 / DELETE=刪除 Delete','RESTful 必背對應表']]],
+['Northbound vs Southbound API',[['方向','Controller → 上層應用','Controller → 底層設備','北向上、南向下'],['常見技術','REST API','NETCONF、OpenFlow','SDN 架構圖方向題']]],
+['Ansible vs Terraform vs Puppet/Chef',[['架構','Agentless（SSH/API）','Agentless','Agent-based（需裝代理）','Ansible 免裝代理'],['定位','配置管理 Configuration Mgmt','基礎架構即代碼 IaC 佈建','配置管理','佈建基礎架構選 Terraform'],['語言','YAML Playbook','HCL','Ruby DSL','Ansible 用 YAML 人類可讀']]],
+['JSON vs YAML vs XML',[['語法','鍵值對 + 陣列 {} []','縮排階層（無括號）','標籤式 <> 成對'],['可讀性','機器友善主流','人類最易讀（Ansible 用）','冗長但嚴謹','REST API 回傳 JSON；Playbook 用 YAML']]]
+]]
+];
+
+const cl=document.getElementById('cmp-list');
+let cmpTotal=0;
+
+// 工具列：搜尋 + 模組篩選
+const tools=document.createElement('div');tools.id='cmp-tools';
+tools.innerHTML=`<input id="cmp-search" placeholder="🔍 搜尋對照表…">`+
+ cmpModules.map(([moduleName],i)=>`<button data-m="${i}">${moduleName}</button>`).join('')+
+ `<button class="active" data-m="all">全部</button>`;
+cl.parentNode.insertBefore(tools,cl);
+
+let activeModule='all';
+function renderCmp(){
+ cl.innerHTML='';cmpTotal=0;
+ const kw=(document.getElementById('cmp-search').value||'').toLowerCase();
+ cmpModules.forEach(([modName,tables],i)=>{
+  if(activeModule!=='all'&&activeModule!=i)return;
+  const visible=tables.filter(([t])=>!kw||t.toLowerCase().includes(kw));
+  if(!visible.length)return;
+  const h=document.createElement('h3');h.className='cmp-module';
+  h.innerHTML=`<span>${modName}</span><span class="cnt">${visible.length} 表</span>`;
+  const wrap=document.createElement('div');
+  visible.forEach(([title,rows],ti)=>{
+   cmpTotal++;
+   const d=document.createElement('details');if(kw||activeModule==='all')/*保持收合*/;
+  let html='<table><tbody>';
+   rows.forEach(r=>{html+='<tr>'+r.map(c=>`<td>${c??''}</td>`).join('')+'</tr>';});
+   html+='</tbody></table>';
+  d.innerHTML=`<summary>${title}</summary><div class="body">${html}</div>`;
+   wrap.appendChild(d);
+  });
+  cl.appendChild(h);cl.appendChild(wrap);
+ });
+ renderCmp.n=0;
+ // 重新編號（依渲染順序）
+ cl.querySelectorAll('summary').forEach(s=>{const t=s.textContent;s.innerHTML=s.innerHTML.replace(/^#\d+/,'#'+(++renderCmp.n));});
+}
+renderCmp();
+
+tools.querySelectorAll('button').forEach(b=>b.onclick=()=>{
+ tools.querySelectorAll('button').forEach(x=>x.classList.remove('active'));
+ b.classList.add('active');activeModule=b.dataset.m;renderCmp();
+});
+document.getElementById('cmp-search').oninput=renderCmp;
+
+
+/* ================= Lab Cisco IOS 實作指令（CCNA 200-301 完整版 35 Labs） ================= */
+const labs=[
+
+// ---------- 網路存取 Network Access ----------
+['Lab ：VLAN 基本建立與埠指派',`vlan 10\n name SALES\nvlan 20\n name IT\ninterface f0/1\n switchport mode access\n switchport access vlan 10`,
+ `show vlan brief → 各介面所屬 VLAN\nshow interfaces status → 埠 VLAN 與狀態\n排錯：VLAN 未建時 access port 不生效，需先 vlan 10`],
+
+['Lab ：Trunking 與 Native VLAN',`interface g0/1\n switchport mode trunk\n switchport trunk native vlan 99\n switchport trunk allowed vlan 10,20,99`,
+ `show interfaces trunk → Trunking Mode on、Native VLAN 一致性\n排錯：兩端 Native VLAN 不一致會造成 VLAN hopping / CDP mismatch 訊息；allowed vlan 缺漏導致單向不通`],
+
+['Lab ：DTP 關閉與安全端口模式',`interface range g0/1-24\n switchport nonegotiate\n switchport mode access\n shutdown   ! 未用埠預設關閉`,
+ `show interfaces trunk → DTP off\n排錯：dynamic auto 對 dynamic auto 不會形成 trunk，導致跨交換機 VLAN 不通`],
+
+['Lab ：EtherChannel LACP/PAGP',`interface range g0/1-2\n channel-group 1 mode active\ninterface port-channel 1\n switchport mode trunk`,
+ `show etherchannel summary → Po1 標記 SU、埠為 P\nshow etherchannel load-balance\n排錯：LACP：mode active 對 active/passive 才能成；\n PAgP：mode desirable 對 desirable/auto  才能成；\n 兩端 channel-group number 可不同但協定需相容；速度/duplex/vlan 不符會 suspend`],
+
+['Lab ：Port Security 進階',`interface f0/1\n switchport mode access\n switchport port-security\n switchport port-security maximum 1\n switchport port-security mac-address sticky\n switchport port-security violation restrict`,
+ `show port-security interface f0/1 → Secure-up、Violation Mode restrict（丟棄+計數+Syslog，不 shutdown）\nshow port-security address → Sticky MAC 清單\n排錯：err-disabled 復原 errdisable recovery cause psecure-violation`],
+
+['Lab ：語音 VLAN 與 PoE',`interface f0/5\n switchport voice vlan 150\n switchport access vlan 10`,
+ `show interfaces f0/5 switchport → Voice VLAN 150\n排錯：IP Phone 不通先查 PoE show power inline`],
+
+// ---------- IP Connectivity ----------
+['Lab ：Router-on-a-Stick VLAN 間路由',`interface g0/0.10\n encapsulation dot1q 10\n ip address 192.168.10.1 255.255.255.0\ninterface g0/0.20\n encapsulation dot1q 20\n ip address 192.168.20.1 255.255.255.0\ninterface g0/0\n no shutdown`,
+ `show ip interface brief → 子介面 up/up\nPC 跨 VLAN ping 通即成功\n排錯：忘記 no shutdown 主介面則所有子介面 down`],
+
+['Lab ：SVI 三層交換 VLAN 間路由',`ip routing\ninterface vlan 10\n ip address 192.168.10.1 255.255.255.0\n no shutdown`,
+ `show ip route connected → C 條目\n排錯：L3 switch 忘 ip routing 則 SVI 間不轉送；VLAN 內無活動埠 SVI 會 down/down`],
+
+['Lab ：靜態路由與浮動靜態路由',`ip route 192.168.20.0 255.255.255.0 10.0.0.2\nip route 192.168.20.0 255.255.255.0 172.16.0.2 90\nip route 0.0.0.0 0.0.0.0 203.0.113.1`,
+ `show ip route static → S 路由、AD 90 浮動備援\nshow ip route → Gateway of last resort 標記 *\n排錯：下一跳遞迴不可解時靜態路由不會裝表`],
+
+['Lab ：OSPFv2 單區域',`router ospf 1\n router-id 1.1.1.1\n network 10.0.0.0 0.0.0.255 area 0\n passive-interface g0/0`,
+ `show ip ospf neighbor → FULL/DR、BDR 角色\nshow ip route ospf → O 路由 Cost=100Mbps/BW 累加\nshow ip protocols → Area、Passive Interface\n排錯：Hello/Dead Timer、Area ID、MTU 不匹配鄰居起不來`],
+
+['Lab ：OSPF 多區域與 ABR/ASBR',`router ospf 1\n network 10.0.0.0 0.0.0.255 area 0\n network 192.168.30.0 0.0.0.255 area 1`,
+ `show ip ospf → Router is an area border router\nshow ip route ospf → O IA 區域間路由\n排錯：area 0 不連續需 virtual-link（考試僅考觀念）`],
+
+['Lab ：OSPFv3 IPv6 單區域',`ipv6 unicast-routing\nipv6 router ospf 10\n router-id 2.2.2.2\ninterface g0/0\n ipv6 ospf 10 area 0`,
+ `show ipv6 ospf neighbor → FULL\nshow ipv6 route ospf → OE/OI\n排錯：OSPFv3 必須手動指定 router-id 否則進程不啟動`],
+
+['Lab ：第一跳冗餘 FHRP 觀念與 HSRP',`interface g0/0\n standby version 2\n standby 1 ip 192.168.1.254\n standby 1 priority 110\n standby 1 preempt`,
+ `show standby brief → Active/Standby、Virtual IP\nshow standby → Priority、Preempt、Hello 1s/Hold 3s\n排錯：priority 相同比較 IP 大者為 Active；preempt 缺失時故障恢復不搶回角色\n另識別 VRRP（master）、GLBP（AVG/AVF 負載平衡）差異`],
+
+['Lab ：IPv6 位址配置（SLAAC/EUI-64/Link-local）',`ipv6 unicast-routing\ninterface g0/0\n ipv6 address 2001:db8:acad:1::1/64\n ipv6 address fe80::1 link-local`,
+ `show ipv6 interface brief → Global + Link-local 雙位址\nPC 端 SLAAC 取得位址並產生 Default Gateway (fe80::)\n排錯：RA 停止發送（ipv6 nd suppress-ra）客戶端拿不到預設閘道`],
+
+['Lab ：IPv6 靜態與預設路由',`ipv6 route 2001:db8:acad:2::/64 2001:db8:acad:12::2\nipv6 route ::/0 2001:db8:acad:12::2`,
+ `show ipv6 route static → S 與 ::/0\nping（IPv6 格式）跨網段連通性\n排錯：下一跳必須是 link-local 或 global 位址且可達`],
+
+// ---------- IP Services ----------
+['Lab ：DHCP Server 配置與排除',`ip dhcp excluded-address 192.168.20.1 192.168.20.10\nip dhcp pool LAN20\n network 192.168.20.0 255.255.255.0\n default-router 192.168.20.1\n dns-server 8.8.8.8\n domain-name lab.local`,
+ `show ip dhcp binding → IP-MAC 對應\nshow ip dhcp pool → 使用率\nPC ipconfig /all → IP/Gateway/DNS 正確`],
+
+['Lab ：DHCP Relay（ip helper-address）',`interface g0/0\n ip helper-address 10.0.0.1`,
+ `debug ip dhcp server events\n排錯：Relay 後 DHCP Discover 以 giaddr 欄位選池；helper 未設定或 ACL 擋 UDP 67/68 導致取不到位址`],
+
+['Lab ：NAT Static / Dynamic / PAT',`ip nat inside source static 192.168.1.5 203.0.113.5\nip nat pool POOL 203.0.113.10 203.0.113.20 netmask 255.255.255.240\nip nat inside source list 1 pool POOL\nip nat inside source list 1 interface g0/2 overload\naccess-list 1 permit 192.168.1.0 0.0.0.255\ninterface g0/0 → ip nat inside\ninterface g0/2 → ip nat outside`,
+ `show ip nat translations → Inside/Outside Global/Local 四欄位\nshow ip nat statistics → Hits/Misses、inside/outside 標記\n排錯：inside/outside 方向掛反 NAT 完全不觸發`],
+
+['Lab ：SSH 安全遠端管理',`hostname R1\nip domain-name lab.local\ncrypto key generate rsa general-keys modulus 1024\nusername admin secret Cisco123!\nline vty 0 4\n login local\n transport input ssh`,
+ `show ip ssh → SSH version 2\nshow users → 登入來源與協定\n排錯：RSA 金鑰 <768 bits 無法啟 SSHv2；domain-name 未設無法生金鑰`],
+
+['Lab ：QoS 分類標記與信任邊界',`class-map match-any VOICE\n match protocol rtp\npolicy-map MARKING\n class VOICE\n  set dscp ef\ninterface g0/0\n service-policy input MARKING`,
+ `show policy-map interface g0/0 → Class Matched Packets、DSCP 統計\n觀念：Trust boundary 在接入層標記，EF=46 語音、AF31 影像、Best Effort DSCP 0`],
+ 
+['Lab ：SNMP v2c / v3',`snmp-server community RO123 ro\nsnmp-server location HQ\nsnmp-server host 10.0.0.50 version 3 auth user1\nsnmp-server enable traps`,
+ `SNMP Manager GUI → OID 讀取成功\n觀念：v3 提供 auth（MD5/SHA）與 priv（AES/DES 加密）；trap 是主動通知、poll 是被動查詢`],
+
+['Lab ：Syslog 與 Log Severity',`logging host 10.0.0.200\nlogging trap warning\nservice timestamps log datetime msec`,
+ `Syslog Server GUI → 嚴重度 0-7（emergency→debugging）、warning=4\n排錯：console logging level 與 trap level 不同步造成「看得到/收不到」落差`],
+
+['Lab ：NTP 同步',`ntp server 10.0.0.100\nntp master 3   ! 本機作 NTP Source 時\nntp authenticate / ntp authentication-key 1 md5 ... （選配驗證）`,
+ `show ntp status → synchronized、stratum\nshow ntp associations → * 標記同步來源\n排錯：時間差異影響憑證/Syslog 排序，stratum 數字越小越權威`],
+
+
+// ---------- Security Fundamentals ----------
+['Lab ：標準與延伸 ACL',`access-list 10 permit 192.168.1.0 0.0.0.255\naccess-list 100 deny tcp 192.168.1.0 0.0.0.255 host 172.16.0.100 eq 23\naccess-list 100 permit ip any any\ninterface s0/0/0\n ip access-group 100 out`,
+ `show access-lists → matches 計數\nshow ip interface → ACL 掛載方向\n排錯：隱含 deny any、順序由上而下、標準 ACL 放近目的地/延伸放近來源`],
+
+['Lab ：命名 ACL 與編輯',`ip access-list extended BLOCK_TELNET\n 10 deny tcp 192.168.1.0 0.0.0.255 host 172.16.0.100 eq telnet\n 20 permit ip any any`,
+ `show access-lists → 序號顯示\nip access-list extended BLOCK_TELNET → no 10 / 15 deny ... 可插入修改\n排錯：編號 ACL 只能整條刪除重建`],
+
+['Lab ：ACL 管理 Telnet/VTY 流量',`access-list 20 permit host 10.0.0.10\nline vty 0 4\n access-class 20 in`,
+ `telnet 測試：允許主機通、其他拒絕\n排錯：access-class 用於 VTY 過濾管理流量，非資料平面`],
+
+['Lab ：AAA 與 802.1X 觀念',`aaa new-model\naaa authentication login default group tacacs+ local\nradius-server host 10.0.0.100 auth-port 1812 key cisco`,
+ `test aaa group tacacs+ admin Cisco123 legacy\n觀念：802.1X 三元件 Supplicant/Authenticator(Authentication Server)、EAPoL；TACACS+=Cisco 私有 TCP49 全加密、RADIUS=開放 UDP1812 僅密碼加密`],
+
+['Lab ：密碼強化與裝置防護',`enable secret StrongPass!\no exec-timeout\nlogin block-for 120 attempts 3 within 60\nbanner motd #Authorized Only#\ncopy running-config startup-config`,
+ `show login → 登入封鎖狀態\n觀念：enable secret 以 MD5/SCRYPT 儲存優於 enable password；startup-config 斷電保存`],
+
+['Lab ：DHCP Snooping / DAI / BPDU Guard（Layer 2 防護）',`ip dhcp snooping\nip dhcp snooping vlan 10\ninterface g0/24\n ip dhcp snooping trust\nip arp inspection vlan 10\ninterface range f0/1-10\n spanning-tree bpduguard enable\n spanning-tree portfast`,
+ `show ip dhcp snooping binding\nshow ip arp inspection statistics\n排錯：untrust 口收到 DHCP Offer 被 drop；PortFast+BPDUGuard 防 rogue switch`],
+
+// ---------- Automation & Programmability ----------
+['Lab ：控制器架構 SDN 與 Cisco DNA Center',`! 觀念：傳統分散式控制平面 vs Controller-Based\n! DNA Center：Northbound REST API / Southbound NETCONF-RESTCONF-SNMP\n! 分離 Control Plane 與 Data Plane`,
+ `DNA Center GUI → Inventory/Topology/Assurance\n觀念：SDN 控制器集中運算拓撲與路徑（Overlay/Underlay、Fabric）`],
+
+['Lab ：REST API 與 JSON/YAML/XML',`! curl 示範呼叫 DNA Center API：\n! POST https://dnac/api/system/v1/auth/token\n! GET https://dnac/api/v1/network-device （Header: X-Auth-Token）`,
+ `回傳驗證：JSON {key:value}、陣列 []；YAML 以縮排表示結構常用於 Ansible\n觀念：JSON 較 XML 輕量、YAML 人類可讀性最佳；HTTP 方法 GET/POST/PUT/DELETE 語意`],
+
+['Lab ：Ansible / Terraform 自動化與 Python 基礎',`# Ansible playbook.yml\n---\n- name: Configure VLAN\n  hosts: switches\n  tasks:\n    - cisco.ios.ios_vlans:\n        name: SALES\n        vlan_id: 10\n# Python paramiko/netmiko 連線執行 show vlan brief`,
+ `ansible-playbook playbook.yml -i inventory → changed=1 成功\n觀念：IaC 宣告式（Terraform）/程序式（Ansible）差異；Python dict/list 對應 JSON 結構解析`],
+
+ // ----------  ----------
+['Lab ：無線 WLC / WLAN 設定',`! WLC GUI：WLANs → Create New → General（SSID、Status Enabled）\n! → Security → Layer 2 WPA+WPA2 PSK → QoS Profile\n! AP Join 需 CAPWAP UDP 5246/5247 可達`,
+ `WLC Monitor → Clients：Associated/Authenticated、WPA2\nshow ap summary（WLC CLI）\n排錯：AP 未註冊檢查 DHCP option 43 / DNS cisco-capwap-controller 解析`],
+
+['Lab ：無線組態要素（Controller vs Autonomous）',`! 觀念題重點：Split-MAC 架構中 Association 由 AP 處理、\n! Authentication/Association Request 轉交 WLC；Autonomous AP 為獨立設定`,
+ `WLC Monitor → AP Join Statistics\n排錯：CAPWAP tunnel 不通常見於 MTU/防火牆擋 UDP 5246`],
+
+ ['Lab ：VPN 與加密基礎觀念',`! 觀念 Lab：Site-to-Site IPSec vs SSL VPN（AnyConnect）\n! IKE Phase1(UDP500) / Phase2 ESP(Protocol 50)`,
+ `show crypto isakmp sa → ACTIVE（若實作）\n觀念題重點：機密性(AES)/完整性(SHA/HMAC)/來源認證(DH)；SSL VPN 適合遠端使用者、不需 client 端預設安裝`],
+
+];
+const ll=document.getElementById('lab-list');
+labs.forEach(([t,cfg,v])=>{
+ const d=document.createElement('details');
+ d.innerHTML=`<summary>${t}</summary><div class="body"><pre>${cfg.replace(/</g,'&lt;')}</pre><p><b>🔍 驗證指令：</b></p><pre>${v.replace(/</g,'&lt;')}</pre></div>`;
+ ll.appendChild(d);
+});
+
+/* ================= 陷阱避坑（CCNA 200-301） ================= */
+const pits=[
+
+// ---------- 基礎與子網劃分 ----------
+['Subnetting / Wildcard Mask 計算','把 Subnet Mask 直接反轉當 Wildcard，如 /27 寫成 0.0.0.128','Wildcard = 255.255.255.255 − Subnet Mask；可用主機數要減 2。Wildcard 最後一位元組 = 256 − Block Size。/27 → 32 → 0.0.0.31','256 減塊長，減一再加頭'],
+
+['可用 IP 數量與網段/廣播位址判斷','把 Network Address 或 Broadcast Address 當成可分配給主機的 IP；/31 忘了例外','每個 subnet 減 2（Network + Broadcast）；唯獨 /31（RFC 3021 點對點鏈路）有 2 個可用位址、無廣播概念。考題常問「最多幾台主機」要扣 2','減二才可用，/31 是特例'],
+
+['Longest Prefix Match vs AD vs Metric 三層仲裁','認為 AD 低的路由永遠優先，或 Metric 小就一定勝出','順序：① Longest Prefix Match → ② AD → ③ Metric。AD 只在相同 prefix length 時比較。/24 static（AD 1）勝過 /16 OSPF（AD 110）','最長前綴 > AD > Metric，三關依序闖'],
+
+['Loopback Interface 作為 Router ID','誤以為 OSPF Router ID 一定要配在實體介面','優先序：① 手動 router-id → ② 最高 Loopback IP → ③ 最高實體介面 IP。Router ID 不需存在路由表中即可被選為 DR/BDR 身分','手動 > Loopback > 實體，數字大者勝'],
+
+// ---------- Switching / Layer 2 ----------
+['EtherChannel 模式匹配失敗','desirable（PAgP）配 passive（LACP），或 on 配 active','PAgP 與 LACP 互不相通；on 不發送協商封包。矩陣：on↔on、active↔(active/passive)、desirable↔(desirable/auto)','on 只跟 on，LACP 不理 PAgP'],
+
+['MAC Address Table vs ARP Table','認為交換器靠 ARP 表轉發','MAC Table：L2 交換器「MAC→埠」；ARP Cache：L3 設備「IP→MAC」','交換機記 MAC 找埠，路由器記 IP 找 MAC'],
+
+['Native VLAN 與 Trunk 驗證','兩端 Native VLAN 不一致仍認為正常；誤以為 Native VLAN 也打標籤','Native VLAN 幀不打標籤明文穿越，不一致造成 VLAN 洩漏/Hopping。show interfaces trunk 兩端必須一致；建議改用閒置編號如 VLAN 999','Native 不打標，兩端要對齊'],
+
+['DTP 協商結果誤判','兩端都設 dynamic auto 就期待形成 Trunk','dynamic auto 對 dynamic auto = access（不協商成功）；dynamic desirable 對 auto 才會成 trunk。安全最佳實務：明確 switchport mode access + nonegotiate','auto 配 auto 變 access，安全埠直接指定模式'],
+
+['Port Security 違規模式行為差異','三種違規模式都會關閉埠或反應相同','只有 shutdown（預設）進入 err-disabled；restrict 有 Syslog+違規計數；protect 完全靜默丟棄。恢復：shutdown+no shutdown 或 errdisable recovery cause psecure-violation','protect 靜默、restrict 吵鬧、shutdown 關燈'],
+
+['Port Security Sticky MAC 的本質','誤把 sticky 當作動態學習後永久寫入 NVRAM','sticky 是「動態學習後複製到 running-config」，必須 copy run start 才斷電保存；未存檔重啟即消失','Sticky 存在 running-config，存檔才算真保存'],
+
+['VLAN 1 安全風險與管理 VLAN 規劃','所有流量走 VLAN 1 且認為這是最佳實務','VLAN 1 是預設 Native/Management VLAN，易受攻擊。應將 Management 移至獨立 VLAN、Native 改閒置 VLAN 並關閉未用埠','別住在一樓（VLAN 1），搬去高樓層'],
+
+['Trunk allowed vlan 缺漏導致單向不通','只在一端加新 VLAN 到 allowed list，另一端忘記','allowed vlan 清單兩端必須涵蓋該 VLAN，否則該 VLAN 流量被丟棄。驗證 show interfaces trunk 比對 VLANs allowed 欄位','允許清單兩邊抄，少一個就不通'],
+
+['CDP/LLDP 面向不可信網段未停用','全域開啟 CDP/LLDP 且面向 Internet 也照開','鄰居發現協定洩漏設備型號、IOS 版本、IP，是攻擊偵察利器。面向不可信網段：no cdp enable / no lldp transmit','內網開著方便排錯，外網關掉保平安'],
+
+// ---------- Routing ----------
+['Static Route 出介面 vs 下一跳 IP','乙太網路上只寫出介面而不指定下一跳 IP','乙太網是多接取網路，路由器不知道 ARP 誰，可能產生大量 ARP 查詢甚至失敗；Serial 點對點才適合純出介面','乙太網必寫下一跳 IP；Serial/P2P 才可出介面'],
+
+['浮動靜態路由 AD 設計','備援路由忘了調高 AD，或設得比動態協定還低','浮動靜態 = 同目的多條路徑中 AD 較高的那條平時不裝表。OSPF(110) 備援需設 AD > 110，如 ip route ... 120','備援路 AD 要比主路高才會沉睡'],
+
+['OSPF Hello/Dead Timer 與 Area 不匹配','鄰居起不來時只查 IP 和密碼','Hello/Dead Timer（10/40 秒）、Area ID、MTU、認證任一不符鄰居即失敗。Timer 可用 ip ospf hello-interval 手動調整，但兩端需一致','四要素：Hello、Dead、Area、MTU 缺一不可'],
+
+['OSPF DR/BDR 選舉誤解','後加入的高 Priority 路由器會搶走 DR','DR 選舉不具搶佔性（非 Preemptive）；Priority 0 永不參選。順序：① 最高 Priority → ② 最高 Router ID','先到先得、不搶位'],
+
+['Passive-interface 語意誤解','以為 passive-interface 會停止發送路由更新','它只是停止發送 Hello（不再建立鄰居），但仍宣告該介面網段給其他鄰居。常用於面向使用者的介面','Passive 不打招呼，但路由照樣廣告出去'],
+
+['OSPF Cost 計算基準誤解','以為 Cost 固定值或忘了參考頻寬概念','Cost = 參考頻寬（100 Mbps）/ 介面頻寬；Gigabit 以上介面 Cost 都是 1，除非用 auto-cost reference-bandwidth 調整參考值','Cost = 100M ÷ 介面頻寬，取整不小於 1'],
+
+['IPv6 位址縮寫規則錯誤','同一位址出現兩次 ::，或刪除尾零','RFC 5952：:: 每位址限一次；只能刪每組的前導零','雙冒號唯一一次，只刪頭不刪尾'],
+
+['EUI-64 與 SLAAC 產生位址的來源混淆','以為 SLAAC 位址一定來自 DHCPv6 Server','SLAAC 由 RA（Router Advertisement）提供 prefix，客戶端自組 Interface ID（EUI-64 或隨機）。DHCPv6 分 Stateless（只給 DNS 等）與 Stateful','RA 發前綴自己組，DHCPv6 只補料或全包'],
+
+['Link-local 位址作用域誤解','以為 Link-local 可以跨路由器通訊或當一般目的地','fe80::/10 僅限同一 Link 內，不可路由跨網段；但 IPv6 的動態路由協定與下一跳常使用 Link-local 位址','Link-local 出不了門，卻是鄰居間的暗語'],
+
+// ---------- First Hop Redundancy ----------
+['HSRP 配置細節遺漏','只配 standby 1 ip 忘記 priority 或 preempt','預設 priority 100；相同且無 Preempt 時舊 Active 重啟仍維持角色。驗證 show standby brief','先配 IP，再配 Priority，最後配 Preempt'],
+
+['FHRP 三兄弟角色混淆','把 VRRP/G LBP 行為套到 HSRP','HSRP：Cisco 私有、Active/Standby；VRRP：開放標準、Master/Backup；GLBP：單虛擬 IP 自動負載平衡（AVG 分派 AVF）。考試常出辨識題','HSRP 私有 A/S，VRRP 公開 M/B，GLBP 會分工'],
+
+// ---------- IP Services ----------
+['NAT overload 關鍵字遺漏','想多對一共享外網 IP，卻漏掉 overload','沒有 overload 時設備嘗試為每個內網 IP 分配獨立外部 IP，外網 IP 不足則轉換失敗連線失敗','多對一必加 overload（=PAT）'],
+
+['inside local / inside global 方向掛反','ip nat inside/outside 掛錯介面或搞混四欄位定義','Inside Local=內部私 IP、Inside Global=內部對外的公 IP、Outside Global/Local=外部真實/註冊位址。方向掛反 NAT 完全不觸發，show ip nat statistics 先查介面標記','Local 看內部視角，Global 看外部世界'],
+
+['ACL 掛載在 NAT 之前或之後的處理順序','以為 NAT 後 ACL 用原始私 IP 匹配','路由器處理順序：Outside→In 是 NAT 先於 ACL；Inside→Out 是路由→ACL→NAT。寫 ACL 匹配 NAT 轉換後的流量時要用轉換後位址','先翻譯還是先過濾？看方向，別背死'],
+
+['DHCP DORA 流向混淆','搞錯 Discover/Offer 誰發、廣播還是單播','Client 初始無 IP，Discover/Request 必為廣播。D(C→廣播)→O(S 回)→R(C→廣播確認)→A(S 發放)；跨網段靠 ip helper-address（giaddr 決定選哪個 pool）','DORA 廣播開廣播確認，helper 帶 giaddr 選池'],
+
+['DHCP Relay 忘記排除靜態位址','Server pool 未設 excluded-address 造成 IP 衝突','伺服器不知道哪些 IP 已被手動配置，需 ip dhcp excluded-address 排除 Gateway/印表機等靜態裝置','靜態設備先報備，排除名單不能省'],
+
+['NTP Stratum 與同步狀態誤判','看到 stratum 數字就以為同步完成','Stratum 16 = 未同步！必須 show ntp status 看到 synchronized 才算。stratum 數字越小越接近權威時鐘（stratum 1 直接收 GPS/原子鐘）','Stratum 16 是孤兒，synchronized 才是真同步'],
+
+['Syslog Severity 數字方向搞反','以為 severity 7 比 0 更嚴重','Severity 0（emergency）最嚴重 → 7（debugging）最輕微。logging trap warning 表示「4 及更嚴重」都送出','數字越小越危急，trap 層級含以下全部'],
+
+['QoS 信任邊界設定錯誤','在核心交換器介面直接設定 service-policy input，未在第一跳設定信任','信任邊界應設在進入網路的第一跳；核心重新分類導致 DSCP 標記失效，語音品質下降。EF=46 語音、CS3/AF31 信令','信任邊界設在第一跳，核心只分類不重打']
+
+];
+
+const pl=document.getElementById('pit-list');
+pits.forEach(([t,sc,an,mn])=>{
+ const d=document.createElement('details');d.className='pitfall';
+ d.innerHTML=`<summary>⚠️ ${t}</summary><div class="body">
+ <p><b>【陷阱情境】</b>${sc}</p>
+ <p style="margin-top:8px"><b>【破解邏輯】</b>${an}</p>
+ <p style="margin-top:8px;color:#fbbf24"><b>💡 口訣：</b>${mn}</p></div>`;
+ pl.appendChild(d);
+});
+
+/* ================= 模擬測驗（100 題 · 模組分類） ================= */
+const QM=['Network Fundamentals','Network Access','IP Connectivity','IP Services','Security Fundamentals','Automation & Programmability'];
+const quiz=[
+// ── Network Fundamentals（15題）──
+{m:0,q:'OSI 模型中，Switch 與 Router 分別主要運作於哪一層？',o:['L1 / L2','L2 / L3','L3 / L4','L2 / L7'],a:1,e:'Switch 是 L2（Frame/MAC），Router 是 L3（Packet/IP）；Hub 才是 L1。'},
+{m:0,q:'TCP 三向交握的正確順序？',o:['SYN → ACK → SYN-ACK','SYN → SYN-ACK → ACK','ACK → SYN → FIN','SYN → FIN → ACK'],a:1,e:'建立連線 SYN→SYN-ACK→ACK；斷線四次揮手 FIN→ACK→FIN→ACK。'},
+{m:0,q:'下列何者使用 UDP 埠 69？',o:['SNMP','TFTP','DNS','Syslog'],a:1,e:'TFTP=UDP 69；SNMP=161、DNS=53、Syslog=514（皆 UDP）。'},
+{m:0,q:'主機顯示 IP 為 169.254.17.5，最可能的原因是？',o:['靜態路由錯誤','DHCP Server 無回應，取得 APIPA','IPv6 未啟用','子網路遮罩錯誤'],a:1,e:'169.254.0.0/16 是 APIPA，代表 DHCP 失敗後的自動私有位址。'},
+{m:0,q:'長距離骨幹光纖應選用？',o:['多模光纖（LED）','單模光纖（雷射）','Cat6a UTP','Coaxial'],a:1,e:'單模：長距離+雷射+黃色接頭；多模：短距離+LED+橘色接頭。'},
+{m:0,q:'IPv6 位址 2001:0db8:0000:0000:0000:ff00:0042:8329 的正確縮寫？',o:['2001:db8::ff00:42:8329','2001::db8::ff00:42:8329','2001:db8:0:0:0:ff00:4200:8329','2001:db8::::ff00:42:8329'],a:0,e:':: 只能出現一次；每組前導零可刪（0042→42）。'},
+{m:0,q:'IPv6 Link-local 位址的前綴是？',o:['2000::/3','FE80::/10','FC00::/7','FF00::/8'],a:1,e:'Link-local=FE80::/10；Global=2000::/3；ULA=FC00::/7；Multicast=FF00::/8。'},
+{m:0,q:'/26 子網路的可用主機數為？',o:['62','64','126','30'],a:0,e:'主機位元 6 位 → 2^6−2=62。Block Size=64。'},
+{m:0,q:'IP 192.168.1.77/28 所屬的網路位址是？',o:['192.168.1.64','192.168.1.72','192.168.1.80','192.168.1.48'],a:0,e:'/28 Block Size=16；77÷16=4 餘 13 → 網路位址 192.168.1.64。'},
+{m:0,q:'255.255.255.240 的 Wildcard Mask 是？',o:['0.0.0.15','0.0.0.31','0.0.0.240','255.255.255.15'],a:0,e:'Wildcard = 256−240=15 → 0.0.0.15。'},
+{m:0,q:'Type 1 Hypervisor 的例子是？',o:['VMware Workstation','VirtualBox','ESXi','Docker Engine'],a:2,e:'Type 1 裸機：ESXi/KVM/Hyper-V；Type 2 架於 OS 上：Workstation/VirtualBox。'},
+{m:0,q:'Container 與 VM 的最大差異？',o:['Container 效能較差','Container 共享 Host OS Kernel','VM 不需 Hypervisor','Container 不能跑 Linux'],a:1,e:'Container 共享 Kernel 啟動秒級更輕量；VM 各自含完整 Guest OS。'},
+{m:0,q:'直通線（Straight-through）適用於？',o:['PC 對 PC','Switch 對 Switch','PC 對 Switch','Router 對 Router'],a:2,e:'不同類設備用直通線；同類設備用跳接線（Crossover）。'},
+{m:0,q:'IPv6 中「所有路由器」的 Multicast 位址是？',o:['ff02::1','ff02::2','ff02::5','fe80::1'],a:1,e:'ff02::1=所有節點、ff02::2=所有路由器、ff02::5=OSPFv3 路由器。'},
+{m:0,q:'Cat6a UTP 支援 10Gbps 的最大距離約為？',o:['55 公尺','100 公尺','10 公尺','500 公尺'],a:1,e:'Cat6a=10G@100m；Cat6 僅 10G@55m；Cat5e=1G@100m。'},
+
+// ── Network Access（20題）──
+{m:1,q:'STP 選舉根橋的比較順序？',o:['最低 MAC → 最低 Priority','最低 Priority → 最低 MAC','最高 Priority → 最高 MAC','最低 Cost → 最高 MAC'],a:1,e:'先比 Bridge Priority（小者勝），相同再比 MAC（小者勝）。'},
+{m:1,q:'RSTP 的埠狀態有哪三種？',o:['Blocking/Learning/Forwarding','Discarding/Learning/Forwarding','Listening/Learning/Forwarding','Disabled/Blocking/Forwarding'],a:1,e:'RSTP 以 Discarding 取代 STP 的 Blocking+Listening，三態制。'},
+{m:1,q:'RSTP 中提供通往根橋備援路徑的埠角色是？',o:['Backup Port','Alternate Port','Designated Port','Edge Port'],a:1,e:'Alternate=根橋路徑備胎；Backup=同一鏈路上 Designated 的備胎。'},
+{m:1,q:'Trunk 兩端 Native VLAN 不一致會導致？',o:['Trunk 自動關閉','流量在 VLAN 間洩漏（安全風險）','自動協商修正','僅 Syslog 警告無影響'],a:1,e:'Native VLAN 明文不打標籤，不一致造成 VLAN Hopping/洩漏；建議改閒置 VLAN 999。'},
+{m:1,q:'LACP passive 模式可與下列何者成功組成 EtherChannel？',o:['on','desirable','active 或 passive','auto'],a:2,e:'passive↔active 可成；passive↔passive 不行；on/desirable/auto 屬其他模式不相通。'},
+{m:1,q:'Port Security 違規模式預設值為？',o:['protect','restrict','shutdown','log'],a:2,e:'預設 shutdown → err-disabled，需 shutdown+no shutdown 或 errdisable recovery 恢復。'},
+{m:1,q:'交換器收到目的 MAC 不在 MAC Table 的單播影格時會？',o:['丟棄','送往所有埠（Flood）','送回來源埠','觸發 ARP'],a:1,e:'未知單播 Flood 至同 VLAN 所有埠（除來源埠）。'},
+{m:1,q:'混合 Cisco 與 Juniper 設備的環境，鄰居發現應啟用？',o:['CDP only','LLDP only','兩者皆可但 LLDP 必要','STP'],a:1,e:'LLDP 是 IEEE 802.1AB 開放標準；CDP 為 Cisco 專屬。'},
+{m:1,q:'Lightweight AP 架構中，使用者流量加密通常發生在哪裡？',o:['WLC 中央處理（全部模式）','AP 本地加密（Split-MAC Local Mode）','Client 端自行處理','Core Switch'],a:1,e:'Split-MAC：控制訊息交給 WLC，資料面加密在 AP 本地處理。'},
+{m:1,q:'WPA3-Personal 的金鑰交換機制是？',o:['PSK','SAE（Dragonfly）','EAP-TLS','TKIP'],a:1,e:'SAE 抗離線字典攻擊；搭配 AES-GCMP 加密與強制 PMF。'},
+{m:1,q:'2.4 GHz 頻段中互不重疊的三個通道？',o:['1、5、9','1、6、11','2、7、12','3、6、9'],a:1,e:'口訣 1-6-11；相鄰通道（如 1、2）會互相干擾。'},
+{m:1,q:'Access Port 與 Trunk Port 的差異？',o:['Access 承載多 VLAN','Trunk 承載多個 VLAN 並打 802.1Q 標籤','兩者皆打標籤','Access 用於交換器互連'],a:1,e:'Access 接 End Host 僅 1 VLAN；Trunk 用於 Switch↔Switch/Router/AP。'},
+{m:1,q:'show etherchannel summary 中「SU」代表？',o:['Suspended Unused','Layer2 + In Use（正常運作）','Shutdown Up','Standby Up'],a:1,e:'S=L2、U=in use 表示 EtherChannel 正常；成員埠應顯示 P（bundled）。'},
+{m:1,q:'DHCP Snooping 中連接合法 DHCP Server 的埠應設為？',o:['Untrusted','Trusted','Err-disabled','Passive'],a:1,e:'Trust 埠允許 DHCP Offer；Untrusted 埠收到 Offer 即丟棄防 Rogue DHCP。'},
+{m:1,q:'Dynamic ARP Inspection（DAI）依賴什麼驗證 ARP 封包？',o:['ACL','DHCP Snooping Binding Table','MAC Table','Routing Table'],a:1,e:'DAI 比對 Snooping 建立的 IP-MAC Binding Table，不符即丟棄。'},
+{m:1,q:'VLAN 1 的安全建議做法？',o:['當管理 VLAN 使用','將 Native/管理用途改至閒置 VLAN，未用埠移入 Black Hole VLAN','開放所有埠給 VLAN 1','停用所有 VLAN'],a:1,e:'VLAN 1 預設全埠皆屬之，易受攻擊；最佳實務是閒置化。'},
+{m:1,q:'Autonomous AP 適合的部署規模？',o:['數百台 AP 的大型園區','小型 1–3 台獨立設定','任何規模皆最佳','僅戶外橋接'],a:1,e:'小型獨立設定用 Autonomous；中大型集中管理用 Lightweight+WLC。'},
+{m:1,q:'PoE 標準中 802.3at 提供的功率約為？',o:['15.4W','30W','60W','100W'],a:1,e:'802.3af≈15.4W、802.3at(PoE+)≈30W、802.3bt≈60–90W。'},
+{m:1,q:'RSTP Edge Port 的特性？',o:['參與拓撲變更通知','直接進入 Forwarding，類似 PortFast','必須等待 Forward Delay','只能連接交換器'],a:1,e:'Edge Port 接終端設備立即轉發；若收到 BPDU 會失去 Edge 身分。'},
+{m:1,q:'交換器學習 MAC 位址的依據是？',o:['目的 MAC','來源 MAC','IP 位址','VLAN ID'],a:1,e:'收到影框時記錄「來源 MAC ↔ 進入埠」到 MAC Table。'},
+
+// ── IP Connectivity（25題）──
+{m:2,q:'OSPF Cost 公式為？',o:['頻寬 ÷ 參考頻寬','參考頻寬 ÷ 介面頻寬','Hop 數','MTU ÷ 頻寬'],a:1,e:'預設參考頻寬 100 Mbps；FastE=1、GigE=1。'},
+{m:2,q:'OSPF 鄰居卡在 ExStart 狀態最常見原因？',o:['Hello/Dead Timer 不符','MTU 不符','Area ID 不同','Authentication 失敗'],a:1,e:'ExStart 交換 DD 封包時 MTU 不符會卡住；Timer/Area 不符則停在 Init/Down。'},
+{m:2,q:'OSPF DR 選舉順序？',o:['最高 Router ID → 最高 Priority','最高 Priority（0 不參選）→ 最高 Router ID','最低 MAC → 最低 Priority','先到先得無順序'],a:1,e:'① 最高 Priority（0 永不參選）→ ② 最高 Router ID；不具搶佔性。'},
+{m:2,q:'NBMA 網路的 OSPF Hello/Dead Timer？',o:['10/40 秒','30/120 秒','5/15 秒','60/180 秒'],a:1,e:'Broadcast/P2P=10/40；NBMA=30/120——考題陷阱！'},
+{m:2,q:'路由表中同時存在 /24 Static 與 /24 OSPF 到同一目的地，採用哪條？',o:['OSPF','Static（AD 較小）','負載平衡','隨機'],a:1,e:'前綴相同比 AD：Static=1 < OSPF=110，選 Static。'},
+{m:2,q:'浮動靜態路由（Floating Static）的原理？',o:['較高的 AD 作為備援','較低的 Metric 作為主用','使用 AD 255 強制生效','動態調整 Metric'],a:0,e:'設定高於主用路由的 AD（如 ip route … 200），主路由失效時才浮出。'},
+{m:2,q:'Standard ACL 編號範圍？',o:['100–199','1–99 及 1300–1999','2000–2699','任意編號'],a:1,e:'Standard=1–99/1300–1999；Extended=100–199/2000–2699。'},
+{m:2,q:'Extended ACL 應放置於？',o:['靠近目的地','靠近來源端','核心層中央','任意位置'],a:1,e:'口訣「Stan 靠遠、Ext 靠近」— Extended 近來源可提早過濾省頻寬。'},
+{m:2,q:'ACL 結尾未寫 permit any any 的結果？',o:['無影響','隱含 deny any 全部拒絕','自動允許全部','只擋 TCP'],a:1,e:'每個 ACL 結尾自動隱含 deny any，務必補 permit any any。'},
+{m:2,q:'PAT 的配置關鍵字是？',o:['pool','overload','inside global','static'],a:1,e:'漏寫 overload 會嘗試一對一分配外部 IP，不足即失敗。'},
+{m:2,q:'內部 Web 伺服器對外發布固定公網 IP 應使用？',o:['PAT','Dynamic NAT','Static NAT','NAT64'],a:2,e:'Static NAT 一對一固定映射，供外部主動存取內部伺服器。'},
+{m:2,q:'HSRP 讓原 Standby 在恢復後搶回 Active 角色需設定？',o:['standby preempt','standby priority 255','standby version 2','standby track'],a:0,e:'Priority 決定初始選舉；preempt 允許高優先者搶回；track 連動介面狀態降級。'},
+{m:2,q:'三層交換器實現 VLAN 間路由使用？',o:['子介面 dot1q','SVI（interface vlan X）','Bridge-group','Tunnel 介面'],a:1,e:'三層交換器用 SVI；Router-on-a-Stick 才用子介面+dot1q。'},
+{m:2,q:'乙太網路上配置靜態路由的最佳寫法？',o:['ip route 10.0.0.0 255.0.0.0 gi0/0','ip route 10.0.0.0 255.0.0.0 192.168.1.1','ip route 0.0.0.0 0.0.0.0 null0','ip route 10.0.0.0 255.0.0.0 gi0/0 permanent'],a:1,e:'多接取網路必指定下一跳 IP，避免大量 ARP 查詢失敗；P2P 才可用出介面。'},
+{m:2,q:'OSPF Router ID 的決定優先序？',o:['最高環迴介面 IP → 最高實體介面 IP','router-id 手動設定 → 最高環迴 → 最高實體 IP','最低 MAC','最低 IP'],a:1,e:'手動 router-id > 最高 Loopback > 最高 Active 實體介面 IP。'},
+{m:2,q:'OSPFv2 鄰居建立的必要條件不包括？',o:['Area ID 相同','Hello/Dead Timer 相同','認證一致','相同的介面 MTU 大小'],a:3,e:'MTU 不符不影響鄰居建立（只卡 ExStart）；Area/Timer/認證不符則無法建鄰居。'},
+{m:2,q:'show ip route 中「O」開頭的路由代表？',o:['外部路由','OSPF 區域內路由','靜態路由','直連路由'],a:1,e:'C=Connected、S=Static、O=OSPF、O IA=OSPF Inter-Area、O E2=External。'},
+{m:2,q:'Default Route 的表示方式？',o:['0.0.0.0 255.255.255.0','0.0.0.0 0.0.0.0','255.255.255.255 0.0.0.0','0.0.0.0 255.255.255.255'],a:1,e:'0.0.0.0/0 匹配所有未知目的地，又稱 Gateway of last resort（S*）。'},
+{m:2,q:'OSPF Hello 封包的目的位址是？',o:['255.255.255.255','224.0.0.5','224.0.0.6','ff02::1'],a:1,e:'224.0.0.5=AllSPFRouters；224.0.0.6=AllDRouters（DR/BDR 收聽）。'},
+{m:2,q:'Router-on-a-Stick 子介面的正確配置順序？',o:['先 encapsulation dot1q 再配 IP','先配 IP 再 encapsulation','只需配 IP','需先 switchport mode trunk'],a:0,e:'子介面必須先 encapsulation dot1q <vlan> 才能配 IP；switchport 指令屬交換器。'},
+{m:2,q:'OSPF 建立鄰居後，LSDB 同步完成的穩定狀態是？',o:['Exchange','Loading','Full','2-Way'],a:2,e:'Down→Init→2-Way→ExStart→Exchange→Loading→Full；廣播網路非 DR/BDR 停在 2-Way 屬正常。'},
+{m:2,q:'ip route 10.4.0.0 255.255.0.0 10.2.2.2 120 的「120」代表？',o:['Metric','Administrative Distance','TTL','Hop Count'],a:1,e:'語法：ip route <net> <mask> <next-hop> <AD>；120=RIP 同級，常用於浮動備援。'},
+{m:2,q:'Loopback 介面作為 Router ID 來源的優點？',o:['速度較快','不依賴實體介面狀態，穩定不中斷','節省 IP','加密流量'],a:1,e:'Loopback 永遠 up/up，避免實體介面故障導致 RID 變動重算。'},
+{m:2,q:'兩台路由器 OSPF Area 不同會發生？',o:['正常建立鄰居','無法建立鄰居','建立但無路由','自動修正 Area'],a:1,e:'Hello 封包攜帶 Area ID，不一致直接忽略鄰居請求。'},
+{m:2,q:'HSRP Virtual MAC 格式 0000.0C07.AC0A 中「0A」代表？',o:['群組編號 10（十六進位）','VLAN 10','優先權 10','埠 10'],a:0,e:'末兩碼十六進位=HSRP Group Number；ACxx 的 xx 即群組號。'},
+
+// ── IP Services（12題）──
+{m:3,q:'DHCP DORA 正確順序？',o:['Offer→Discover→Request→Acknowledge','Discover→Offer→Request→Acknowledge','Discover→Request→Offer→Acknowledge','Request→Discover→Offer→Acknowledge'],a:1,e:'Discover/Request 由 Client 廣播；跨網段需 ip helper-address 轉單播。'},
+{m:3,q:'Syslog 最嚴重的等級是？',o:['Level 7 debugging','Level 0 emergency','Level 1 alert','Level 4 warning'],a:1,e:'0(emergency)→7(debugging)；logging trap <level> 設傳送門檻。'},
+{m:3,q:'SSH 登入前的必要配置不含？',o:['hostname 與 ip domain-name','crypto key generate rsa','line vty 下 login local','enable secret level 15'],a:3,e:'SSH 需要 hostname+domain-name 產生 RSA 金鑰+vty 本地認證；enable secret 非必要。'},
+{m:3,q:'NTP stratum 2 伺服器的上游是？',o:['stratum 0','stratum 1','stratum 3','Internet 根伺服器'],a:1,e:'stratum 0=權威鐘（原子鐘/GPS）、1 直接收 stratum 0、2 收 stratum 1，逐層遞增。'},
+{m:3,q:'QoS 中語音流量的建議 DSCP 標記？',o:['AF31 (26)','EF (46)','CS1 (8)','BE (0)'],a:1,e:'EF=Expedited Forwarding 給語音；AF31 給呼叫信令；BE 預設盡力而為。'},
+{m:3,q:'CoS 位於封裝的哪個位置？',o:['IP Header ToS','802.1Q Tag 內 3-bit','TCP Option','Ethernet Type 欄位'],a:1,e:'CoS 是 L2（802.1Q 3-bit 0–7）；DSCP 是 L3（ToS 前 6-bit 0–63）。'},
+{m:3,q:'SNMP v3 相較 v2c 的最大改良？',o:['支援 Trap','認證與加密（authPriv）','支援 Get/Set','使用 UDP'],a:1,e:'v2c Community String 明文；v3 是唯一具加密版本。'},
+{m:3,q:'Syslog 與 SNMP Trap 的共同點？',o:['都由 NMS 主動輪詢','都是設備主動推送通知','都用 TCP 443','都只能傳文字'],a:1,e:'Trap/Syslog 皆為設備主動告警；輪詢才是 NMS 主動。'},
+{m:3,q:'DHCP Relay（ip helper-address）的作用？',o:['替 Client 配置靜態 IP','將 DHCP 廣播轉為單播跨網段送達 Server','加密 DHCP 流量','防止 Rogue DHCP'],a:1,e:'Client 廣播無法過路由器，Relay Agent 轉單播至指定 Server。'},
+{m:3,q:'NTP 驗證同步成功的指令輸出應包含？',o:['unsynchronized','synchronized','stratum 16','offset 9999'],a:1,e:'show ntp status 出現 synchronized 即成功；stratum 16 代表未同步。'},
+{m:3,q:'信任邊界（Trust Boundary）應設置在？',o:['核心層交換器','流量進入網路的第一跳','資料中心出口','防火牆上'],a:1,e:'第一跳標記 DSCP 後，內部設備信任該標記直通，避免重複分類。'},
+{m:3,q:'DHCP Server 回覆 Offer 時使用的位址類型？',o:['廣播或單播（視 Client flag）','僅 multicast','僅 anycast','僅 link-local'],a:0,e:'Discover 廣播出去；Offer 依 Client 的 broadcast flag 決定回廣播或單播。'},
+
+// ── Security Fundamentals（15題）──
+{m:4,q:'AAA 中「你能做什麼」屬於哪個要素？',o:['Authentication','Authorization','Accounting','Auditing'],a:1,e:'Authentication=你是誰、Authorization=你能做什麼、Accounting=你做了什麼。'},
+{m:4,q:'分公司整體網路與總部互連的 VPN 類型？',o:['Remote Access VPN','Site-to-Site VPN','SSL VPN','Clientless VPN'],a:1,e:'Site-to-Site 閘道器對閘道器、使用者無感免客戶端。'},
+{m:4,q:'Telnet 相較 SSH 的重大風險？',o:['速度慢','明文傳輸帳密與資料','不支援密碼','僅限區網'],a:1,e:'Telnet TCP 23 全程明文；SSH TCP 22 加密，一律選 SSH。'},
+{m:4,q:'enable secret 與 enable password 同時設定時？',o:['password 生效','secret 生效（優先）','兩者皆需輸入','系統報錯'],a:1,e:'enable secret 使用雜湊儲存且優先於明文的 password。'},
+{m:4,q:'DHCP Snooping 防禦的攻擊是？',o:['ARP Spoofing','Rogue DHCP Server 發放假閘道','IP Spoofing','MAC Flooding'],a:1,e:'Snooping 防 Rogue DHCP；DAI 防 ARP Spoofing；IPSG 防 IP Spoofing。'},
+{m:4,q:'攻擊者偽造大量不同來源 MAC 使 CAM 表爆滿的攻擊稱為？',o:['ARP Poisoning','MAC Flooding','DHCP Starvation','VLAN Hopping'],a:1,e:'CAM 表滿後交換器退化成 Flood 行為，可被竊聽；Port Security 可防禦。'},
+{m:4,q:'802.1X 架構中的三個角色？',o:['Supplicant / Authenticator / Authentication Server','Client / Server / Proxy','User / Switch / Router','Host / AP / WLC'],a:0,e:'Supplicant（Client）↔ Authenticator（Switch/AP，EAPoL）↔ RADIUS Server。'},
+{m:4,q:'TACACS+ 與 RADIUS 的差異？',o:['TACACS+ 用 UDP','TACACS+ 支援逐指令授權且全程加密','RADIUS 加密整個封包','兩者皆用 TCP 49'],a:1,e:'TACACS+=TCP 49 全程加密+逐指令授權；RADIUS=UDP 1812 僅加密密碼。'},
+{m:4,q:'WPA2-Enterprise 的認證架構基礎是？',o:['PSK 共享金鑰','802.1X/EAP + RADIUS','SAE','WEP'],a:1,e:'企業版用 802.1X 動態派發憑證；Personal 版才用 PSK。'},
+{m:4,q:'VLAN Hopping 的常見防禦？',o:['啟用 CDP','Native VLAN 改閒置編號+關閉 DTP（switchport nonegotiate）','提高 Trunk 頻寬','啟用 PoE'],a:1,e:'雙重標籤攻擊利用 Native VLAN；改閒置 VLAN+nonegotiate 可阻斷。'},
+{m:4,q:'service password-encryption 的限制？',o:['完全安全的加密','僅 Type 7 弱編碼可被逆解','只加密 enable secret','需重開機生效'],a:1,e:'Type 7 是可逆的弱混淆；敏感密碼仍應用 secret（MD5/SCRYPT）。'},
+{m:4,q:'物理安全中「偵測型」措施是？',o:['電子門鎖','CCTV 監視攝影機','生物辨識門禁','保安人員'],a:1,e:'攝影機偵測記錄但不阻擋；門禁/警衛屬防護阻擋型。'},
+{m:4,q:'密碼最佳實務中，vty 線路應設定？',o:['password cisco','login local + transport input ssh','no login','transport input telnet'],a:1,e:'login local 使用本地帳號資料庫；transport input ssh 禁止 Telnet。'},
+{m:4,q:'DoS 攻擊的特性是？',o:['竊取資料','癱瘓服務可用性','提升權限','側錄流量'],a:1,e:'DoS/DDoS 目標是 Availability（可用性），非機密性。'},
+{m:4,q:'社交工程（Social Engineering）防禦最有效的方式？',o:['更強防火牆','使用者安全教育訓練','加密硬碟','VLAN 劃分'],a:1,e:'釣魚/尾隨等攻擊鎖定人的弱點，教育訓練是第一道防線。'},
+
+// ── Automation & Programmability（13題）──
+{m:5,q:'REST API 的核心特性？',o:['Stateful Session','Stateless、HTTP 動詞操作資源','僅支援 XML','需要專屬二進位協定'],a:1,e:'Stateless+JSON 主流；GET/POST/PUT/PATCH/DELETE 對應 CRUD。'},
+{m:5,q:'Northbound API 的方向與常見技術？',o:['Controller→底層設備，NETCONF','Controller→上層應用，REST API','設備→Controller，OpenFlow','應用→Controller，SNMP'],a:1,e:'北向上（REST）、南向下（NETCONF/OpenFlow）。'},
+{m:5,q:'「佈建基礎架構即代碼」應選哪個工具？',o:['Ansible','Terraform','Puppet','Wireshark'],a:1,e:'Terraform 定位 IaC 佈建；Ansible/Puppet 是配置管理；Ansible Agentless。'},
+{m:5,q:'HTTP 動詞中「更新資源」使用？',o:['GET','POST','PUT','DELETE'],a:2,e:'GET=Read、POST=Create、PUT=Update、DELETE=Delete。'},
+{m:5,q:'JSON 資料格式中，多個值以什麼表示？',o:['{} 物件','[] 陣列','<> 標籤','縮排階層'],a:1,e:'JSON：{}=物件、[]=陣列、鍵值對 key:value；YAML 用縮排、XML 用標籤。'},
+{m:5,q:'SDN 架構中，Southbound API 的作用？',o:['Controller 與上層應用溝通','Controller 與底層網路設備溝通','使用者與 Controller 溝通','設備之間互相溝通'],a:1,e:'北向上（REST）、南向下（NETCONF/OpenFlow）控制底層設備。'},
+{m:5,q:'Ansible 的核心特性是？',o:['Agent-based 架構','Agentless，透過 SSH/API 推送配置','使用 Ruby DSL','專門做 IaC 佈建'],a:1,e:'Ansible Agentless+YAML Playbook 做配置管理；IaC 佈建選 Terraform。'},
+{m:5,q:'Controller-based 網路中，管理平面位於？',o:['每台設備本地','集中於 Controller','雲端資料庫','終端主機'],a:1,e:'SDN 將管理/控制平面集中於 Controller，資料平面仍在設備本地轉發。'},
+{m:5,q:'NETCONF 屬於哪一類 API？',o:['Northbound','Southbound','East-Westbound','Client-side'],a:1,e:'NETCONF/OpenFlow 是 Southbound，用於 Controller 下發配置至設備。'},
+{m:5,q:'REST API 回應中最常見的資料格式？',o:['XML','JSON','CSV','純文字'],a:1,e:'JSON 機器友善、輕量，是 REST API 主流格式。'},
+{m:5,q:'下列何者屬於「配置管理」而非「佈建」工具？',o:['Terraform','Ansible','CloudFormation','OpenTofu'],a:1,e:'Ansible/Puppet/Chef=配置管理；Terraform/CloudFormation=IaC 佈建。'},
+{m:5,q:'DNA Center 在 Cisco 架構中的角色？',o:['Southbound 協定','Cisco 實作的 SDN Controller / 管理平台','路由協定','加密演算法'],a:1,e:'DNA Center 提供北向 REST API 供程式呼叫，南向管理網路設備。'},
+{m:5,q:'YAML 格式的最大特色？',o:['標籤成對','以縮排表示階層，人類可讀性高','必須單行','僅支援數字'],a:1,e:'YAML 縮排階層無括號，Ansible Playbook 即採用 YAML。'},
+{m:5,q:'Stateless 的意義是？',o:['伺服器記住每次連線狀態','每次請求自帶完整資訊（如 Token），伺服器不保存會話','不允許並發連線','只能 GET'],a:1,e:'REST 無狀態：每個請求獨立攜帶認證資訊，利於水平擴展。'},
+{m:5,q:'自動化腳本透過 SSH 批次下達指令到 100 台交換器，最適合的工具？',o:['Wireshark','Ansible','Postman','Ping'],a:1,e:'Ansible Agentless+Playbook 天生適合批次配置管理。'}
+];
+/* ================= 渲染引擎 ================= */
+let answered=0,correct=0;
+const qa=document.getElementById('quiz-area');
+const totalEl=document.getElementById('total');
+const ansEl=document.getElementById('answered');
+const corEl=document.getElementById('correct');
+
+// 模組篩選
+const quizFilterBar=document.createElement('div');quizFilterBar.className='quiz-filter';
+quizFilterBar.innerHTML=`<button class="active" data-m="all">全部 (${quiz.length})</button>`+
+ QM.map((m,i)=>`<button data-m="${i}">${m} (${quiz.filter(q=>q.m===i).length})</button>`).join('');
+qa.parentNode.insertBefore(quizFilterBar,qa);
+
+// 進度條
+const pbar=document.createElement('div');pbar.id='quiz-progress-bar';
+pbar.innerHTML='<div id="quiz-progress-fill"></div>';
+qa.parentNode.insertBefore(pbar,qa);
+
+// 分數面板
+const panel=document.createElement('div');panel.className='score-panel';
+panel.innerHTML=`已作答：<b id="p-ans">0</b>／<span class="q-total"></span>　✅ 正確：<b id="p-cor" style="color:#22c55e">0</b>`;
+qa.parentNode.insertBefore(panel,qa);
+
+function renderQuiz(mod){
+ qa.innerHTML='';answered=0;correct=0;
+ const list=mod==='all'?quiz:quiz.filter(q=>q.m===mod);
+ totalEl.textContent=list.length;
+ document.querySelector('.q-total').textContent=list.length;
+ ansEl.textContent=0;corEl.textContent=0;
+ document.getElementById('final-score').style.display='none';
+ const fs=document.getElementById('final-score');if(fs)fs.innerHTML='';
+ 
+ list.forEach((item,i)=>{
+  const d=document.createElement('div');d.className='quiz-q';
+  d.innerHTML=`<p><b>Q${i+1}.</b> ${item.q}<span class="tag">${QM[item.m]}</span></p>`;
+  item.o.forEach((opt,j)=>{
+   const b=document.createElement('button');b.className='opt';
+   b.textContent=String.fromCharCode(65+j)+'. '+opt;
+   b.onclick=()=>{
+    if(d.dataset.done)return;d.dataset.done='1';answered++;
+    if(j===item.a){b.classList.add('correct');correct++;}
+    else{b.classList.add('wrong');d.querySelectorAll('.opt')[item.a].classList.add('correct');}
+    // 立即顯示詳解
+    const ex=document.createElement('div');ex.className='explain';ex.style.display='block';
+    ex.innerHTML=(j===item.a?'✅ <b>答對了！</b> ':'❌ <b>正確答案：'+String.fromCharCode(65+item.a)+'</b><br>')+'💡 '+item.e;
+    d.appendChild(ex);
+    d.querySelectorAll('.opt').forEach(x=>x.disabled=true);
+    ansEl.textContent=answered;corEl.textContent=correct;
+    document.getElementById('p-ans').textContent=answered;
+    document.getElementById('p-cor').textContent=correct;
+    document.getElementById('quiz-progress-fill').style.width=(answered/list.length*100)+'%';
+    if(answered===list.length)showFinal(list);
+   };
+   d.appendChild(b);
+  });
+  qa.appendChild(d);
+ });
+}
+
+function showFinal(list){
+ let f=document.getElementById('final-score');
+ f.style.display='block';
+ const pct=Math.round(correct/list.length*100);
+ const wrongs=[];
+ list.forEach((item,i)=>{
+  // 從 DOM 判斷是否答錯
+ });
+ f.innerHTML=`<h2 style="color:${pct>=80?'#22c55e':pct>=60?'#f59e0b':'#ef4444'}">得分：${correct}/${list.length}（${pct}%）</h2>
+ <div style="background:#0f172a;border-radius:8px;height:14px;overflow:hidden;margin:10px 0">
+  <div style="height:100%;width:${pct}%;background:${pct>=80?'#22c55e':pct>=60?'#f59e0b':'#ef4444'}"></div></div>
+ <p>${pct>=80?'✅ 已達通過水準（80%），維持手感！':pct>=60?'⚠️ 接近及格線，重讀錯題章節':'❌ 需加強，回到配速表重跑弱項'}</p>
+ <button onclick="location.reload()" style="margin-top:10px;padding:10px 24px;border-radius:20px;border:none;background:#0ea5e9;color:#fff;cursor:pointer;font-weight:bold">🔄 重新測驗</button>`;
+ f.scrollIntoView({behavior:'smooth'});
+}
+
+function resetQuiz(){location.reload();}
+
+renderQuiz('all');
+quizFilterBar.querySelectorAll('button').forEach(b=>b.onclick=()=>{
+ quizFilterBar.querySelectorAll('button').forEach(x=>x.classList.remove('active'));
+ b.classList.add('active');
+ renderQuiz(b.dataset.m==='all'?'all':parseInt(b.dataset.m));
+});
+
+/* ================= Subnetting 計算機（優化版） ================= */
+const sel=document.getElementById('cidr');
+for(let i=8;i<=30;i++){const o=document.createElement('option');o.value=i;o.textContent='/'+i;sel.appendChild(o);}
+sel.value=24;
+
+const fmt=n=>[(n>>>24)&255,(n>>>16)&255,(n>>>8)&255,n&255].join('.');
+const toInt=s=>{const p=s.split('.').map(Number);return(p[0]<<24>>>0)+(p[1]<<16)+(p[2]<<8)+p[3];};
+const rnd=n=>Math.floor(Math.random()*n);
+const bin=x=>x.toString(2).padStart(8,'0');
+
+function classify(n){
+ const a=n>>>24,b=(n>>>16)&255;
+ if(a===10||(a===172&&b>=16&&b<=31)||(a===192&&b===168))return'<span class="warn">🔒 RFC1918 私有位址</span>';
+ if(a===127)return'<span class="bad">Loopback（127.0.0.0/8）</span>';
+ if(a===169&&b===254)return'<span class="bad">APIPA 自動私用位址（DHCP 失敗）</span>';
+ return '<span class="ok">🌐 公有位址</span>';
+}
+
+function calcSubnet(){
+ const parts=document.getElementById('ip').value.trim().split('.').map(Number);
+ if(parts.length!==4||parts.some(p=>isNaN(p)||p<0||p>255)){alert('請輸入有效的 IPv4 位址');return;}
+ const cidr=parseInt(sel.value);
+ let mask=[0,0,0,0];
+ for(let i=0;i<cidr;i++)mask[Math.floor(i/8)]|=128>>(i%8);
+ const ipInt=(parts[0]<<24>>>0)+(parts[1]<<16)+(parts[2]<<8)+parts[3];
+ const maskInt=(mask[0]<<24>>>0)+(mask[1]<<16)+(mask[2]<<8)+mask[3];
+ const netInt=(ipInt&maskInt)>>>0;
+ const bcInt=(netInt|(~maskInt>>>0))>>>0;
+ const total=Math.pow(2,32-cidr);
+ let hosts,first,last,isNet,isBc;
+ if(cidr===32){hosts=1;first=last=netInt;isNet=true;isBc=true;}
+ else if(cidr===31){hosts=2;first=netInt;last=bcInt;isNet=false;isBc=false;}
+ else{hosts=total-2;first=netInt+1;last=bcInt-1;}
+ isNet=(ipInt===netInt)&&cidr<31; isBc=(ipInt===bcInt)&&cidr<31;
+ const oct=Math.min(3,Math.floor((cidr-1)/8));
+
+ document.getElementById('calc-out').style.display='block';
+ document.getElementById('calc-out').innerHTML=
+ `IP 分類：${classify(ipInt)}<br>`+
+ `網路位址：<b>${fmt(netInt)}/${cidr}</b>${isNet?' <span class="warn">← 你輸入的就是網路位址！</span>':''}<br>`+
+ `子網路遮罩：<b>${fmt(maskInt)}</b>（Wildcard：<b>${fmt(~maskInt>>>0)}</b>）<br>`+
+ `廣播位址：<b>${fmt(bcInt)}</b>${isBc?' <span class="bad">← 不可分配給主機！</span>':''}<br>`+
+ `可用主機範圍：<b>${fmt(first)} ~ ${fmt(last)}</b><br>`+
+ `可用主機數：<b>${hosts.toLocaleString()}</b> 台${cidr===31?'（/31 點對點特例，無需減 2）':''}<br>`+
+ `Block Size：<b>${Math.min(total,256)}</b><br>`+
+ `<pre class="bin">第 ${oct+1} 組八位元：IP=${bin(parts[oct])}　遮罩=${bin(mask[oct])}　→ AND = ${bin(parts[oct]&mask[oct])}</pre>`;
+}
+calcSubnet();
+
+/* ================= Subnetting 三合一隨機考題模組 ================= */
+let qData=null,sOk=0,sNg=0,qType='net';
+
+// 共用工具
+function fmtOfMask(c){let m=[0,0,0,0];for(let i=0;i<c;i++)m[Math.floor(i/8)]|=128>>(i%8);return m.join('.');}
+function randPrivateNet(cidr){
+ // 產生對齊 block boundary 的隨機私有子網網路位址
+ const base=[192,172,10][rnd(3)];
+ let net=[base,
+   base===192?168:(base===172?16+rnd(16):rnd(256)),
+   rnd(256),0];
+ const subBits=cidr-24;
+ if(subBits>0){
+   const block=Math.pow(2,8-subBits);           // 最後位元組的 block size
+   net[3]=rnd(Math.pow(2,subBits))*block;
+ }else{
+   // /24 以下：隨機化第三組八位元並歸零第四組
+   net[2]=rnd(256);net[3]=0;
+ }
+ return net;
+}
+
+/* ---------- 題型一：是否為網路位址 ---------- */
+function genNetQ(){
+ const cidr=[24,25,26,27,28,29,30][rnd(7)];
+ const net=randPrivateNet(cidr);
+ const span=Math.pow(2,32-cidr);
+ let ipArr,isAns;
+ if(rnd(100)<50){ipArr=[...net];isAns=true;}
+ else{
+   ipArr=[...net];isAns=false;
+   ipArr[3]=net[3]+1+rnd(span-2);               // 主機範圍或廣播位址
+ }
+ return {q:`❓ 位址 <b>${ipArr.join('.')}</b> 在遮罩 <b>/${cidr}（${fmt(toInt(fmtOfMask(cidr)))}）</b> 下<br>是否為<b>網路位址（Network Address）</b>？`,
+   type:'yn',answer:isAns,
+   explain(){
+     const ipI=toInt(ipArr.join('.')),mI=toInt(fmtOfMask(cidr));
+     const netI=(ipI&mI)>>>0,bcI=(netI|(~mI>>>0))>>>0;
+    return `💡 解析：<code>${ipArr.join('.')} AND ${fmt(mI)} = ${fmt(netI)}</code><br>`+
+       (isAns?`結果與原位址相同 → 是網路位址。`
+        :ipArr.join('.')===fmt(bcI)?`原位址其實是<b>廣播位址</b>（${fmt(bcI)}），不可分配給主機。`
+        :`結果與原位址不同 → 不是網路位址，是一般主機位址。`)+
+       `<br><span class="dim">口訣：IP AND Mask = 自己 → 網路位址；= 全 1 尾端 → 廣播位址。</span>`;
+   }};
+}
+
+/* ---------- 題型二：求可用主機數 ---------- */
+function genHostsQ(){
+ const cidr=[22,23,24,25,26,27,28,29,30][rnd(9)];
+ const total=Math.pow(2,32-cidr);
+ const correctAns=cidr===31?2:total-2;
+ // 干擾選項：忘記減2、多減、block size 混淆
+ const opts=new Set([correctAns,total,total-2,cidr===30?2:Math.pow(2,32-cidr-1)-2]);
+ while(opts.size<4)opts.add(correctAns+rnd(11)-5>=0?correctAns+rnd(11)-5:correctAns+1);
+ const arr=[...opts].sort((a,b)=>a-b);
+ return {q:`❓ 子網路 <b>/${cidr}</b>（遮罩 ${fmt(toInt(fmtOfMask(cidr)))}）<br>最多可提供多少台<b>可用主機</b>？`,
+   type:'mc',options:arr.map(String),answer:arr.indexOf(correctAns),
+   explain(){
+     const hbits=32-cidr;
+     return `💡 解析：主機位元 = 32 − ${cidr} = <b>${hbits} bits</b><br>`+
+       `可用主機數 = 2^${hbits} − 2 = <b>${correctAns}</b> 台<br>`+
+       (cidr===31?`⚠️ 但 /31 是 RFC 3021 點對點特例，無廣播概念，實際可用 2 台。`:
+        `<span class="dim">口訣：減 2 扣掉網路位址與廣播位址。</span>`);
+   }};
+}
+
+/* ---------- 題型三：反向 — 給主機數求遮罩 ---------- */
+function genMaskQ(){
+ // 常考主機數需求
+ const needPool=[[1000,'/22'],[500,'/23'],[250,'/24'],[120,'/25'],[60,'/26'],[30,'/27'],[14,'/28'],[6,'/29'],[2,'/30']];
+ const [need,ansCidr]=needPool[rnd(needPool.length)];
+ const ansMask=fmtOfMask(parseInt(ansCidr.slice(1)));
+ // 干擾選項：差一級的遮罩
+ const ci=parseInt(ansCidr.slice(1));
+ const distract=[ci-1,ci+1,ci+2].filter(c=>c>=8&&c<=30).map(c=>fmtOfMask(c));
+ const opts=[...new Set([ansMask,...distract])].slice(0,4);
+ while(opts.length<4)opts.push(fmtOfMask(20));
+ opts.sort();
+ return {q:`❓ 某部門需要至少 <b>${need.toLocaleString()} 台</b>可用主機的子網路<br>應選用哪個<b>子網路遮罩</b>？（選最小的足夠遮罩）`,
+   type:'mc',options:opts,answer:opts.indexOf(ansMask),
+   explain(){
+     const c=parseInt(ansCidr.slice(1)),hbits=32-c;
+     return `💡 解析：需要 ${need.toLocaleString()} 台 → 找最小的 n 使 <code>2^n − 2 ≥ ${need.toLocaleString()}</code><br>`+
+       `→ 主機位元需 <b>${hbits} bits</b>（2^${hbits} − 2 = ${(Math.pow(2,hbits)-2).toLocaleString()} 台 ✓）<br>`+
+       `→ 網路位元 = 32 − ${hbits} = ${c} → 遮罩 <b>/${c} = ${ansMask}</b><br>`+
+       `<span class="dim">陷阱：選大一級會浪費位址；選小一級主機不夠用——考試要選「剛好夠」的最小遮罩。</span>`;
+   }};
+}
+
+/* ---------- 渲染與作答 ---------- */
+function newQuiz(){
+ const gens={net:genNetQ,hosts:genHostsQ,mask:genMaskQ};
+ qData=gens[qType]();
+ document.getElementById('quiz-q').innerHTML=qData.q;
+ document.getElementById('quiz-out').style.display='none';
+ const btnBox=document.getElementById('quiz-btns');
+ btnBox.innerHTML='';
+ if(qData.type==='yn'){
+   btnBox.innerHTML=`<button class="btn-ans btn-yes" onclick="answerQuiz(true)">✔ 是</button>
+                     <button class="btn-ans btn-no" onclick="answerQuiz(false)">✘ 不是</button>`;
+ }else{
+   qData.options.forEach((opt,i)=>{
+     const b=document.createElement('button');
+     b.className='btn';b.style.marginRight='8px';b.textContent=opt;
+     b.onclick=()=>answerQuiz(i);
+     btnBox.appendChild(b);
+   });
+ }
+}
+
+function answerQuiz(ans){
+ if(!qData)return;
+ const correct=(qData.type==='yn')?(ans===qData.answer):(ans===qData.answer);
+ correct?sOk++:sNg++;
+ document.getElementById('s-ok').textContent=sOk;
+ document.getElementById('s-ng').textContent=sNg;
+ const tot=sOk+sNg;
+ document.getElementById('s-rate').textContent=Math.round(sOk/tot*100)+'%';
+ const out=document.getElementById('quiz-out');
+ out.style.display='block';
+ out.innerHTML=`${correct?'<span class="ok">🎉 答對了！</span>':'<span class="bad">😢 答錯了～</span>'}<br>`+
+   (qData.type==='yn'?`正確答案：${qData.answer?'<span class="ok">✔ 是網路位址</span>':'<span class="bad">✘ 不是網路位址</span>'}<br>`:
+    `正確答案：<b>${qData.options[qData.answer]}</b><br>`)+
+   qData.explain();
+ qData=null; // 防止重複作答
+}
+
+// 題型切換分頁
+document.querySelectorAll('#sq-tabs button').forEach(b=>b.onclick=()=>{
+ document.querySelectorAll('#sq-tabs button').forEach(x=>x.classList.remove('active'));
+ b.classList.add('active');
+ qType=b.dataset.t;
+ sOk=0;sNg=0;
+ document.getElementById('s-ok').textContent=0;
+ document.getElementById('s-ng').textContent=0;
+ document.getElementById('s-rate').textContent='—';
+ newQuiz();
+});
+
+newQuiz(); // 啟動第一題
+
+</script>
