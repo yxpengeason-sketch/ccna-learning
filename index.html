@@ -2545,6 +2545,84 @@ pre.bin {
 <footer>Vibe Coding Project · CCNA 200-30x Offline Study Dashboard · 進度自動儲存於 localStorage</footer>
 
 <script>
+
+/* ==========================================================================
+   CCNA 200-301 防作弊安全防護模組 (DevTools & Keystroke Interceptor)
+   - 攔截 F12、Ctrl+Shift+I/J/C、Ctrl+U、Ctrl+S 與 Mac 對應快捷鍵
+   - 阻斷右鍵選單 (contextmenu) 防止點擊「檢查元素 (Inspect)」
+   - 完整放行文字標記選取與鍵盤複製 (Ctrl+C / Cmd+C / Ctrl+A)
+   ========================================================================== */
+
+(function (window, document) {
+  'use strict';
+
+  /**
+   * 1. 鍵盤快捷鍵攔截器 (Keystroke Interceptor)
+   * 專門阻斷 DevTools 開啟與原始碼檢視，放行正常文字選取與複製
+   */
+  function handleKeyDown(e) {
+    const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+    const ctrlOrCmd = isMac ? e.metaKey : e.ctrlKey;
+    const shift = e.shiftKey;
+    const altOrOpt = e.altKey;
+    const key = e.key ? e.key.toUpperCase() : '';
+    const keyCode = e.keyCode || e.which;
+
+    // (1) 攔截 F12 鍵 (keyCode 123)
+    if (key === 'F12' || keyCode === 123) {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }
+
+    // (2) 攔截 Windows: Ctrl+Shift+I/J/C | Mac: Cmd+Opt+I/J/C (開發者工具 / 控制台 / 元素選取)
+    if (
+      (ctrlOrCmd && shift && (key === 'I' || key === 'J' || key === 'C' || keyCode === 73 || keyCode === 74 || keyCode === 67)) ||
+      (isMac && ctrlOrCmd && altOrOpt && (key === 'I' || key === 'J' || key === 'C' || keyCode === 73 || keyCode === 74 || keyCode === 67))
+    ) {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }
+
+    // (3) 攔截 Ctrl+U / Cmd+Opt+U / Cmd+U (檢視網頁原始碼 View Source)
+    if (
+      (ctrlOrCmd && !shift && (key === 'U' || keyCode === 85)) ||
+      (isMac && ctrlOrCmd && altOrOpt && (key === 'U' || keyCode === 85))
+    ) {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }
+
+    // (4) 攔截 Ctrl+S / Cmd+S (儲存網頁離線檔案，防止離線逆向解析)
+    if (ctrlOrCmd && (key === 'S' || keyCode === 83)) {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }
+
+    // (5) 明確放行複製 (Ctrl+C / Cmd+C) 與全選 (Ctrl+A / Cmd+A)
+    if (ctrlOrCmd && (key === 'C' || key === 'A')) {
+      return true;
+    }
+  }
+
+  /**
+   * 2. 滑鼠右鍵選單攔截器 (Context Menu Interceptor)
+   * 阻斷右鍵彈出選單以防止點擊「檢查 (Inspect)」，但完全不干擾滑鼠反白與選取文字
+   */
+  function handleContextMenu(e) {
+    e.preventDefault();
+    return false;
+  }
+
+  // 註冊全域事件監聽 (Capture 階段優先攔截)
+  window.addEventListener('keydown', handleKeyDown, true);
+  document.addEventListener('contextmenu', handleContextMenu, true);
+
+})(window, document);
+
 /* ================= 導航 ================= */
 document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>{
  document.querySelectorAll('#nav button').forEach(x=>x.classList.remove('active'));
@@ -3083,6 +3161,13 @@ const cmpModules=[
       ['', '北向 API (Northbound)', '南向 API (Southbound)', '代表性協定與技術', ''],
       ['架構位置與連接對象', '位於 SDN 控制器上方；連接 Controller 與「上層應用程式 / 管理腳本 / 業務軟體」', '位於 SDN 控制器下方；連接 Controller 與「底層實體/虛擬網路設備 (Switch/Router)」', 'Northbound: REST API (JSON/HTTPS)<br>Southbound: NETCONF, RESTCONF, gRPC, OpenFlow', '北向負責業務意圖；南向負責設備配置與狀態收集'],
       ['管理協定特性對比', '透過標準 RESTful 請求下發高層策略 (Intent-based)', 'NETCONF (RFC 6241)：走 SSH (TCP 830)，採用 XML 與 RPC 交互<br>RESTCONF (RFC 8040)：走 HTTPS，採用 JSON/XML，提供 RESTful 介面', 'YANG (RFC 6020/7950)：NETCONF 與 RESTCONF 所使用的資料建模語言 (Data Model)', 'NETCONF 基於 XML/SSH；RESTCONF 基於 JSON/HTTPS']
+    ]],
+
+    ['Cisco SD-Access (SDA) Fabric 4 大節點角色與職責', [
+      ['', 'Fabric Control Plane Node', 'Fabric Edge Node', 'Fabric Border Node', 'Fabric Intermediate Node'],
+      ['核心職責與功能', '維護 Fabric 映射資料庫（HTDB）；追蹤端點（Endpoints）與 Edge Node 關聯', '終端設備接入點；負責端點識別、註冊，並進行 VXLAN 封裝與解封裝', '連接 SDA Fabric 與外部網路（如 WAN/Internet/傳統 LAN）的邊界閘道', '底層 Underlay 核心/分發交換機；僅負責純 IP 路由轉發，不跑 VXLAN'],
+      ['依賴協定與技術', '基於 LISP（Locator/ID Separation Protocol）協定運作', '提供 Anycast Gateway；執行 VXLAN 封裝 + TrustSec (SGT) 安全策略', '負責 LISP-to-BGP / VRF 路由重分配與外部連通性', '運行 IS-IS 或 OSPF；完全不參與 Overlay / VXLAN 運算'],
+      ['口訣與秒殺速記', 'Control 查 LISP 找人、Edge 接終端做封裝、Border 當外網閘道、Intermediate 純 Underlay 轉發']
     ]],
 
     ['REST API 機制與 CLI 特性對比', [
@@ -3954,39 +4039,25 @@ renderPitfalls();
 const QM=['Network Fundamentals','Network Access','IP Connectivity','IP Services','Security Fundamentals','Automation & Programmability'];
 const quiz=[
 // ══════════ Module 0: Network Fundamentals（45題）══════════
-{m:0,q:'In the OSI model, at which layers do a Switch and a Router primarily operate?',o:['L1 / L2','L2 / L3','L3 / L4','L2 / L7'],a:1,e:'Switch 是 L2（Frame/MAC），Router 是 L3（Packet/IP）；Hub 才是 L1。'},
-{m:0,q:'What is the correct order of the TCP three-way handshake?',o:['SYN → ACK → SYN-ACK','SYN → SYN-ACK → ACK','ACK → SYN → FIN','SYN → FIN → ACK'],a:1,e:'建立連線 SYN→SYN-ACK→ACK；斷線四次揮手 FIN→ACK→FIN→ACK。'},
-{m:0,q:'Which protocol uses UDP port 69?',o:['SNMP','TFTP','DNS','Syslog'],a:1,e:'TFTP=UDP 69；SNMP=161、DNS=53、Syslog=514（皆 UDP）。'},
-{m:0,q:'A host shows IP address 169.254.17.5. What is the most likely cause?',o:['Incorrect static route','DHCP server unreachable; host obtained an APIPA address','IPv6 not enabled','Wrong subnet mask'],a:1,e:'169.254.0.0/16 是 APIPA，代表 DHCP 失敗後的自動私有位址。'},
-{m:0,q:'Which cabling type should be used for long-distance backbone fiber runs?',o:['Multimode fiber (LED)','Single-mode fiber (laser)','Cat6a UTP','Coaxial'],a:1,e:'單模：長距離 LR+雷射+黃色接頭；多模：短距離 SR+LED+橘色接頭。'},
-{m:0,q:'Which two statements describe TCP characteristics compared to UDP? (Choose two)',
- o:['Connection-oriented with handshake','Reliable delivery using sequence numbers and acknowledgments','No flow control mechanism','Lower header overhead than UDP'],
- a:[0,1],
- e:'TCP 具三向交握、序號確認重傳與滑動視窗流量控制；UDP 才是低開銷。'},
-{m:0,q:'Which three address types can be assigned to a single IPv6-enabled interface simultaneously? (Choose three)',
- o:['Global unicast address','Link-local address','Solicited-node multicast address','APIPA address 169.254.x.x'],
- a:[0,1,2],
- e:'一個 IPv6 介面可同時擁有 Global Unicast、Link-local（FE80::/10 必有）、Multicast（含 Solicited-node）；APIPA 屬 IPv4 機制。'},
-
-
-{m:0,q:'What is the correct compressed form of IPv6 address 2001:0db8:0000:0000:0000:ff00:0042:8329?',o:['2001:db8::ff00:42:8329','2001::db8::ff00:42:8329','2001:db8:0:0:0:ff00:4200:8329','2001:db8::::ff00:42:8329'],a:0,e:':: 只能出現一次；每組前導零可刪（0042→42）。'},
+{m: 0,
+  q: 'An engineer notices that an Ethernet interface experiences excessive "late collisions". What are two common causes of this issue? (Choose two)',
+  o: [
+    'Duplex mismatch between the two connected ends',
+    'Ethernet cable length exceeds the 100-meter standard limit',
+    'Carrier Sense Multiple Access with Collision Detection (CSMA/CD) is operating normally',
+    'Excessive broadcast traffic on the local VLAN'
+  ],
+  a: [0, 1],
+  e: '【實體層排錯考點】：Late Collision 指的是訊框發送超過 512 bits（64 bytes）後才偵測到碰撞。正常半雙工網路不應發生；常見原因為「雙工不匹配（一端 Full 一端 Half）」或「雙絞線長度超過 100 公尺上限」導致訊號延遲過大。'
+},
 {m:0,q:'Which two statements about full-duplex Ethernet are correct? (Choose two)',
  o:['Collisions are eliminated','Separate transmit and receive wire pairs allow simultaneous send/receive','CSMA/CD remains fully active','Bandwidth is halved'],
  a:[0,1],
  e:'全雙工用獨立 TX/RX 線對同時收送，無碰撞、CSMA/CD 停用，頻寬加倍而非減半。'},
-
-{m:0,q:'Which prefix identifies an IPv6 link-local address?',o:['2000::/3','FE80::/10','FC00::/7','FF00::/8'],a:1,e:'Link-local=FE80::/10；Global=2000::/3；ULA=FC00::/7；Multicast=FF00::/8。'},
-{m:0,q:'How many usable hosts are available in a /26 subnet?',o:['62','64','126','30'],a:0,e:'主機位元 6 位 → 2^6−2=62。Block Size=64。'},
 {m:0,q:'Which two functions does a router perform? (Choose two)',
  o:['Path selection using the routing table','Forwarding packets between different networks','Learning source MAC addresses into a CAM table','Reducing the size of broadcast domains on a single segment'],
  a:[0,1],
  e:'Router 依路由表選路並在網路間轉發封包；學 MAC 是 Switch 功能；Router 是「分隔」廣播域而非縮小同一網段內的碰撞域。'},
-
-{m:0,q:'IP address 192.168.1.77/28 belongs to which network?',o:['192.168.1.64','192.168.1.72','192.168.1.80','192.168.1.48'],a:0,e:'/28 Block Size=16；77÷16=4 餘 13 → 網路位址 192.168.1.64。'},
-{m:0,q:'What is the wildcard mask for subnet mask 255.255.255.240?',o:['0.0.0.15','0.0.0.31','0.0.0.240','255.255.255.15'],a:0,e:'Wildcard = 256−240=15 → 0.0.0.15。'},
-{m:0,q:'Which of the following is an example of a Type 1 hypervisor?',o:['VMware Workstation','VirtualBox','ESXi','Docker Engine'],a:2,e:'Type 1 裸機：ESXi/KVM/Hyper-V；Type 2 架於 OS 上：Workstation/VirtualBox。'},
-{m:0,q:'What is the key difference between containers and virtual machines?',o:['Containers perform worse','Containers share the host OS kernel','VMs do not need a hypervisor','Containers cannot run Linux'],a:1,e:'Container 共享 Kernel 啟動秒級更輕量；VM 各自含完整 Guest OS。'},
-{m:0,q:'When is a straight-through cable used?',o:['PC to PC','Switch to Switch','PC to Switch','Router to Router'],a:2,e:'不同類設備用直通線；同類設備用跳接線（Crossover，或靠 Auto-MDIX 自動偵測）。'},
 {m:0,q:'Which two IPv6 multicast address assignments are correct? (Choose two)',
  o:['ff02::1 — all nodes',
     'ff02::2 — all routers',
@@ -3994,9 +4065,6 @@ const quiz=[
     'ff02::2 — OSPFv3 designated routers'],
  a:[0,1],
  e:'ff02::1=所有節點、ff02::2=所有路由器；OSPFv3 路由器用 ff02::5、DHCPv6 用 ff02::1:2。'},
-{m:0,q:'What is the maximum distance Cat6a UTP supports 10 Gbps over?',o:['55 meters','100 meters','10 meters','500 meters'],a:1,e:'Cat6a=10G@100m；Cat6 僅 10G@55m；Cat5e=1G@100m。'},
-{m:0,q:'At which OSI layer does TCP operate?',o:['Layer 2','Layer 3','Layer 4','Layer 7'],a:2,e:'TCP/UDP 位於傳輸層（L4）；IP 在網路層（L3）；HTTP/DNS 在應用層（L7）。'},
-{m:0,q:'Which statement describes PDU encapsulation correctly?',o:['Segment→Frame→Packet→Bit','Data→Segment→Packet→Frame→Bits','Frame→Segment→Packet→Bit','Packet→Segment→Frame→Bit'],a:1,e:'封裝順序：資料加 TCP 標頭成 Segment → 加 IP 成 Packet → 加 MAC 成 Frame → 成 Bits 傳輸。'},
 {m:0,q:'Which three IPv4 address ranges are defined by RFC 1918 as private? (Choose three)',
  o:['10.0.0.0 – 10.255.255.255',
     '172.16.0.0 – 172.31.255.255',
@@ -4004,15 +4072,10 @@ const quiz=[
     '169.254.0.0 – 169.254.255.255'],
  a:[0,1,2],
  e:'RFC1918 三段私有位址：10/8、172.16/12、192.168/16；169.254.0.0/16 是 APIPA（link-local），不屬於 RFC1918。'},
-{m:0,q:'How many subnets and hosts does 192.168.10.0/27 provide?',o:['8 subnets / 30 hosts','16 subnets / 14 hosts','8 subnets / 62 hosts','32 subnets / 6 hosts'],a:0,e:'/24 切 /27 借 3 bit → 8 個子網路，每個 2^5−2=30 主機。'},
 {m:0,q:'Which three statements about IPv6 SLAAC are correct? (Choose three)',
  o:['The host builds its address using the prefix received in a Router Advertisement','The interface identifier can be generated by EUI-64','No DHCPv6 server is strictly required for basic addressing','The host must obtain its entire address exclusively from DHCPv6'],
  a:[0,1,2],
  e:'SLAAC 由 RA 提供前綴＋EUI-64 或隨機 ID 自組位址，基本定址不需 DHCPv6（僅 DNS 等資訊可能需 Stateless DHCPv6）。'},
-
-{m:0,q:'Which network topology provides full redundancy by connecting every node to every other node?',o:['Star','Ring','Full mesh','Partial mesh'],a:2,e:'Full Mesh 每節點兩兩相連，容錯最高但成本最高；n 節點需 n(n−1)/2 條鏈路。'},
-{m:0,q:'What is the function of ARP?',o:['Resolve domain names to IPs','Resolve an IP address to a MAC address','Assign IP addresses dynamically','Route packets between networks'],a:1,e:'ARP 將已知 IP 解析為 MAC（同一子網內）；反向 RARP/無狀態廣播詢問。'},
-{m:0,q:'Which two fields are found in an Ethernet frame header? (Choose two)',o:['Source MAC address','Destination MAC address','Source port','TTL'],a:[0,1],e:'Ethernet Frame：Dest MAC + Src MAC + Type + Payload + FCS；Port 屬 L4、TTL 屬 IP 標頭。'},
 {m:0,q:'Which two subnet calculations are correct? (Choose two)',
  o:['A /29 subnet provides 6 usable host addresses','Subnet mask 255.255.255.192 provides 62 usable hosts','A /30 subnet provides 4 usable hosts','255.255.255.240 provides 20 usable hosts'],
  a:[0,1],
@@ -4025,9 +4088,6 @@ const quiz=[
  o:['TTL','Protocol','Source IP address','Source port number'],
  a:[0,1,2],
  e:'IPv4 標頭含 TTL、Protocol、來源/目的 IP 等；Port 屬 TCP/UDP（L4）標頭。'},
-
-{m:0,q:'Which command displays the local routing table on a Windows host?',o:['ipconfig /all','route print or netstat -r','arp -d','nslookup'],a:1,e:'Windows 用 route print/netstat -r；Linux 用 ip route；Cisco IOS 用 show ip route。'},
-{m:0,q:'What does DNS record type MX identify?',o:['Host IPv4 address','Mail server for a domain','Domain name alias','Name server'],a:1,e:'MX=郵件伺服器、A=IPv4、AAAA=IPv6、CNAME=別名、NS=name server。'},
 {m:0,q:'Which two statements about switch MAC address learning are correct? (Choose two)',
  o:['The switch records the source MAC and ingress port in the CAM table','Unknown destination MAC addresses cause flooding within the VLAN','The switch learns destination MAC addresses','Frames are forwarded only after ARP completes'],
  a:[0,1],
@@ -4036,25 +4096,133 @@ const quiz=[
  o:['Use WPA3 or WPA2 with AES','Disable WPS','Use a strong, unique passphrase','Enable WEP for backward compatibility'],
  a:[0,1,2],
  e:'WEP 已被破解絕不可用；WPS 易受 PIN 暴力破解，應停用。'},
-
-{m:0,q:'An engineer must choose a cable to connect a router Ethernet port directly to a PC NIC. Which type is required (assuming Auto-MDIX is disabled)?',o:['Straight-through','Crossover','Rollover','Console cable'],a:1,e:'同類設備（router↔PC）用 Crossover；Rollover 是 Cisco Console 線。'},
-{m:0,q:'What is the purpose of the FCS field in an Ethernet frame?',o:['Identify upper-layer protocol','Error detection via CRC','Priority marking','Fragmentation control'],a:1,e:'FCS 使用 CRC 校驗影框完整性，錯誤即丟棄；Type 欄位才是識別上層協定。'},
-{m:0,q:'Which IPv6 address type is automatically configured using the EUI-64 process on an interface?',o:['Global unicast from DHCPv6','Modified EUI-64 interface identifier in SLAAC','Loopback','Unique local only'],a:1,e:'SLAAC 用 Router Advertisement 前綴 + EUI-64（MAC 中插入 FF:FE 並反轉第 7 bit）產生介面 ID。'},
-{m:0,q:'Which statement about IPv6 solicited-node multicast is true?',o:['It replaces broadcast for neighbor discovery','It uses prefix FF01::/16','Every host joins ff02::1 only','It is used by OSPFv2'],a:0,e:'Solicited-node multicast (FF02::1:FFxx:xxxx) 取代 ARP 廣播做 ND 解析。'},
 {m:0,q:'Which three application layer protocols normally use TCP? (Choose three)',
  o:['HTTP','FTP','SMTP','TFTP'],
  a:[0,1,2],
  e:'HTTP/HTTPS、FTP、SMTP/SSH/Telnet 用 TCP；TFTP、DNS 查詢、DHCP、SNMP 用 UDP。'},
-
-{m:0,q:'What is the valid range of the first octet for Class C addresses?',o:['1–126','128–191','192–223','224–239'],a:2,e:'A=1–126、B=128–191、C=192–223；127 是 loopback、224+ 是 multicast。'},
-{m:0,q:'Which term describes the ability of a network to expand without redesign?',o:['Availability','Scalability','Security','Manageability'],a:1,e:'可擴展性=不需重新設計即可成長；可用性=不停機；CCNA 常考架構四大目標。'},
-{m:0,q:'Which device separates collision domains but NOT broadcast domains?',o:['Hub','Switch','Router','Firewall'],a:1,e:'Switch 分隔碰撞域（每埠一個）但廣播域整台一個；Router 才分隔廣播域。'},
-{m:0,q:'What is the binary representation of decimal 168?',o:['10101000','11000000','10101100','11111000'],a:0,e:'168 = 128+32+8 = 10101000；子網化必考二進位轉換。'},
 {m:0,q:'Which two statements about DNS are correct? (Choose two)',
  o:['It resolves domain names to IP addresses','Queries commonly use UDP port 53','It assigns IP addresses to clients dynamically','MX records point to web servers'],
  a:[0,1],
  e:'DNS 解析名稱、查詢常用 UDP 53（Zone Transfer 用 TCP 53）；動態配址是 DHCP；MX 是郵件伺服器。'},
+{m:0,q:'Which two statements describe TCP characteristics compared to UDP? (Choose two)',
+ o:['Connection-oriented with handshake','Reliable delivery using sequence numbers and acknowledgments','No flow control mechanism','Lower header overhead than UDP'],
+ a:[0,1],
+ e:'TCP 具三向交握、序號確認重傳與滑動視窗流量控制；UDP 才是低開銷。'},
+{m:0,q:'Which three address types can be assigned to a single IPv6-enabled interface simultaneously? (Choose three)',
+ o:['Global unicast address','Link-local address','Solicited-node multicast address','APIPA address 169.254.x.x'],
+ a:[0,1,2],
+ e:'一個 IPv6 介面可同時擁有 Global Unicast、Link-local（FE80::/10 必有）、Multicast（含 Solicited-node）；APIPA 屬 IPv4 機制。'},
+{m:0,q:'Which two statements about UDP are correct? (Choose two)',
+ o:['Connectionless','Lower overhead than TCP','Guaranteed delivery','Uses sequence numbers'],
+ a:[0,1],
+ e:'UDP 無連線、無序號、不保證送達，開銷小適合語音/DNS/TFTP。'},
 
+
+{m: 0,
+  q: 'A host with an empty DNS cache and an empty ARP cache opens a browser to connect to URL www.ciscopress.com located on a remote network. Which packet is sent FIRST by the host?',
+  o: [
+    'A DNS request sent to the DNS server\'s IP address',
+    'A DNS request sent to the 255.255.255.255 broadcast address',
+    'An ARP request looking for the DNS server\'s MAC address',
+    'An ARP request looking for the MAC address of the default gateway (Router)'
+  ],
+  a: 3,
+  e: '【經典跨網段封裝陷阱題】：主機欲解析網名需向遠端 DNS Server 發送 DNS Request，但跨網段封包在封裝 Layer 2 Data Link Header 時，必須填入「預設閘道 (Default Gateway)」的 MAC 位址；由於本地 ARP Cache 為空，主機第一步「必須先發送 ARP Request 詢問預設閘道 (10.1.1.3) 的 MAC」，取得後才能將 DNS 請求封裝送出。'
+},
+
+{m: 0,
+  q: 'Which physical characteristic distinguishes single-mode fiber (SMF) from multimode fiber (MMF)?',
+  o: [
+    'SMF uses a smaller core diameter (typically 9 microns) and a laser light source to eliminate modal dispersion',
+    'SMF uses an LED light source and is ideal for short-distance intra-datacenter runs',
+    'MMF has a 9-micron core and allows only a single wavelength of light to propagate',
+    'MMF operates over longer distances up to 70 km without requiring optical amplifiers'
+  ],
+  a: 0,
+  e: '【光纖介質特性】：單模光纖 (SMF) 核心極細（約 9 微米），以雷射為光源，光線直線傳播無模態色散，支援 10km~70km 長距傳輸；多模光纖 (MMF) 核心粗（50/62.5 微米），以 LED 為光源，多路光線折射傳播，僅適合 550m 內短距離。'
+},
+{m: 0,
+  q: 'An engineer must configure a point-to-point router link using RFC 3021 to conserve IPv4 address space. Which subnet mask meets this requirement?',
+  o: ['255.255.255.252 (/30)', '255.255.255.254 (/31)', '255.255.255.248 (/29)', '255.255.255.255 (/32)'],
+  a: 1,
+  e: '【RFC 3021 /31 點對點子網】：/31 遮罩（255.255.255.254）專門用於點對點串列或乙太網路鏈路，提供剛好 2 個可用 IP，且沒有傳統的 Network ID 與 Broadcast IP，最大化節省 IPv4 位址空間。'
+},
+
+{m: 0,
+  q: 'What is the name of the Cisco IOS CLI exec mode that allows an administrator to run more powerful commands such as "show running-config" and "debug"?',
+  o: [
+    'User mode',
+    'Enable mode (Privileged Exec mode)',
+    'Configuration mode',
+    'Boot mode'
+  ],
+  a: 1,
+  e: 'Cisco IOS CLI 階層模式：User mode (使用者模式，提示字元 >) 僅能執行基礎檢視；Enable mode (特權模式 / Privileged Exec mode，提示字元 #) 可執行 show run、debug 與 copy 等高階排錯維護指令；Configuration mode (全域設定模式，提示字元 (config)#) 則用於修改組態。'
+},
+{m: 0,
+  q: 'A router interface has MAC address 12-a0-ab-dd-00-02. When the interface is configured for IPv6 on prefix 2001:db8:44:90::/64 using EUI-64, which IPv6 address is generated?',
+  o: [
+    '2001:db8:44:90:10a0:abff:fedd:2/64',
+    '2001:db8:44:90:12a0:abff:fedd:2/64',
+    '2001:db8:44:90:13a0:abff:fedd:2/64',
+    '2001:db8:44:90:12a0:abfe:ffdd:2/64'
+  ],
+  a: 0,
+  e: '【EUI-64 運算陷阱】：MAC 位址中段插入 FFFE 變成 12a0:abFF:FEdd:0002；接著將第一個 Byte (0x12 = 二進位 0001 0010) 的第 7 位元 (U/L bit) 反轉變成 0001 0000 = 0x10，因此前綴為 10a0:abff:fedd:2。'
+},
+{m: 0,
+  q: 'What is the key difference between 1000BASE-LX/LH and 1000BASE-ZX optical transceivers?',
+  o: [
+    '1000BASE-LX/LH supports links up to 10 km, while 1000BASE-ZX operates over single-mode fiber links up to 70 km',
+    '1000BASE-LX/LH requires copper media, while 1000BASE-ZX requires single-mode fiber',
+    '1000BASE-ZX operates over links up to 1000 km using LED light sources',
+    '1000BASE-LX/LH operates exclusively in half-duplex mode'
+  ],
+  a: 0,
+  e: '【光纖收發模組規格】：1000BASE-LX/LH（長波長/長距離）標準支援單模光纖最長達 10 km（多模 550m）；1000BASE-ZX 採用 1550nm 波長雷射，專為長途骨幹設計，最長傳輸距離達 70 km。'
+},
+{m: 0,
+  q: 'Which architectural characteristic accurately describes a data center Spine-and-Leaf topology?',
+  o: [
+    'Every leaf switch connects to every spine switch in a full mesh, providing predictable latency with equal hop counts between any two endpoints',
+    'Spine switches connect to each other in a ring to provide localized loop resolution',
+    'Leaf switches connect directly to other leaf switches to reduce uplink load to the spine layer',
+    'Traffic between servers on different leaf switches must traverse at least four intermediate routing hops'
+  ],
+  a: 0,
+  e: '【Spine-Leaf 架構特性】：Spine-Leaf 拓撲中 Leaf 交換機與所有 Spine 交換機兩兩全互連（Full-Mesh），Leaf 與 Leaf 之間、Spine 與 Spine 之間均不相連；任何伺服器跨 Leaf 通訊皆固定為 2 跳（Leaf → Spine → Leaf），延遲極度一致且利於東西向（East-West）流量擴展。'
+},
+
+{m:0,q:'In the OSI model, at which layers do a Switch and a Router primarily operate?',o:['L1 / L2','L2 / L3','L3 / L4','L2 / L7'],a:1,e:'Switch 是 L2（Frame/MAC），Router 是 L3（Packet/IP）；Hub 才是 L1。'},
+{m:0,q:'What is the correct order of the TCP three-way handshake?',o:['SYN → ACK → SYN-ACK','SYN → SYN-ACK → ACK','ACK → SYN → FIN','SYN → FIN → ACK'],a:1,e:'建立連線 SYN→SYN-ACK→ACK；斷線四次揮手 FIN→ACK→FIN→ACK。'},
+{m:0,q:'Which protocol uses UDP port 69?',o:['SNMP','TFTP','DNS','Syslog'],a:1,e:'TFTP=UDP 69；SNMP=161、DNS=53、Syslog=514（皆 UDP）。'},
+{m:0,q:'A host shows IP address 169.254.17.5. What is the most likely cause?',o:['Incorrect static route','DHCP server unreachable; host obtained an APIPA address','IPv6 not enabled','Wrong subnet mask'],a:1,e:'169.254.0.0/16 是 APIPA，代表 DHCP 失敗後的自動私有位址。'},
+{m:0,q:'Which cabling type should be used for long-distance backbone fiber runs?',o:['Multimode fiber (LED)','Single-mode fiber (laser)','Cat6a UTP','Coaxial'],a:1,e:'單模：長距離 LR+雷射+黃色接頭；多模：短距離 SR+LED+橘色接頭。'},
+{m:0,q:'What is the correct compressed form of IPv6 address 2001:0db8:0000:0000:0000:ff00:0042:8329?',o:['2001:db8::ff00:42:8329','2001::db8::ff00:42:8329','2001:db8:0:0:0:ff00:4200:8329','2001:db8::::ff00:42:8329'],a:0,e:':: 只能出現一次；每組前導零可刪（0042→42）。'},
+{m:0,q:'Which prefix identifies an IPv6 link-local address?',o:['2000::/3','FE80::/10','FC00::/7','FF00::/8'],a:1,e:'Link-local=FE80::/10；Global=2000::/3；ULA=FC00::/7；Multicast=FF00::/8。'},
+{m:0,q:'How many usable hosts are available in a /26 subnet?',o:['62','64','126','30'],a:0,e:'主機位元 6 位 → 2^6−2=62。Block Size=64。'},
+{m:0,q:'IP address 192.168.1.77/28 belongs to which network?',o:['192.168.1.64','192.168.1.72','192.168.1.80','192.168.1.48'],a:0,e:'/28 Block Size=16；77÷16=4 餘 13 → 網路位址 192.168.1.64。'},
+{m:0,q:'What is the wildcard mask for subnet mask 255.255.255.240?',o:['0.0.0.15','0.0.0.31','0.0.0.240','255.255.255.15'],a:0,e:'Wildcard = 256−240=15 → 0.0.0.15。'},
+{m:0,q:'Which of the following is an example of a Type 1 hypervisor?',o:['VMware Workstation','VirtualBox','ESXi','Docker Engine'],a:2,e:'Type 1 裸機：ESXi/KVM/Hyper-V；Type 2 架於 OS 上：Workstation/VirtualBox。'},
+{m:0,q:'What is the key difference between containers and virtual machines?',o:['Containers perform worse','Containers share the host OS kernel','VMs do not need a hypervisor','Containers cannot run Linux'],a:1,e:'Container 共享 Kernel 啟動秒級更輕量；VM 各自含完整 Guest OS。'},
+{m:0,q:'When is a straight-through cable used?',o:['PC to PC','Switch to Switch','PC to Switch','Router to Router'],a:2,e:'不同類設備用直通線；同類設備用跳接線（Crossover，或靠 Auto-MDIX 自動偵測）。'},
+{m:0,q:'What is the maximum distance Cat6a UTP supports 10 Gbps over?',o:['55 meters','100 meters','10 meters','500 meters'],a:1,e:'Cat6a=10G@100m；Cat6 僅 10G@55m；Cat5e=1G@100m。'},
+{m:0,q:'At which OSI layer does TCP operate?',o:['Layer 2','Layer 3','Layer 4','Layer 7'],a:2,e:'TCP/UDP 位於傳輸層（L4）；IP 在網路層（L3）；HTTP/DNS 在應用層（L7）。'},
+{m:0,q:'Which statement describes PDU encapsulation correctly?',o:['Segment→Frame→Packet→Bit','Data→Segment→Packet→Frame→Bits','Frame→Segment→Packet→Bit','Packet→Segment→Frame→Bit'],a:1,e:'封裝順序：資料加 TCP 標頭成 Segment → 加 IP 成 Packet → 加 MAC 成 Frame → 成 Bits 傳輸。'},
+{m:0,q:'How many subnets and hosts does 192.168.10.0/27 provide?',o:['8 subnets / 30 hosts','16 subnets / 14 hosts','8 subnets / 62 hosts','32 subnets / 6 hosts'],a:0,e:'/24 切 /27 借 3 bit → 8 個子網路，每個 2^5−2=30 主機。'},
+{m:0,q:'Which network topology provides full redundancy by connecting every node to every other node?',o:['Star','Ring','Full mesh','Partial mesh'],a:2,e:'Full Mesh 每節點兩兩相連，容錯最高但成本最高；n 節點需 n(n−1)/2 條鏈路。'},
+{m:0,q:'What is the function of ARP?',o:['Resolve domain names to IPs','Resolve an IP address to a MAC address','Assign IP addresses dynamically','Route packets between networks'],a:1,e:'ARP 將已知 IP 解析為 MAC（同一子網內）；反向 RARP/無狀態廣播詢問。'},
+{m:0,q:'Which two fields are found in an Ethernet frame header? (Choose two)',o:['Source MAC address','Destination MAC address','Source port','TTL'],a:[0,1],e:'Ethernet Frame：Dest MAC + Src MAC + Type + Payload + FCS；Port 屬 L4、TTL 屬 IP 標頭。'},
+{m:0,q:'Which command displays the local routing table on a Windows host?',o:['ipconfig /all','route print or netstat -r','arp -d','nslookup'],a:1,e:'Windows 用 route print/netstat -r；Linux 用 ip route；Cisco IOS 用 show ip route。'},
+{m:0,q:'What does DNS record type MX identify?',o:['Host IPv4 address','Mail server for a domain','Domain name alias','Name server'],a:1,e:'MX=郵件伺服器、A=IPv4、AAAA=IPv6、CNAME=別名、NS=name server。'},
+{m:0,q:'An engineer must choose a cable to connect a router Ethernet port directly to a PC NIC. Which type is required (assuming Auto-MDIX is disabled)?',o:['Straight-through','Crossover','Rollover','Console cable'],a:1,e:'同類設備（router↔PC）用 Crossover；Rollover 是 Cisco Console 線。'},
+{m:0,q:'What is the purpose of the FCS field in an Ethernet frame?',o:['Identify upper-layer protocol','Error detection via CRC','Priority marking','Fragmentation control'],a:1,e:'FCS 使用 CRC 校驗影框完整性，錯誤即丟棄；Type 欄位才是識別上層協定。'},
+{m:0,q:'Which IPv6 address type is automatically configured using the EUI-64 process on an interface?',o:['Global unicast from DHCPv6','Modified EUI-64 interface identifier in SLAAC','Loopback','Unique local only'],a:1,e:'SLAAC 用 Router Advertisement 前綴 + EUI-64（MAC 中插入 FF:FE 並反轉第 7 bit）產生介面 ID。'},
+{m:0,q:'Which statement about IPv6 solicited-node multicast is true?',o:['It replaces broadcast for neighbor discovery','It uses prefix FF01::/16','Every host joins ff02::1 only','It is used by OSPFv2'],a:0,e:'Solicited-node multicast (FF02::1:FFxx:xxxx) 取代 ARP 廣播做 ND 解析。'},
+{m:0,q:'What is the valid range of the first octet for Class C addresses?',o:['1–126','128–191','192–223','224–239'],a:2,e:'A=1–126、B=128–191、C=192–223；127 是 loopback、224+ 是 multicast。'},
+{m:0,q:'Which term describes the ability of a network to expand without redesign?',o:['Availability','Scalability','Security','Manageability'],a:1,e:'可擴展性=不需重新設計即可成長；可用性=不停機；CCNA 常考架構四大目標。'},
+{m:0,q:'Which device separates collision domains but NOT broadcast domains?',o:['Hub','Switch','Router','Firewall'],a:1,e:'Switch 分隔碰撞域（每埠一個）但廣播域整台一個；Router 才分隔廣播域。'},
+{m:0,q:'What is the binary representation of decimal 168?',o:['10101000','11000000','10101100','11111000'],a:0,e:'168 = 128+32+8 = 10101000；子網化必考二進位轉換。'},
 {m:0,q:'Given 172.17.0.0/16, how many /20 subnets can be created?',o:['4','8','16','64'],a:2,e:'/20 比 /16 多借 4 bit → 2^4=16 個子網路。'},
 {m:0,q:'Which protocol maps IPv4 multicast addresses to Layer 2 addresses?',o:['IGMP','ICMP','Multicast MAC derived from IP (01:00:5E prefix)','CDP'],a:2,e:'Multicast MAC 固定前綴 01:00:5E + IP 後 23 bit（第 25 bit 恆 0，有 32:1 重疊）。'},
 {m:0,q:'Which cloud service model provides the customer control over the operating system but not the hardware?',o:['SaaS','PaaS','IaaS','XaaS'],a:2,e:'IaaS=管 OS 以上；PaaS=只管應用程式與資料；SaaS=全都交給廠商。責任共擔模型必背。'},
@@ -4062,10 +4230,6 @@ const quiz=[
 {m:0,q:'What is the default gateway used for?',o:['Resolving MAC addresses','Forwarding traffic destined to remote networks','Assigning dynamic IPs','Encrypting local traffic'],a:1,e:'目的 IP 不在同子網時，主機把影框送往預設閘道 MAC 由路由器轉發。'},
 {m:0,q:'A technician pings 127.0.0.1 successfully but cannot reach any external host. Where is the problem most likely located?',o:['Local TCP/IP stack is fine; check beyond loopback (cable/gateway)','TCP/IP stack corrupted','DNS server down','DHCP failed'],a:0,e:'127.x.x.x 測本機堆疊；成功代表堆疊正常，問題在實體層之後（纜線/IP/閘道）。'},
 {m:0,q:'Which field in the IPv4 header prevents packets from looping forever?',o:['Checksum','TTL','Flags','Protocol'],a:1,e:'TTL 每過一台路由器減 1，歸零丟棄並回 ICMP Time Exceeded（traceroute 的原理）。'},
-{m:0,q:'Which two statements about UDP are correct? (Choose two)',
- o:['Connectionless','Lower overhead than TCP','Guaranteed delivery','Uses sequence numbers'],
- a:[0,1],
- e:'UDP 無連線、無序號、不保證送達，開銷小適合語音/DNS/TFTP。'},
 {m:0,q:'What does a switch do when it receives a frame whose destination MAC exists in its table?',o:['Floods to all ports','Forwards out the specific mapped port','Drops the frame','Requests the source retransmit'],a:1,e:'MAC Table 有對應項就從指定埠轉發；沒有才 Flood（未知單播洪泛）。'},
 {m:0,q:'Which IPv6 transition mechanism tunnels IPv6 packets inside IPv4 packets?',o:['NAT64','6to4 tunneling','Dual stack','SLAAC'],a:1,e:'6to4/GRE 隧道把 v6 包進 v4；NAT64 是轉換技術；雙堆疊是並行啟用兩協定。'},
 {m:0,q:'Which wireless standard operates ONLY in the 5 GHz band?',o:['802.11b','802.11g','802.11a','802.11ax'],a:2,e:'802.11a 只用 5GHz；b/g 用 2.4GHz；n/ac/ax 雙頻。'},
@@ -4079,8 +4243,6 @@ const quiz=[
  e:'Class 0≈15.4W；Class 4=PoE+（802.3at）PSE 端 30W／PD 端 25.5W；51W(PD)/60W(PSE) 屬 802.3bt Type 3，bt 最高可達 90W(PSE)。'},
 
 // ══════════ Module 1: Network Access（40題）══════════
-{m:1,q:'What is the root bridge election order in STP?',o:['Lowest MAC → lowest priority','Lowest priority → lowest MAC','Highest priority → highest MAC','Lowest cost → highest MAC'],a:1,e:'先比 Bridge Priority（小者勝），相同再比 MAC（小者勝）。'},
-{m:1,q:'Which are the three RSTP port states?',o:['Blocking/Learning/Forwarding','Discarding/Learning/Forwarding','Listening/Learning/Forwarding','Disabled/Blocking/Forwarding'],a:1,e:'RSTP 以 Discarding 取代 STP 的 Blocking+Listening，三態制。'},
 {m:1,q:'Which two settings must match on both ends of an 802.1Q trunk for proper operation? (Choose two)',
  o:['The allowed VLAN list','The native VLAN','The port-security maximum count','The CDP holdtime'],
  a:[0,1],
@@ -4089,27 +4251,14 @@ const quiz=[
  o:['BPDU Guard','Root Guard','Loop Guard','DTP negotiation'],
  a:[0,1,2],
  e:'BPDU Guard 保護 Edge 埠、Root Guard 保護根橋地位、Loop Guard 防單向鏈路造成迴圈；DTP 與防護無關且應關閉。'},
-
-{m:1,q:'In RSTP, which port role provides a backup path to the root bridge?',o:['Backup Port','Alternate Port','Designated Port','Edge Port'],a:1,e:'Alternate=根橋路徑備胎；Backup=同一鏈路上 Designated 的備胎。'},
-{m:1,q:'What happens if the native VLAN mismatches on both ends of a trunk?',o:['The trunk shuts down','Traffic leaks between VLANs (security risk)','Negotiation auto-corrects it','Only a syslog warning, no impact'],a:1,e:'Native VLAN 明文不打標籤，不一致造成 VLAN Hopping/洩漏；建議改閒置 VLAN 999。'},
-{m:1,q:'With which LACP mode can a passive-mode interface successfully form an EtherChannel?',o:['on','desirable','active','auto'],a:2,e:'passive↔active 可成；passive↔passive 不行；on/desirable/auto 屬其他模式不相通。'},
-{m:1,q:'What is the default violation mode of port security?',o:['protect','restrict','shutdown','log'],a:2,e:'預設 shutdown → err-disabled，需 shutdown+no shutdown 或 errdisable recovery 恢復。'},
 {m:1,q:'Which two protocols can negotiate an EtherChannel? (Choose two)',
  o:['PAgP','LACP','DTP','VTP'],
  a:[0,1],
  e:'PAgP（Cisco 專屬）與 LACP（IEEE 802.3ad）是兩大協商協定。'},
-
-{m:1,q:'What does a switch do when it receives a unicast frame with a destination MAC not in its MAC table?',o:['Drops it','Floods it out all ports','Sends it back to the source port','Triggers ARP'],a:1,e:'未知單播 Flood 至同 VLAN 所有埠（除來源埠）。'},
-{m:1,q:'In a mixed vendor environment (Cisco + non-Cisco), which discovery protocol must be enabled?',o:['CDP','LLDP','LDAP','VTP'],a:1,e:'LLDP 是 IEEE 802.1AB 開放標準；CDP 為 Cisco 專屬。'},
 {m:1,q:'Which three are valid RSTP port roles? (Choose three)',
  o:['Root port','Designated port','Alternate port','Listening port'],
  a:[0,1,2],
  e:'RSTP 角色：Root/Designated/Alternate/Backup；Listening 是 STP 的狀態而非角色。'},
-
-{m:1,q:'In a Lightweight AP architecture, where is client data-plane encryption typically performed in Local mode?',o:['Centrally at the WLC (all modes)','Locally at the AP','By the client alone','At the core switch'],a:1,e:'Split-MAC：控制訊息交給 WLC（CAPWAP Tunnel），資料面加密在 AP 本地處理。'},
-{m:1,q:'Which key exchange mechanism does WPA3-Personal use?',o:['PSK','SAE (Dragonfly)','EAP-TLS','TKIP'],a:1,e:'SAE 抗離線字典攻擊；搭配 AES-GCMP 加密與強制 PMF。'},
-{m:1,q:'Which three channels are non-overlapping in the 2.4 GHz band?',o:['1, 5, 9','1, 6, 11','2, 7, 12','3, 6, 9'],a:1,e:'口訣 1-6-11；相鄰通道（如 1、2）會互相干擾。'},
-{m:1,q:'What is the difference between an access port and a trunk port?',o:['Access carries multiple VLANs','Trunk carries multiple VLANs tagged with 802.1Q','Both tag frames','Access is used between switches'],a:1,e:'Access 接 End Host 僅 1 VLAN；Trunk 用於 Switch↔Switch/Router/AP 打 802.1Q 標籤。'},
 {m:1,q:'Which two statements about the native VLAN are correct? (Choose two)',
  o:['Its traffic crosses the trunk untagged','Best practice is to assign it to an unused VLAN','It must always remain VLAN 1','Its frames are encrypted by 802.1Q'],
  a:[0,1],
@@ -4118,19 +4267,147 @@ const quiz=[
  o:['show interfaces trunk','show interfaces gigabitethernet0/1 switchport','show mac address-table','show cdp neighbors'],
  a:[0,1],
  e:'show interfaces trunk 看整體 Trunk/Native VLAN；show interfaces … switchport 看單埠模式與細節。'},
-
-{m:1,q:'In show etherchannel summary output, what does flag “SU” indicate?',o:['Suspended Unused','Layer2 + In use (operational)','Shutdown Up','Standby Up'],a:1,e:'S=L2、U=in use 表示 EtherChannel 正常；成員埠應顯示 P（bundled）。若成員埠顯示 s（suspended），通常是 VLAN/speed/duplex 不匹配。'},
-{m:1,q:'In DHCP snooping, how should ports connected to legitimate DHCP servers be configured?',o:['Untrusted','Trusted','Err-disabled','Passive'],a:1,e:'Trust 埠允許 DHCP Offer；Untrusted 埠收到 Offer 即丟棄防 Rogue DHCP。'},
 {m:1,q:'Which two port-security violation modes drop offending traffic while keeping the port up? (Choose two)',
  o:['protect','restrict','shutdown','errdisable'],
  a:[0,1],
  e:'protect 靜默丟棄、restrict 丟棄並記錄/計數，埠皆維持 up；shutdown 直接 err-disabled。'},
-
-{m:1,q:'Dynamic ARP Inspection (DAI) validates ARP packets against what?',o:['ACLs','The DHCP snooping binding table','The MAC address table','The routing table'],a:1,e:'DAI 比對 Snooping 建立的 IP-MAC Binding Table，不符即丟棄。'},
 {m:1,q:'Which three benefits does a WLC-based (Lightweight) architecture provide? (Choose three)',
  o:['Centralized configuration management','Seamless inter-AP roaming','Dynamic RF management (RRM)','Independent per-AP manual configuration at scale'],
  a:[0,1,2],
  e:'WLC 集中設定、漫遊與 RRM 射頻管理；「逐台手動設定」是 Autonomous AP 的缺點。'},
+{m:1,q:'Which two characteristics apply to the 2.4 GHz band? (Choose two)',
+ o:['Only channels 1, 6, and 11 are non-overlapping (North America)','It experiences more interference from microwaves and Bluetooth than 5 GHz','It offers far more non-overlapping channels than 5 GHz','It penetrates obstacles worse than 5 GHz'],
+ a:[0,1],
+ e:'2.4G 僅 1/6/11 三個非重疊通道、干擾源多、穿透較佳但頻寬較窄。'},
+{m:1,q:'Which two statements about 802.1Q tagging are correct? (Choose two)',
+ o:['It inserts a 4-byte tag into the Ethernet frame','It defines the concept of a native VLAN','It is a Cisco-proprietary encapsulation','It doubles the size of every frame'],
+ a:[0,1],
+ e:'802.1Q 插入 4-byte Tag 並支援 Native VLAN（不打標籤）；ISL 才是 Cisco 專屬舊技術。'},
+{m:1,q:'Which three steps are part of configuring DHCP snooping? (Choose three)',
+ o:['Enable DHCP snooping globally','Configure ports facing legitimate servers as trusted','Apply rate limiting on untrusted ports','Enable DTP on all user-facing ports'],
+ a:[0,1,2],
+ e:'全域啟用、Server 埠 trust、Untrusted 埠限速防攻擊；DTP 應 nonegotiate 關閉。'},
+{m:1,q:'Which two statements about LLDP are correct? (Choose two)',
+ o:['It is an IEEE standard (802.1AB)','It exchanges information using TLVs','It is Cisco proprietary','It operates only at Layer 3'],
+ a:[0,1],
+ e:'LLDP 是開放標準、以 Type-Length-Value 結構交換鄰居資訊、運作於 L2；CDP 才是 Cisco 專屬。'},
+{m: 1,
+  q: 'An administrator is configuring a new WLAN on a Cisco WLC. The network requires dual-band clients to preferentially connect to 5 GHz and dynamically apply VLAN assignments received from a RADIUS server. Which two options must be enabled? (Choose two)',
+  o: [
+    'Client Band Select',
+    'Allow AAA Override',
+    'Coverage Hole Detection',
+    'Protected Management Frames (PMF) as Required'
+  ],
+  a: [0, 1],
+  e: '【WLC WLAN 進階功能】：Client Band Select 會延遲回應 2.4 GHz 的 Probe 訊框，主動引導雙頻終端關聯至干擾較少、頻寬較大的 5 GHz 頻段；Allow AAA Override 允許 WLC 套用 RADIUS 認證通過後回傳的 IETF 64/65/81 屬性以動態劃分 VLAN。'
+},
+
+
+{m: 1,
+  q: 'Which statement correctly describes the behavior of a Cisco switch operating in VTP Transparent mode?',
+  o: [
+    'It forwards received VTP advertisements out trunk ports, allows local creation of extended VLANs (1006-4094), and saves VLAN configurations to running-config',
+    'It synchronizes its VLAN database with the VTP Server that has the highest configuration revision number',
+    'It originates VTP advertisements to notify neighboring switches whenever a local VLAN is created or deleted',
+    'It blocks all VLAN traffic from traversing trunk ports unless configured as a VTP Client'
+  ],
+  a: 0,
+  e: '【VTP Transparent 模式】：Transparent 模式不參與 VTP 網域同步，但會透過 Trunk 轉發收到的 VTP 宣告；它允許配置 Extended Range VLAN（1006–4094），且其 VLAN 資訊儲存於 `running-config` / `startup-config` 而非 `vlan.dat`。'
+},
+{m: 1,
+  q: 'An engineer configures a switch port connected to a Cisco IP Phone that has a workstation attached to its PC data port. Which command configures the switch to trust the priority marking of packets originating directly from the IP phone while overriding the PC data traffic?',
+  o: [
+    'switchport priority extend trust',
+    'switchport priority extend cos 0',
+    'mls qos trust cos',
+    'switchport voice vlan dot1p'
+  ],
+  a: 0,
+  e: '【IP Phone 信任延伸指令】：`switchport priority extend trust` 指示 IP Phone 信任連接在其 PC 埠上的終端 CoS 標記；若使用 `switchport priority extend cos 0` 則會強制將 PC 送入的資料訊框重設為 Best-Effort (CoS 0)，防止 PC 偽造高優先權語音標記。'
+},
+
+{m: 1,
+  q: 'A Cisco IP Phone is connected between a switch port and a PC. How does the IP phone handle untagged data traffic originating from the PC?',
+  o: [
+    'It tags the PC traffic with the Voice VLAN ID',
+    'It passes the untagged traffic through to the switch unchanged in the native/access VLAN',
+    'It drops the untagged frames unless 802.1X authentication is completed',
+    'It converts the untagged frame into an 802.1Q double-tagged frame'
+  ],
+  a: 1,
+  e: '【Voice VLAN 封裝考點】：連接在 Cisco IP Phone 內部 Switch Port 的 PC 所送出的未打標籤（Untagged）資料訊框，電話會原封不動直接穿透轉發給交換器，交換器將其歸入 Access VLAN（Data VLAN）；只有電話本身的語音流量才會被電話打上 Voice VLAN 的 802.1Q Tag。'
+},
+{m: 1,
+  q: 'What occurs when the native VLAN is mismatched across an 802.1Q trunk link between two Cisco switches?',
+  o: [
+    'The trunk link is immediately placed into err-disabled state',
+    'The trunk forms, but traffic from the mismatched native VLANs is merged into a single broadcast domain',
+    'DTP automatically detects and reconfigures the native VLAN to VLAN 1',
+    'Spanning-tree blocks all VLANs across the trunk link permanently'
+  ],
+  a: 1,
+  e: '【Native VLAN Mismatch 陷阱】：802.1Q Trunk 在 Native VLAN 不一致時「Trunk 仍會維持建立」，但因為 Native VLAN 流量跨 Trunk 都不打標籤，SW1 送出 VLAN A 的未標記訊框會被 SW2 視為 VLAN B，導致兩個不同的 VLAN 發生廣播域實質洩漏與合併。'
+},
+{m: 1,
+  q: 'An engineer wants an EtherChannel bundle to be automatically disabled if the number of active operational physical links drops below 2. Which command must be configured under the port-channel interface?',
+  o: [
+    'lacp min-bundle 2',
+    'port-channel min-links 2',
+    'lacp max-bundle 2',
+    'channel-group 1 min-ports 2'
+  ],
+  a: 1,
+  e: '【EtherChannel 門檻保護】：在 `interface port-channel X` 下配置 `port-channel min-links 2`，可確保當成員實體鏈路故障導致可用數量小於 2 條時，整條 Port-Channel 自動轉為 down，以避免剩餘單一鏈路產生嚴重頻寬過載。'
+},
+{m: 1,
+  q: 'Which statement about Link Aggregation (LAG) on a Cisco Wireless LAN Controller (WLC) is correct?',
+  o: [
+    'LAG bundles all distribution system ports using IEEE 802.3ad, requiring a controller reboot to enable or disable',
+    'LAG operates using Cisco proprietary PAgP mode desirable',
+    'When LAG is enabled, at least three functional physical ports are required to pass client traffic',
+    'LAG dynamically assigns individual SSIDs to distinct physical ports'
+  ],
+  a: 0,
+  e: '【WLC LAG 運作特性】：Cisco WLC 上的 LAG 採用 IEEE 802.3ad 標準將所有實體 distribution ports 綑綁為單一邏輯通道；啟用或關閉 LAG「必須重新開機控制器（Reboot）」；啟用後只要有「1 個」可用實體埠即可維持客戶端流量轉發。'
+},
+{m: 1,
+  q: 'What distinguishes Cisco OfficeExtend Access Point (OEAP) mode from FlexConnect mode?',
+  o: [
+    'OEAP is designed for teleworkers, uses indoor APs with internal antennas, tunnels corporate traffic via DTLS, and supports a local personal SSID',
+    'OEAP only operates when connected to a local switch that supports 802.1Q trunking',
+    'FlexConnect requires a direct Layer 2 CAPWAP connection and cannot traverse the public Internet',
+    'FlexConnect encrypts client data traffic using WEP by default'
+  ],
+  a: 0,
+  e: '【OEAP vs FlexConnect 架構比較】：OEAP 專為遠距居家辦公設計，限定具備內建天線的室內型 AP，透過公網向企業 WLC 建立安全的 DTLS 加密隧道，並允許同時廣播企業 SSID（隧道回傳）與家庭用個人 SSID（本地直出）。'
+},
+{m: 1,
+  q: 'Which 802.11 management frame type is transmitted by a wireless client when roaming from one AP to another within the same ESSID?',
+  o: ['Association Request', 'Reassociation Request', 'Probe Request', 'Authentication Frame'],
+  a: 1,
+  e: '【無線漫遊訊框類型】：無線用戶端在同一個 SSID 下從 AP1 移動並切換關聯至 AP2 時，送出的是 `Reassociation Request`（重新關聯請求）管理訊框，以通知 WLC/AP 更新 Client 所在的 AP 映射。'
+},
+
+{m:1,q:'What is the root bridge election order in STP?',o:['Lowest MAC → lowest priority','Lowest priority → lowest MAC','Highest priority → highest MAC','Lowest cost → highest MAC'],a:1,e:'先比 Bridge Priority（小者勝），相同再比 MAC（小者勝）。'},
+{m:1,q:'Which are the three RSTP port states?',o:['Blocking/Learning/Forwarding','Discarding/Learning/Forwarding','Listening/Learning/Forwarding','Disabled/Blocking/Forwarding'],a:1,e:'RSTP 以 Discarding 取代 STP 的 Blocking+Listening，三態制。'},
+
+{m:1,q:'In RSTP, which port role provides a backup path to the root bridge?',o:['Backup Port','Alternate Port','Designated Port','Edge Port'],a:1,e:'Alternate=根橋路徑備胎；Backup=同一鏈路上 Designated 的備胎。'},
+{m:1,q:'What happens if the native VLAN mismatches on both ends of a trunk?',o:['The trunk shuts down','Traffic leaks between VLANs (security risk)','Negotiation auto-corrects it','Only a syslog warning, no impact'],a:1,e:'Native VLAN 明文不打標籤，不一致造成 VLAN Hopping/洩漏；建議改閒置 VLAN 999。'},
+{m:1,q:'With which LACP mode can a passive-mode interface successfully form an EtherChannel?',o:['on','desirable','active','auto'],a:2,e:'passive↔active 可成；passive↔passive 不行；on/desirable/auto 屬其他模式不相通。'},
+{m:1,q:'What is the default violation mode of port security?',o:['protect','restrict','shutdown','log'],a:2,e:'預設 shutdown → err-disabled，需 shutdown+no shutdown 或 errdisable recovery 恢復。'},
+{m:1,q:'What does a switch do when it receives a unicast frame with a destination MAC not in its MAC table?',o:['Drops it','Floods it out all ports','Sends it back to the source port','Triggers ARP'],a:1,e:'未知單播 Flood 至同 VLAN 所有埠（除來源埠）。'},
+{m:1,q:'In a mixed vendor environment (Cisco + non-Cisco), which discovery protocol must be enabled?',o:['CDP','LLDP','LDAP','VTP'],a:1,e:'LLDP 是 IEEE 802.1AB 開放標準；CDP 為 Cisco 專屬。'},
+
+{m:1,q:'In a Lightweight AP architecture, where is client data-plane encryption typically performed in Local mode?',o:['Centrally at the WLC (all modes)','Locally at the AP','By the client alone','At the core switch'],a:1,e:'Split-MAC：控制訊息交給 WLC（CAPWAP Tunnel），資料面加密在 AP 本地處理。'},
+{m:1,q:'Which key exchange mechanism does WPA3-Personal use?',o:['PSK','SAE (Dragonfly)','EAP-TLS','TKIP'],a:1,e:'SAE 抗離線字典攻擊；搭配 AES-GCMP 加密與強制 PMF。'},
+{m:1,q:'Which three channels are non-overlapping in the 2.4 GHz band?',o:['1, 5, 9','1, 6, 11','2, 7, 12','3, 6, 9'],a:1,e:'口訣 1-6-11；相鄰通道（如 1、2）會互相干擾。'},
+{m:1,q:'What is the difference between an access port and a trunk port?',o:['Access carries multiple VLANs','Trunk carries multiple VLANs tagged with 802.1Q','Both tag frames','Access is used between switches'],a:1,e:'Access 接 End Host 僅 1 VLAN；Trunk 用於 Switch↔Switch/Router/AP 打 802.1Q 標籤。'},
+
+{m:1,q:'In show etherchannel summary output, what does flag “SU” indicate?',o:['Suspended Unused','Layer2 + In use (operational)','Shutdown Up','Standby Up'],a:1,e:'S=L2、U=in use 表示 EtherChannel 正常；成員埠應顯示 P（bundled）。若成員埠顯示 s（suspended），通常是 VLAN/speed/duplex 不匹配。'},
+{m:1,q:'In DHCP snooping, how should ports connected to legitimate DHCP servers be configured?',o:['Untrusted','Trusted','Err-disabled','Passive'],a:1,e:'Trust 埠允許 DHCP Offer；Untrusted 埠收到 Offer 即丟棄防 Rogue DHCP。'},
+
+{m:1,q:'Dynamic ARP Inspection (DAI) validates ARP packets against what?',o:['ACLs','The DHCP snooping binding table','The MAC address table','The routing table'],a:1,e:'DAI 比對 Snooping 建立的 IP-MAC Binding Table，不符即丟棄。'},
 
 {m:1,q:'What is the security best practice regarding VLAN 1?',o:['Use it as the management VLAN','Move native/management use to an unused VLAN and place unused ports in a black-hole VLAN','Assign all ports to VLAN 1','Disable all VLANs'],a:1,e:'VLAN 1 預設全埠皆屬之，易受攻擊；最佳實務是閒置化。'},
 {m:1,q:'Which deployment size suits Autonomous APs best?',o:['Large campuses with hundreds of APs','Small deployments of 1–3 independently configured APs','Any scale equally','Outdoor bridging only'],a:1,e:'小型獨立設定用 Autonomous；中大型集中管理用 Lightweight+WLC。'},
@@ -4142,33 +4419,17 @@ const quiz=[
 {m:1,q:'What does DTP negotiate?',o:['EtherChannel formation','Trunk mode and encapsulation','Port security levels','Spanning-tree priority'],a:1,e:'DTP 協商 Access/Trunk 模式；安全最佳實務 switchport nonegotiate 關閉它防攻擊。'},
 {m:1,q:'Which command verifies the native VLAN of a trunk interface?',o:['show interfaces trunk','show vlan brief','show mac address-table','show cdp neighbors'],a:0,e:'show interfaces trunk 顯示 Native VLAN 與允許清單，排障首選指令之一。'},
 {m:1,q:'What is the effect of the command spanning-tree vlan 10 root primary?',o:['Sets priority to 24576','Sets priority to 4096 lower than current root','Hard-codes MAC priority','Disables STP on VLAN 10'],a:0,e:'root primary=24576（若現根更低則自動調更小）；root secondary=28672。'},
-{m:1,q:'Which two characteristics apply to the 2.4 GHz band? (Choose two)',
- o:['Only channels 1, 6, and 11 are non-overlapping (North America)','It experiences more interference from microwaves and Bluetooth than 5 GHz','It offers far more non-overlapping channels than 5 GHz','It penetrates obstacles worse than 5 GHz'],
- a:[0,1],
- e:'2.4G 僅 1/6/11 三個非重疊通道、干擾源多、穿透較佳但頻寬較窄。'},
-{m:1,q:'Which two statements about 802.1Q tagging are correct? (Choose two)',
- o:['It inserts a 4-byte tag into the Ethernet frame','It defines the concept of a native VLAN','It is a Cisco-proprietary encapsulation','It doubles the size of every frame'],
- a:[0,1],
- e:'802.1Q 插入 4-byte Tag 並支援 Native VLAN（不打標籤）；ISL 才是 Cisco 專屬舊技術。'},
 
 {m:1,q:'Which STP feature protects the network from receiving superior BPDUs on designated ports?',o:['BPDU Guard','Root Guard','Loop Guard','UDLD'],a:1,e:'Root Guard 擋 Designated 埠上的劣質 BPDU；BPDU Guard 擋 Edge port的任何 BPDU。'},
 {m:1,q:'What happens when BPDU Guard is triggered on a port with PortFast enabled?',o:['Port goes into listening state','Port transitions to err-disabled','BPDU is silently dropped','Root bridge changes'],a:1,e:'Edge/PortFast port收到 BPDU 即被置入 err-disabled，需手動恢復，防止私接交換器。'},
 {m:1,q:'Which EtherChannel negotiation protocol is Cisco proprietary?',o:['LACP','PAgP','802.3ad','MSTP'],a:1,e:'PAgP=Cisco 專屬（desirable/auto）；LACP=IEEE 802.3ad 開放標準（active/passive）。'},
 {m:1,q:'Which command shows STP status for a specific VLAN including root bridge ID?',o:['show spanning-tree vlan 10','show stp summary all','debug spanning-tree events','show interfaces status'],a:0,e:'show spanning-tree vlan <id> 看 Root ID/Bridge ID/port 角色與狀態。'},
 {m:1,q:'Which wireless topology element connects lightweight APs to the wired network controller?',o:['CAPWAP tunnel','GRE over IPSec','PPPoE','MPLS LSP'],a:0,e:'Lightweight AP 與 WLC 之間走 CAPWAP（控制通道加密、資料通道可 DTLS 加密）。'},
-{m:1,q:'Which three steps are part of configuring DHCP snooping? (Choose three)',
- o:['Enable DHCP snooping globally','Configure ports facing legitimate servers as trusted','Apply rate limiting on untrusted ports','Enable DTP on all user-facing ports'],
- a:[0,1,2],
- e:'全域啟用、Server 埠 trust、Untrusted 埠限速防攻擊；DTP 應 nonegotiate 關閉。'},
 
 {m:1,q:'What is the purpose of a WLAN in a WLC configuration?',o:['Maps SSIDs to VLANs and defines security policy','Configures radio transmit power only','Creates CAPWAP certificates','Defines roaming thresholds'],a:0,e:'WLAN 把 SSID 映射到介面/VLAN 並套用安全政策（如 WPA2-Personal/Enterprise）。'},
 {m:1,q:'Which RF phenomenon causes signals to bend around obstacles or spread after passing through openings?',o:['Reflection','Diffraction','Absorption','Refraction'],a:1,e:'繞射=繞過障礙物；反射=彈回；折射=穿過不同介質偏折；吸收=能量被吃掉（訊號衰減）。'},
 {m:1,q:'What does RSSI measure in wireless networking?',o:['Channel width','Received signal strength (power level of incoming signal)','Number of clients','Noise floor only'],a:1,e:'RSSI=接收訊號強度，數值越接近 0 越好（如 −50dBm 優於 −80dBm）。'},
 {m:1,q:'Which command displays port-security learned MAC addresses?',o:['show port-security interface gi0/1','show mac learning secure','show port-security address','Both A and C'],a:3,e:'show port-security interface 看狀態/違規計數；address 選項看學到的安全 MAC。'},
-{m:1,q:'Which two statements about LLDP are correct? (Choose two)',
- o:['It is an IEEE standard (802.1AB)','It exchanges information using TLVs','It is Cisco proprietary','It operates only at Layer 3'],
- a:[0,1],
- e:'LLDP 是開放標準、以 Type-Length-Value 結構交換鄰居資訊、運作於 L2；CDP 才是 Cisco 專屬。'},
 
 {m:1,q:'Which two features protect against CAM table overflow attacks? (Choose two)',o:['Port security','802.1X','DHCP snooping','Storm control'],a:[0,1],e:'Port Security 限制每實體port MAC 數、802.1X 強制認證，皆可防 MAC Flooding。'},
 {m:1,q:'What is the maximum number of MAC addresses configurable per port with port security?',o:['1 only','Up to 1024 depending on platform','Exactly 8','256 fixed'],a:1,e:'switchport port-security maximum <n>，平台相依一般可到 1024。'},
@@ -4178,13 +4439,6 @@ const quiz=[
 {m:1,q:'What is the benefit of configuring static MAC addresses on a switch port?',o:['Prevents flooding of that destination','Binds a MAC to a port so unknown sources cannot spoof it','Increases bandwidth','Enables trunking'],a:1,e:'靜態 MAC 表項不會老化且固定綁定port，可防來源欺騙與洪泛。'},
 
 // ══════════ Module 2: IP Connectivity（50題）══════════
-{m:2,q:'What is the OSPF cost formula?',o:['Bandwidth ÷ reference bandwidth','Reference bandwidth ÷ interface bandwidth','Hop count','MTU ÷ bandwidth'],a:1,e:'預設參考頻寬 100 Mbps；FastE=1、GigE=1。'},
-
-{m:2,q:'What is the DR election order in OSPF?',o:['Highest Router ID → highest priority','Highest priority (0 does not participate) → highest Router ID','Lowest MAC → lowest priority','First come first served'],a:1,e:'① 最高 Priority（0 永不參選）→ ② 最高 Router ID；不具搶佔性（non-preemptive）。'},
-{m:2,q:'What are the OSPF Hello/Dead timers on an NBMA network?',o:['10/40 seconds','30/120 seconds','5/15 seconds','60/180 seconds'],a:1,e:'Broadcast/P2P=10/40；NBMA=30/120——考題陷阱！'},
-{m:2,q:'A /24 static route and a /24 OSPF route exist for the same destination. Which is preferred?',o:['OSPF','Static (lower AD)','Load-balanced','Random'],a:1,e:'前綴相同比 AD：Static=1 < OSPF=110，選 Static。'},
-{m:2,q:'How does a floating static route work?',o:['Higher AD acts as backup','Lower metric acts as primary','AD 255 forces installation','Metric adjusts dynamically'],a:0,e:'設定高於主用路由的 AD（如 ip route … 200），主路由失效時才浮出。'},
-{m:2,q:'What is the standard ACL number range?',o:['100–199','1–99 and 1300–1999','2000–2699','Any number'],a:1,e:'Standard=1–99/1300–1999；Extended=100–199/2000–2699。'},
 {m:2,q:'Which three values must match for two routers to become OSPF neighbors? (Choose three)',
  o:['Area ID','Hello and Dead timers','Subnet/IP network on the shared link','Router ID'],
  a:[0,1,2],
@@ -4201,23 +4455,14 @@ const quiz=[
  o:['They can specify either a next-hop IP or an exit interface','They support a configurable administrative distance for backup scenarios','They are automatically recalculated like OSPF routes','Their administrative distance cannot be modified'],
  a:[0,1],
  e:'靜態路由可指定下一跳或出介面，且可調 AD 實現浮動備援；它沒有自動收斂機制。'},
-
-{m:2,q:'Which keyword is essential in PAT configuration?',o:['pool','overload','inside global','static'],a:1,e:'漏寫 overload 會嘗試一對一分配外部 IP，不足即失敗。'},
-{m:2,q:'To publish an internal web server with a fixed public IP, which NAT type is used?',o:['PAT','Dynamic NAT','Static NAT','NAT64'],a:2,e:'Static NAT 一對一固定映射，供外部主動存取內部伺服器。'},
-{m:2,q:'Which command allows the original standby router to reclaim the HSRP Active role after recovery?',o:['standby preempt','standby priority 255','standby version 2','standby track'],a:0,e:'Priority 決定初始選舉；preempt 允許高優先者搶回；track 連動介面狀態降級。'},
 {m:2,q:'Which two NAT term-to-definition mappings are correct? (Choose two)',
  o:['Inside local — the private IP of the internal host','Inside global — the public IP representing the internal host','Inside local — the public IP seen on the Internet','Inside global — the private IP of the internal host'],
  a:[0,1],
  e:'Inside Local=內部私有 IP、Inside Global=對外公網 IP；Outside Local/Global 以外部視角對稱理解。'},
-
-{m:2,q:'How does a Layer 3 switch route between VLANs?',o:['dot1q subinterfaces','SVIs (interface vlan X)','Bridge-groups','Tunnel interfaces'],a:1,e:'三層交換器用 SVI；Router-on-a-Stick 才用子介面+dot1q。'},
 {m:2,q:'Which three statements about HSRP are correct? (Choose three)',
  o:['Clients use a virtual IP address as their default gateway','One router is Active and another is Standby','Preempt allows a recovered higher-priority router to take back the Active role','HSRP load-balances traffic across all routers by default'],
  a:[0,1,2],
  e:'HSRP 提供 Virtual IP/MAC、Active/Standby 角色、preempt 搶回；預設負載平衡是 GLBP 的特性。'},
-
-{m:2,q:'What is the best way to configure a static route out an Ethernet interface?',o:['ip route 10.0.0.0 255.0.0.0 gi0/0','ip route 10.0.0.0 255.0.0.0 192.168.1.1','ip route 0.0.0.0 0.0.0.0 null0','ip route 10.0.0.0 255.0.0.0 gi0/0 permanent'],a:1,e:'多接取網路必指定下一跳 IP，避免大量 ARP 查詢失敗；P2P 才可用出介面。'},
-{m:2,q:'What is the OSPF Router ID selection order?',o:['Highest loopback IP → highest physical IP','Manual router-id → highest loopback → highest active physical IP','Lowest MAC','Lowest IP'],a:1,e:'手動 router-id > 最高 Loopback > 最高 Active 實體介面 IP。'},
 {m:2,q:'Which two statements about OSPF DR election are correct? (Choose two)',
  o:['The highest interface priority wins (priority 0 excludes the router)','Election is non-preemptive — a new router with better priority does not displace the current DR','The lowest Router ID wins','Election is preemptive whenever a better candidate joins'],
  a:[0,1],
@@ -4226,10 +4471,6 @@ const quiz=[
  o:['C for connected','S for static','O for OSPF','D for DHCP-assigned routes'],
  a:[0,1,2],
  e:'C/S/O 皆為路由來源代碼；「D」其實代表 EIGRP，不是 DHCP。'},
- 
-{m:2,q:'For two routers to form a Full OSPFv2 adjacency, which value must NOT match?',o:['Area ID','Hello/Dead timers','Router ID','Authentication type and key'],a:2,e:'Router ID 各路由器必須唯一且互不相同——若兩台 Router ID 相同反而無法建立鄰居；而 Area ID、Hello/Dead Timer、認證三者任一不一致，Hello 封包會直接被忽略。'},
-{m:2,q:'Two directly connected routers have OSPF neighbors stuck in ExStart for a long time. What is the most likely cause?',o:['Mismatched Hello/Dead timers','Interface MTU mismatch','Different Area ID','No router-id configured'],a:1,e:'Timer/Area 不符會讓鄰居停在 Down/Init（Hello 被丟棄）；卡在 ExStart 是交換 DBD 封包時 MTU 協商失敗所致，可用 ip ospf mtu-ignore 臨時繞過驗證。'},
-{m:2,q:'An OSPF neighbor state shows Init. What does this mean?',o:['Received neighbor Hello but it does not list my Router ID','LSDB fully synchronized','Exchanging DBD packets','Bidirectional communication confirmed'],a:0,e:'Init = 單向可見：我發出 Hello 也收到對方的，但對方 Hello 的 Neighbor 欄位尚未列出我的 RID；雙方互相列名才進入 2-Way。'},
 {m:2,q:'For two routers to form an OSPFv2 adjacency, which three values must match? (Choose three)',
  o:['Area ID',
     'Hello and Dead timers',
@@ -4237,20 +4478,10 @@ const quiz=[
     'Authentication type and key'],
  a:[0,1,3],
  e:'Area ID、Hello/Dead Timer、認證任一不一致，Hello 封包會被直接忽略而無法建立鄰居；Router ID 恰恰相反——各路由器必須唯一且互不相同。'},
-{m:2,q:'In show ip route output, what does a route beginning with “O” represent?',o:['External routes','OSPF intra-area route','Static route','Connected route'],a:1,e:'C=Connected、S=Static、O=OSPF、O IA=OSPF Inter-Area、O E2=External Type-2。'},
-{m:2,q:'How is a default route represented?',o:['0.0.0.0 255.255.255.0','0.0.0.0 0.0.0.0','255.255.255.255 0.0.0.0','0.0.0.0 255.255.255.255'],a:1,e:'0.0.0.0/0 匹配所有未知目的地，又稱 Gateway of last resort（路由表顯示 S*）。'},
-{m:2,q:'What is the destination address of OSPF Hello packets?',o:['255.255.255.255','224.0.0.5','224.0.0.6','ff02::1'],a:1,e:'224.0.0.5=AllSPFRouters；224.0.0.6=AllDRouters（DR/BDR 收聽）。'},
 {m:2,q:'Which two statements about Administrative Distance are correct? (Choose two)',
  o:['Lower AD is more trustworthy','Static routes have an AD of 1 by default','Higher AD is preferred','OSPF has a default AD of 90'],
  a:[0,1],
  e:'AD 越小越優先；Static=1、OSPF=110、EIGRP=90。'},
-
-{m:2,q:'What is the correct configuration order for a Router-on-a-Stick subinterface?',o:['encapsulation dot1q first, then IP address','IP address first, then encapsulation dot1q','IP address only','switchport mode trunk first'],a:0,e:'子介面必須先 encapsulation dot1q <vlan> 才能配 IP；switchport 指令屬交換器。'},
-{m:2,q:'After adjacency is established, which stable state indicates completed LSDB synchronization?',o:['Exchange','Loading','Full','2-Way'],a:2,e:'Down→Init→2-Way→ExStart→Exchange→Loading→Full；廣播網路非 DR/BDR 停在 2-Way 屬正常。'},
-{m:2,q:'In “ip route 10.4.0.0 255.255.0.0 10.2.2.2 120”, what does 120 represent?',o:['Metric','Administrative Distance','TTL','Hop count'],a:1,e:'語法：ip route <net> <mask> <next-hop> <AD>；120=RIP 同級，常用於浮動備援。'},
-{m:2,q:'What is the advantage of using a loopback interface as the Router ID source?',o:['Faster processing','Stable — not tied to physical interface state','Conserves IP addresses','Encrypts traffic'],a:1,e:'Loopback 永遠 up/up，避免實體介面故障導致 RID 變動重算。'},
-{m:2,q:'What happens if two routers are configured in different OSPF areas on a shared link?',o:['Adjacency forms normally','Adjacency fails to form','Adjacency forms but no routes exchanged','Areas auto-correct'],a:1,e:'Hello 封包攜帶 Area ID，不一致直接忽略鄰居請求。'},
-{m:2,q:'In HSRP Virtual MAC 0000.0C07.AC0A, what does “0A” indicate?',o:['Group number 10 (hex)','VLAN 10','Priority 10','Port 10'],a:0,e:'末兩碼十六進位=HSRP Group Number；ACxx 的 xx 即群組號。'},
 {m:2,q:'Which three OSPF LSA type descriptions are correct? (Choose three)',
  o:['Type 1 — Router LSA','Type 2 — Network LSA originated by the DR','Type 5 — AS External LSA','Type 3 — External routes imported from another AS'],
  a:[0,1,2],
@@ -4263,58 +4494,34 @@ const quiz=[
  o:['Each VLAN requires its own subinterface','encapsulation dot1q must be configured before the IP address on a subinterface','It requires an SVI for each VLAN','It supports only one VLAN on the physical interface'],
  a:[0,1],
  e:'RoAS 每個 VLAN 一個子介面、先 dot1q 封裝再配 IP；SVI 是三層交換器做法。'},
-
-{m:2,q:'Which command displays the next-hop router toward a specific destination?',o:['show ip route <destination>','show arp','show cdp neighbors detail','show ip interface brief'],a:0,e:'show ip route x.x.x.x 可驗證最長前綴匹配結果與出介面/下一跳——排障第一步。'},
-{m:2,q:'What is the default OSPF reference bandwidth?',o:['10 Mbps','100 Mbps','1 Gbps','10 Gbps'],a:1,e:'預設 100 Mbps；現代高速鏈路建議 auto-cost reference-bandwidth 100000 讓 GigE 以上有區別。'},
-{m:2,q:'In OSPF, what is a Type 2 LSA used for?',o:['Router link within an area','Network LSA generated by the DR','Summary of inter-area routes','External routes'],a:1,e:'Type 1=Router LSA、Type 2=Network LSA(DR 發)、Type 3=Summary、Type 5=AS External。'},
 {m:2,q:'Which network type elects a DR/BDR? (Choose two)',o:['Broadcast','NBMA','Point-to-point','Point-to-multipoint'],a:[0,1],e:'Broadcast 與 NBMA 需選 DR/BDR；P2P/P2MP 不需要，全部鄰接。'},
 {m:2,q:'Which two commands verify OSPF operation? (Choose two)',
  o:['show ip ospf neighbor','show ip ospf interface brief','show mac address-table','show spanning-tree summary'],
  a:[0,1],
  e:'show ip ospf neighbor 看鄰居狀態、show ip ospf interface brief 看啟用 OSPF 的介面與 Area/Cost；另兩者屬交換器功能。'},
-
 {m:2,q:'Which command enables OSPF on all interfaces in 192.168.1.0/24 under area 0?',o:['network 192.168.1.0 0.0.0.255 area 0','network 192.168.1.0 255.255.255.0 area 0','network 192.168.1.0 area 0','ip ospf 1 area 0'],a:0,e:'OSPF network 指令使用 wildcard mask；也可在介面下用 ip ospf <pid> area 0。'},
 {m:2,q:'What does the wildcard mask 0.0.0.255 match?',o:['Exactly one host IP','The last octet can be any value','The entire /16 network','Only broadcast addresses'],a:1,e:'Wildcard 中 0=必須相符、1=任意；0.0.0.255 即 /24 範圍。'},
 {m:2,q:'Which three statements describe the routing table lookup process correctly? (Choose three)',
  o:['The router first selects the longest matching prefix','If multiple equal-length prefixes exist, lower administrative distance wins','If AD is also equal, the lower metric is preferred','The default route always wins regardless of prefix length'],
  a:[0,1,2],
  e:'路由決策三步驟：最長前綴 → 最小 AD → 最小 Metric；預設路由（/0）前綴最短，只在無更精確匹配時使用。'},
-
-{m:2,q:'Which statement about HSRP virtual IP is true?',o:['It must equal a physical interface IP','It is shared between Active and Standby routers and used as client gateway','It changes after failover','It is only valid in IPv6'],a:1,e:'Virtual IP/MAC 由 Active 回應 ARP，故障時 Standby 無縫接管，客戶端無感。'},
 {m:2,q:'Which two statements about EIGRP are correct? (Choose two)',
  o:['Feasible successors are stored in the topology table','Hello packets are sent to multicast 224.0.0.10','Its composite metric uses only hop count by default','It uses UDP port 520 for neighbor discovery'],
  a:[0,1],
  e:'可行後繼存於 Topology Table、Hello 用 224.0.0.10；Metric 預設用頻寬+延遲，UDP 520 是 RIPv2。'},
-
 {m:2,q:'Which VRRP characteristic differs from HSRP?',o:['VRRP is an open standard; master can use its own physical IP as virtual IP','VRRP is Cisco proprietary','VRRP cannot do preempt','VRRP supports IPv4 only without extensions'],a:0,e:'VRRP=IETF RFC 3768/5798 開放標準；HSRP=Cisco 專屬。VRRP Master 角色對應 HSRP Active。'},
 {m:2,q:'Which two wildcard mask calculations are correct? (Choose two)',
  o:['Subnet mask /28 corresponds to wildcard 0.0.0.15','Wildcard 0.0.3.255 corresponds to a /22 network','Subnet mask /24 corresponds to wildcard 0.0.0.128','Wildcard 0.0.0.32 corresponds to a /27 network'],
  a:[0,1],
  e:'/28→0.0.0.15、/22→0.0.3.255；/24 應為 0.0.0.255；/27 應為 0.0.0.31 。'},
-
-{m:2,q:'What does FHRP stand for?',o:['First Hop Redundancy Protocol','Fast Hybrid Routing Process','Frame Hop Relay Protocol','Forwarding Header Rewrite Protocol'],a:0,e:'FHRP 泛指 HSRP/VRRP/GLBP 等「第一跳閘道冗餘」協定家族。'},
-{m:2,q:'Which command configures a default static route pointing to 203.0.113.1?',o:['ip default-gateway 203.0.113.1','ip route 0.0.0.0 0.0.0.0 203.0.113.1','ip default-network 203.0.113.0','route add default via 203.0.113.1'],a:1,e:'路由器上用 ip route 0.0.0.0 0.0.0.0 <next-hop>；ip default-gateway 是給交換器管理用的。'},
-{m:2,q:'What is the longest prefix match principle?',o:['Route with smallest metric wins','Most specific (longest) subnet prefix wins regardless of AD','Lowest AD always wins even across different prefixes','Default route wins over specific routes'],a:1,e:'先比前綴長度（越長越精確），同長度才比 AD、再比 Metric——路由決策三步驟必背。'},
-{m:2,q:'Which ACL type filters traffic based on source AND destination IP plus port numbers?',o:['Standard ACL','Extended ACL','Named standard ACL','Time-based ACL only'],a:1,e:'Extended ACL 支援來源/目的 IP+Protocol+Port；Standard 只能比對來源 IP。'},
-{m:2,q:'Which command applies an ACL inbound on interface gi0/1?',o:['ip access-group 101 in','access-list 101 in apply','ip access-list in 101','acl 101 interface gi0/1'],a:0,e:'在介面設定模式：ip access-group <number|name> <in|out>。'},
 {m:2,q:'Which two FHRP characteristics are correct? (Choose two)',
  o:['VRRP is an open standard while HSRP is Cisco proprietary','GLBP can provide load balancing among multiple gateways','HSRP uses the physical MAC of the Active router for clients','VRRP Master cannot use its own IP as the virtual gateway address'],
  a:[0,1],
  e:'VRRP=RFC 開放標準、HSRP=Cisco 專屬；GLBP 支援多閘道負載平衡；HSRP/VRRP 都用 Virtual MAC/IP。'},
-
-{m:2,q:'What is the purpose of NAT inside local address?',o:['Public IP seen on the Internet','Private IP of internal host before translation','IP of the NAT device itself','Translated public destination'],a:1,e:'Inside Local=內部主機私有 IP；Inside Global=對外的公網 IP；Outside Local/Global 對稱理解。'},
-{m:2,q:'Which NAT type conserves public IPv4 addresses best?',o:['Static NAT','Dynamic NAT pool','PAT (overload)','No-NAT'],a:2,e:'PAT 用port number讓數千台主機共享一個公網 IP——IPv4 續命關鍵技術。'},
-
-{m:2,q:'What does EIGRP use to establish neighbor relationships?',o:['Hello multicast 224.0.0.10','Broadcast 255.255.255.255','TCP session 179','UDP 520'],a:0,e:'EIGRP Hello=組播 224.0.0.10；RIP v2 也用 224.0.0.9；BGP 用 TCP 179。'},
 {m:2,q:'Which three conditions cause OSPF adjacency failure? (Choose three)',
  o:['Mismatched Hello/Dead timers','Different Area IDs on the shared link','MTU mismatch during DBD exchange','Identical Router IDs on different routers'],
  a:[0,1,2],
  e:'Timer/Area 不符使 Hello 被忽略、MTU 不符卡 ExStart；Router ID 相同會造成 LSDB 異常而非典型鄰居建立失敗（嚴格說也會出問題，但考試標準答案以前三者為主）。'},
-{m:2,q:'Which table stores EIGRP feasible successors?',o:['Routing table','Topology table','Neighbor table','ARP cache'],a:1,e:'EIGRP 三表：Neighbor Table、Topology Table（存可行後繼）、Routing Table（最佳路徑）。'},
-{m:2,q:'What is the OSPF dead interval on a broadcast network by default?',o:['10 seconds','40 seconds','120 seconds','60 seconds'],a:1,e:'Broadcast Hello 10 秒 ×4 = Dead 40 秒；NBMA 為 30/120。'},
-{m:2,q:'Which command shows all OSPF neighbors and their states?',o:['show ip ospf neighbor','show ip route ospf','show ospf database','debug ip ospf adj'],a:0,e:'排障首秀指令：確認鄰居狀態是否 FULL；卡在特定狀態可對症排查。'},
-{m:2,q:'What does the “*” next to S in “S* 0.0.0.0/0” indicate?',o:['Candidate default route','Backup route','Filtered route','Recursive route'],a:0,e:'S*=Gateway of Last Resort 的候選預設路由，已安裝者會註明 via 指向。'},
-{m:2,q:'Which component does a router consult FIRST when forwarding a packet?',o:['ARP cache','Routing table for longest prefix match','ACL applied outbound','NAT translation table'],a:1,e:'轉發流程：查路由表（最長前綴）→ 找下一跳 → 查 ARP 取得 MAC → 封裝轉發。'},
 {m:2,q:'Which two IPv4 multicast addresses does OSPFv2 use? (Choose two)',
  o:['255.255.255.255',
     '224.0.0.5',
@@ -4323,17 +4530,152 @@ const quiz=[
  a:[1,2],
  e:'224.0.0.5=所有 OSPF 路由器收聽；224.0.0.6=DR/BDR 收聽；224.0.0.9 是 RIPv2。'},
 
+
+{m: 2,
+  q: 'Which MAC address format is recognized as a standard VRRP (Virtual Router Redundancy Protocol) IPv4 virtual MAC address for Group 10?',
+  o: [
+    '0000.5E00.010A',
+    '0000.0C07.AC0A',
+    '0000.0C9F.F00A',
+    '0007.B400.010A'
+  ],
+  a: 0,
+  e: '【FHRP 虛擬 MAC 格式對照】：\n• VRRP IPv4：`0000.5E00.01xx`（xx 為 16 進位 Group ID，Group 10 = 0x0A）\n• HSRP v1：`0000.0C07.ACxx`\n• HSRP v2：`0000.0C9F.Fxxx`\n• GLBP：`0007.B400.xxyy`'
+},
+{m: 2,
+  q: 'Under which condition does the OSPF command "default-information originate" advertise a default route (0.0.0.0/0) into the OSPF domain if the "always" keyword is omitted?',
+  o: [
+    'Only if a default route is already present and active in the router\'s local routing table',
+    'Unconditionally, regardless of whether a default route exists in the routing table',
+    'Only when the router is configured as a Designated Router (DR)',
+    'Only if all connected neighbor interfaces are operating in OSPF Area 0'
+  ],
+  a: 0,
+  e: '【OSPF 預設路由發布機制】：未加 `always` 關鍵字時，路由器本機路由表必須已經存在有效預設路由（如靜態或 BGP 預設路由），才會向 OSPF 區域產生 Type 5 LSA 注入 0.0.0.0/0；加上 `always` 則無論本機有無預設路由皆強制注入。'
+},
+{m: 2,
+  q: 'An administrator needs to insert a new ACE permitting TCP port 53 (DNS) into an existing named extended ACL "CORP_FILTER" between line sequence 30 and line sequence 40. Which command accomplishes this task efficiently?',
+  o: [
+    'ip access-list extended CORP_FILTER / 35 permit tcp 10.0.0.0 0.255.255.255 host 198.51.100.11 eq domain',
+    'no ip access-list extended CORP_FILTER, followed by re-entering all statements manually',
+    'access-list 101 permit tcp 10.0.0.0 0.255.255.255 host 198.51.100.11 eq domain line 35',
+    'ip access-list CORP_FILTER insert 35 permit tcp 10.0.0.0 0.255.255.255 host 198.51.100.11 eq 53'
+  ],
+  a: 0,
+  e: '【Named ACL 序號插行】：Cisco IOS Named ACL 支援 Sequence Number。直接進入 `ip access-list extended <NAME>` 模式下，輸入 `35 permit tcp ...` 即可將該條目精準插入在序號 30 與 40 之間，無需重刪重建 ACL。'
+}, 
+{m: 2,
+  q: 'Two Cisco routers are connected point-to-point via GigabitEthernet. What command should be configured under the interfaces to speed up OSPF adjacency formation and eliminate DR/BDR elections?',
+  o: [
+    'ip ospf priority 255',
+    'ip ospf network point-to-point',
+    'ip ospf hello-interval 1',
+    'ip ospf dead-interval 4'
+  ],
+  a: 1,
+  e: '【OSPF 乙太網點對點優化】：乙太網路預設為 Broadcast 網路型態，會進行 DR/BDR 選舉（耗時且等待 Wait Timer）。在雙路由器直連鏈路上配置 `ip ospf network point-to-point` 可直接跳過 DR 選舉，使鄰居瞬間進入 FULL 狀態。'
+},
+{m: 2,
+  q: 'When configuring an IPv6 static route where the next-hop is specified as a Link-Local address (FE80::/10), what additional parameter is MANDATORY?',
+  o: [
+    'The local exit interface',
+    'The Administrative Distance set to 1',
+    'The remote router\'s MAC address',
+    'The global unicast prefix of the next hop'
+  ],
+  a: 0,
+  e: '【IPv6 Link-Local 靜態路由限制】：由於 Link-Local 位址（FE80::）不具全域唯一性，各介面皆可重複使用，因此以 Link-Local 作為下一跳時，語法必須同時指定本地出介面（如 `ipv6 route 2001:db8::/64 GigabitEthernet0/0 fe80::2`）。'
+},
+{m: 2,
+  q: 'A router receives a packet destined for IP address 10.1.1.65. The routing table contains routes for 10.0.0.0/8 (Static, AD 1), 10.1.1.0/24 (OSPF, AD 110), 10.1.1.64/28 (EIGRP, AD 90), and 0.0.0.0/0 (Static, AD 1). Which route is selected to forward the packet?',
+  o: [
+    '10.0.0.0/8 via the Static route because it has the lowest AD',
+    '10.1.1.64/28 via EIGRP because it is the Longest Prefix Match',
+    '10.1.1.0/24 via OSPF because it matches the classful boundary',
+    '0.0.0.0/0 via the default route'
+  ],
+  a: 1,
+  e: '【路由查表最長前綴匹配原則】：路由器轉發封包時，「最長前綴匹配 (Longest Prefix Match / 遮罩長度最長者)」擁有絕對最高優先權，完全凌駕於 Administrative Distance (AD) 之上。/28 比 /24、/8 更精確，故直接選用 10.1.1.64/28。'
+},
+
+{m:2,q:'What is the OSPF cost formula?',o:['Bandwidth ÷ reference bandwidth','Reference bandwidth ÷ interface bandwidth','Hop count','MTU ÷ bandwidth'],a:1,e:'預設參考頻寬 100 Mbps；FastE=1、GigE=1。'},
+{m:2,q:'How does a Layer 3 switch route between VLANs?',o:['dot1q subinterfaces','SVIs (interface vlan X)','Bridge-groups','Tunnel interfaces'],a:1,e:'三層交換器用 SVI；Router-on-a-Stick 才用子介面+dot1q。'},
+{m:2,q:'What is the DR election order in OSPF?',o:['Highest Router ID → highest priority','Highest priority (0 does not participate) → highest Router ID','Lowest MAC → lowest priority','First come first served'],a:1,e:'① 最高 Priority（0 永不參選）→ ② 最高 Router ID；不具搶佔性（non-preemptive）。'},
+{m:2,q:'What are the OSPF Hello/Dead timers on an NBMA network?',o:['10/40 seconds','30/120 seconds','5/15 seconds','60/180 seconds'],a:1,e:'Broadcast/P2P=10/40；NBMA=30/120——考題陷阱！'},
+{m:2,q:'A /24 static route and a /24 OSPF route exist for the same destination. Which is preferred?',o:['OSPF','Static (lower AD)','Load-balanced','Random'],a:1,e:'前綴相同比 AD：Static=1 < OSPF=110，選 Static。'},
+{m:2,q:'How does a floating static route work?',o:['Higher AD acts as backup','Lower metric acts as primary','AD 255 forces installation','Metric adjusts dynamically'],a:0,e:'設定高於主用路由的 AD（如 ip route … 200），主路由失效時才浮出。'},
+{m:2,q:'What is the standard ACL number range?',o:['100–199','1–99 and 1300–1999','2000–2699','Any number'],a:1,e:'Standard=1–99/1300–1999；Extended=100–199/2000–2699。'},
+{m:2,q:'Which keyword is essential in PAT configuration?',o:['pool','overload','inside global','static'],a:1,e:'漏寫 overload 會嘗試一對一分配外部 IP，不足即失敗。'},
+{m:2,q:'To publish an internal web server with a fixed public IP, which NAT type is used?',o:['PAT','Dynamic NAT','Static NAT','NAT64'],a:2,e:'Static NAT 一對一固定映射，供外部主動存取內部伺服器。'},
+{m:2,q:'Which command allows the original standby router to reclaim the HSRP Active role after recovery?',o:['standby preempt','standby priority 255','standby version 2','standby track'],a:0,e:'Priority 決定初始選舉；preempt 允許高優先者搶回；track 連動介面狀態降級。'},
+{m:2,q:'What is the best way to configure a static route out an Ethernet interface?',o:['ip route 10.0.0.0 255.0.0.0 gi0/0','ip route 10.0.0.0 255.0.0.0 192.168.1.1','ip route 0.0.0.0 0.0.0.0 null0','ip route 10.0.0.0 255.0.0.0 gi0/0 permanent'],a:1,e:'多接取網路必指定下一跳 IP，避免大量 ARP 查詢失敗；P2P 才可用出介面。'},
+{m:2,q:'What is the OSPF Router ID selection order?',o:['Highest loopback IP → highest physical IP','Manual router-id → highest loopback → highest active physical IP','Lowest MAC','Lowest IP'],a:1,e:'手動 router-id > 最高 Loopback > 最高 Active 實體介面 IP。'},
+{m:2,q:'For two routers to form a Full OSPFv2 adjacency, which value must NOT match?',o:['Area ID','Hello/Dead timers','Router ID','Authentication type and key'],a:2,e:'Router ID 各路由器必須唯一且互不相同——若兩台 Router ID 相同反而無法建立鄰居；而 Area ID、Hello/Dead Timer、認證三者任一不一致，Hello 封包會直接被忽略。'},
+{m:2,q:'Two directly connected routers have OSPF neighbors stuck in ExStart for a long time. What is the most likely cause?',o:['Mismatched Hello/Dead timers','Interface MTU mismatch','Different Area ID','No router-id configured'],a:1,e:'Timer/Area 不符會讓鄰居停在 Down/Init（Hello 被丟棄）；卡在 ExStart 是交換 DBD 封包時 MTU 協商失敗所致，可用 ip ospf mtu-ignore 臨時繞過驗證。'},
+{m:2,q:'An OSPF neighbor state shows Init. What does this mean?',o:['Received neighbor Hello but it does not list my Router ID','LSDB fully synchronized','Exchanging DBD packets','Bidirectional communication confirmed'],a:0,e:'Init = 單向可見：我發出 Hello 也收到對方的，但對方 Hello 的 Neighbor 欄位尚未列出我的 RID；雙方互相列名才進入 2-Way。'},
+
+{m:2,q:'In show ip route output, what does a route beginning with “O” represent?',o:['External routes','OSPF intra-area route','Static route','Connected route'],a:1,e:'C=Connected、S=Static、O=OSPF、O IA=OSPF Inter-Area、O E2=External Type-2。'},
+{m:2,q:'How is a default route represented?',o:['0.0.0.0 255.255.255.0','0.0.0.0 0.0.0.0','255.255.255.255 0.0.0.0','0.0.0.0 255.255.255.255'],a:1,e:'0.0.0.0/0 匹配所有未知目的地，又稱 Gateway of last resort（路由表顯示 S*）。'},
+{m:2,q:'What is the destination address of OSPF Hello packets?',o:['255.255.255.255','224.0.0.5','224.0.0.6','ff02::1'],a:1,e:'224.0.0.5=AllSPFRouters；224.0.0.6=AllDRouters（DR/BDR 收聽）。'},
+{m:2,q:'What is the correct configuration order for a Router-on-a-Stick subinterface?',o:['encapsulation dot1q first, then IP address','IP address first, then encapsulation dot1q','IP address only','switchport mode trunk first'],a:0,e:'子介面必須先 encapsulation dot1q <vlan> 才能配 IP；switchport 指令屬交換器。'},
+{m:2,q:'After adjacency is established, which stable state indicates completed LSDB synchronization?',o:['Exchange','Loading','Full','2-Way'],a:2,e:'Down→Init→2-Way→ExStart→Exchange→Loading→Full；廣播網路非 DR/BDR 停在 2-Way 屬正常。'},
+{m:2,q:'In “ip route 10.4.0.0 255.255.0.0 10.2.2.2 120”, what does 120 represent?',o:['Metric','Administrative Distance','TTL','Hop count'],a:1,e:'語法：ip route <net> <mask> <next-hop> <AD>；120=RIP 同級，常用於浮動備援。'},
+{m:2,q:'What is the advantage of using a loopback interface as the Router ID source?',o:['Faster processing','Stable — not tied to physical interface state','Conserves IP addresses','Encrypts traffic'],a:1,e:'Loopback 永遠 up/up，避免實體介面故障導致 RID 變動重算。'},
+{m:2,q:'What happens if two routers are configured in different OSPF areas on a shared link?',o:['Adjacency forms normally','Adjacency fails to form','Adjacency forms but no routes exchanged','Areas auto-correct'],a:1,e:'Hello 封包攜帶 Area ID，不一致直接忽略鄰居請求。'},
+{m:2,q:'In HSRP Virtual MAC 0000.0C07.AC0A, what does “0A” indicate?',o:['Group number 10 (hex)','VLAN 10','Priority 10','Port 10'],a:0,e:'末兩碼十六進位=HSRP Group Number；ACxx 的 xx 即群組號。'},
+
+{m:2,q:'Which command displays the next-hop router toward a specific destination?',o:['show ip route <destination>','show arp','show cdp neighbors detail','show ip interface brief'],a:0,e:'show ip route x.x.x.x 可驗證最長前綴匹配結果與出介面/下一跳——排障第一步。'},
+{m:2,q:'What is the default OSPF reference bandwidth?',o:['10 Mbps','100 Mbps','1 Gbps','10 Gbps'],a:1,e:'預設 100 Mbps；現代高速鏈路建議 auto-cost reference-bandwidth 100000 讓 GigE 以上有區別。'},
+{m:2,q:'In OSPF, what is a Type 2 LSA used for?',o:['Router link within an area','Network LSA generated by the DR','Summary of inter-area routes','External routes'],a:1,e:'Type 1=Router LSA、Type 2=Network LSA(DR 發)、Type 3=Summary、Type 5=AS External。'},
+{m:2,q:'Which statement about HSRP virtual IP is true?',o:['It must equal a physical interface IP','It is shared between Active and Standby routers and used as client gateway','It changes after failover','It is only valid in IPv6'],a:1,e:'Virtual IP/MAC 由 Active 回應 ARP，故障時 Standby 無縫接管，客戶端無感。'},
+
+{m:2,q:'What does FHRP stand for?',o:['First Hop Redundancy Protocol','Fast Hybrid Routing Process','Frame Hop Relay Protocol','Forwarding Header Rewrite Protocol'],a:0,e:'FHRP 泛指 HSRP/VRRP/GLBP 等「第一跳閘道冗餘」協定家族。'},
+{m:2,q:'Which command configures a default static route pointing to 203.0.113.1?',o:['ip default-gateway 203.0.113.1','ip route 0.0.0.0 0.0.0.0 203.0.113.1','ip default-network 203.0.113.0','route add default via 203.0.113.1'],a:1,e:'路由器上用 ip route 0.0.0.0 0.0.0.0 <next-hop>；ip default-gateway 是給交換器管理用的。'},
+{m:2,q:'What is the longest prefix match principle?',o:['Route with smallest metric wins','Most specific (longest) subnet prefix wins regardless of AD','Lowest AD always wins even across different prefixes','Default route wins over specific routes'],a:1,e:'先比前綴長度（越長越精確），同長度才比 AD、再比 Metric——路由決策三步驟必背。'},
+{m:2,q:'Which ACL type filters traffic based on source AND destination IP plus port numbers?',o:['Standard ACL','Extended ACL','Named standard ACL','Time-based ACL only'],a:1,e:'Extended ACL 支援來源/目的 IP+Protocol+Port；Standard 只能比對來源 IP。'},
+{m:2,q:'Which command applies an ACL inbound on interface gi0/1?',o:['ip access-group 101 in','access-list 101 in apply','ip access-list in 101','acl 101 interface gi0/1'],a:0,e:'在介面設定模式：ip access-group <number|name> <in|out>。'},
+
+{m:2,q:'What is the purpose of NAT inside local address?',o:['Public IP seen on the Internet','Private IP of internal host before translation','IP of the NAT device itself','Translated public destination'],a:1,e:'Inside Local=內部主機私有 IP；Inside Global=對外的公網 IP；Outside Local/Global 對稱理解。'},
+{m:2,q:'Which NAT type conserves public IPv4 addresses best?',o:['Static NAT','Dynamic NAT pool','PAT (overload)','No-NAT'],a:2,e:'PAT 用port number讓數千台主機共享一個公網 IP——IPv4 續命關鍵技術。'},
+
+{m:2,q:'What does EIGRP use to establish neighbor relationships?',o:['Hello multicast 224.0.0.10','Broadcast 255.255.255.255','TCP session 179','UDP 520'],a:0,e:'EIGRP Hello=組播 224.0.0.10；RIP v2 也用 224.0.0.9；BGP 用 TCP 179。'},
+
+
+ {m:2,q:'Which table stores EIGRP feasible successors?',o:['Routing table','Topology table','Neighbor table','ARP cache'],a:1,e:'EIGRP 三表：Neighbor Table、Topology Table（存可行後繼）、Routing Table（最佳路徑）。'},
+{m:2,q:'What is the OSPF dead interval on a broadcast network by default?',o:['10 seconds','40 seconds','120 seconds','60 seconds'],a:1,e:'Broadcast Hello 10 秒 ×4 = Dead 40 秒；NBMA 為 30/120。'},
+{m:2,q:'Which command shows all OSPF neighbors and their states?',o:['show ip ospf neighbor','show ip route ospf','show ospf database','debug ip ospf adj'],a:0,e:'排障首秀指令：確認鄰居狀態是否 FULL；卡在特定狀態可對症排查。'},
+{m:2,q:'What does the “*” next to S in “S* 0.0.0.0/0” indicate?',o:['Candidate default route','Backup route','Filtered route','Recursive route'],a:0,e:'S*=Gateway of Last Resort 的候選預設路由，已安裝者會註明 via 指向。'},
+{m:2,q:'Which component does a router consult FIRST when forwarding a packet?',o:['ARP cache','Routing table for longest prefix match','ACL applied outbound','NAT translation table'],a:1,e:'轉發流程：查路由表（最長前綴）→ 找下一跳 → 查 ARP 取得 MAC → 封裝轉發。'},
+
 // ══════════ Module 3: IP Services（30題）══════════
+{m: 3,
+  q: 'What are two functional differences between traffic policing and traffic shaping in QoS? (Choose two)',
+  o: [
+    'Shaping buffers excess packets in a queue to smooth out bursts, whereas policing drops or remarks excess traffic',
+    'Policing introduces delay and jitter by buffering packets',
+    'Policing can be applied in both inbound and outbound directions, while shaping is typically applied only outbound',
+    'Shaping is strictly used for Layer 2 CoS marking'
+  ],
+  a: [0, 2],
+  e: '【QoS Policing vs Shaping 核心差異】：Traffic Shaping（流量整型）使用佇列暫存（Queue/Buffer）超額流量以平滑突發速率（會產生延遲），僅能套用在 Outbound；Traffic Policing（流量監管）不緩存，超額流量直接丟棄（Drop）或降級標記（Remark），可套用於 Inbound 與 Outbound。'
+},
+{m: 3,
+  q: 'Which two features were introduced in SNMPv2c that significantly improved network management efficiency and reliability over SNMPv1? (Choose two)',
+  o: [
+    'GetBulk operation to retrieve large MIB tables in a single request',
+    'InformRequest (Inform) to provide an acknowledged, reliable trap mechanism',
+    'AES-256 payload encryption',
+    'User-based Security Model (USM) authentication'
+  ],
+  a: [0, 1],
+  e: '【SNMPv2c 關鍵升級】：SNMPv2c 引入了 `GetBulk`（單次請求取回多筆 MIB 資料，大幅減少輪詢往返）與 `Inform`（NMS 收到告警後會回覆 ACK，具備可靠傳輸機制）；加密與 USM 認證則是 SNMPv3 的專屬特性。'
+},
 {m:3,q:'What is the correct order of DHCP DORA?',o:['Offer→Discover→Request→Acknowledge','Discover→Offer→Request→Acknowledge','Discover→Request→Offer→Acknowledge','Request→Discover→Offer→Acknowledge'],a:1,e:'Discover/Request 由 Client 廣播；跨網段需 ip helper-address 轉單播。'},
 {m:3,q:'Which syslog severity level is the most critical?',o:['Level 7 debugging','Level 0 emergency','Level 1 alert','Level 4 warning'],a:1,e:'0(emergency)→7(debugging)；logging trap <level> 設傳送門檻。'},
 {m:3,q:'Which three DHCP messages belong to the initial lease acquisition (DORA)? (Choose three)',
  o:['Discover','Offer','Request','Release'],
  a:[0,1,2],
  e:'DORA = Discover→Offer→Request→Acknowledge；Release 是釋放租約時使用。'},
-
-{m:3,q:'Which configuration is NOT required before enabling SSH login?',o:['hostname and ip domain-name','crypto key generate rsa','login local under line vty','enable secret level 15'],a:3,e:'SSH 需要 hostname+domain-name 產生 RSA 金鑰+vty 本地認證；enable secret 非必要。'},
-{m:3,q:'An NTP stratum 2 server synchronizes from which source?',o:['stratum 0','stratum 1','stratum 3','Internet root servers'],a:1,e:'stratum 0=權威鐘（原子鐘/GPS）、1 直接收 stratum 0、2 收 stratum 1，逐層遞增。'},
-{m:3,q:'Which DSCP marking is recommended for voice traffic in QoS?',o:['AF31 (26)','EF (46)','CS1 (8)','BE (0)'],a:1,e:'EF=Expedited Forwarding 給語音；AF31 給呼叫信令；BE 預設盡力而為。'},
 {m:3,q:'Which two services can be forwarded by the ip helper-address mechanism? (Choose two)',
  o:['DHCP (UDP 67)','TFTP (UDP 69)','HTTP (TCP 80)','SSH (TCP 22)'],
  a:[0,1],
@@ -4342,25 +4684,17 @@ const quiz=[
  o:['Level 0 is emergency — the most critical','Level 7 is debugging — the least critical','Level 7 is the most critical','Levels range from 0 to 9'],
  a:[0,1],
  e:'Syslog 0–7：0=emergency 最嚴重、7=debugging 最輕微。'},
-
 {m:3,q:'Where is CoS located in the encapsulation?',o:['IP header ToS field','3 bits inside the 802.1Q tag','TCP options','Ethernet Type field'],a:1,e:'CoS 是 L2（802.1Q 3-bit 0–7）；DSCP 是 L3（ToS 前 6-bit 0–63）。'},
 {m:3,q:'What is SNMPv3’s biggest improvement over v2c?',o:['Support for traps','Authentication and encryption (authPriv)','Support for Get/Set operations','Use of UDP'],a:1,e:'v2c Community String 明文；v3 是唯一具加密版本（noAuth/auth/authPriv 三安全等級）。'},
 {m:3,q:'Which TWO types of messages are actively PUSHED by the network device rather than polled by the NMS? (Choose two)',
  o:['SNMP trap messages','Syslog messages','SNMP Get requests','ICMP echo replies to an NMS ping'],
  a:[0,1],
  e:'Trap 與 Syslog 都是設備主動推送的事件告警；Get 是 NMS 主動輪詢、ping 回應是被動回覆，兩者皆非設備主動行為。'},
-
 {m:3,q:'What is the function of DHCP relay (ip helper-address)?',o:['Assigns static IPs to clients','Converts DHCP broadcasts to unicast across subnets to reach the server','Encrypts DHCP traffic','Prevents rogue DHCP servers'],a:1,e:'Client 廣播無法過路由器，Relay Agent 轉單播至指定 Server。'},
 {m:3,q:'Which two configurations are required for SSH access on an IOS device? (Choose two)',
  o:['A configured hostname and domain name before generating RSA keys','transport input ssh under line vty','An SNMP community string','CDP enabled globally'],
  a:[0,1],
  e:'hostname + ip domain-name 才能產生 RSA 金鑰，vty 下 transport input ssh 限制僅 SSH 登入。'},
-
-{m:3,q:'Which output confirms successful NTP synchronization?',o:['unsynchronized','synchronized','stratum 16','offset 9999'],a:1,e:'show ntp status 出現 synchronized 即成功；stratum 16 代表未同步。'},
-{m:3,q:'Where should the QoS trust boundary be placed?',o:['Core switches','At the first hop where traffic enters the network','Data center egress','On firewalls'],a:1,e:'第一跳標記 DSCP 後，內部設備信任該標記直通，避免重複分類。'},
-{m:3,q:'When replying with an Offer, what addressing does the DHCP server use?',o:['Broadcast or unicast depending on the client’s broadcast flag','Multicast only','Anycast only','Link-local only'],a:0,e:'Discover 廣播出去；Offer 依 Client 的 broadcast flag 決定回廣播或單播。'},
-{m:3,q:'Which port does SSH use by default?',o:['21','22','23','69'],a:1,e:'SSH=TCP 22；Telnet=TCP 23；FTP=20/21；TFTP=UDP 69。'},
-{m:3,q:'Which command generates the RSA key pair required for SSH?',o:['crypto key generate rsa modulus 1024','ssh keygen rsa 2048','crypto rsa create key','key generate ssh 1024'],a:0,e:'IOS 指令 crypto key generate rsa [modulus <bits>]；現代安全基線建議 modulus ≥2048（舊考題常見 1024）。'},
 {m:3,q:'Which two statements about NTP stratum are correct? (Choose two)',
  o:['Stratum 0 represents authoritative reference clocks (atomic/GPS)','Each hop away from the source increases the stratum by one','Stratum 16 indicates a fully synchronized server','Lower stratum numbers mean farther from the time source'],
  a:[0,1],
@@ -4369,43 +4703,108 @@ const quiz=[
  o:['CoS marks traffic at Layer 2 within the 802.1Q tag','DSCP marks traffic at Layer 3 in the IP ToS field','CoS operates at Layer 4','DSCP is carried inside the TCP header'],
  a:[0,1],
  e:'CoS=L2（802.1Q 3 bits）、DSCP=L3（IP ToS 前 6 bits）；跨 L2/L3 邊界需重新映射。'},
-
-{m:3,q:'Which transport setting restricts vty lines to SSH only?',o:['transport input telnet','transport input ssh','transport preferred all','transport output none'],a:1,e:'transport input ssh 禁止 Telnet 明文登入，是安全基線配置。'},
-{m:3,q:'What is the UDP destination port of DNS queries?',o:['53','67','68','161'],a:0,e:'DNS=UDP/TCP 53；DHCP Server=67、Client=68；SNMP=161。'},
 {m:3,q:'Which two SNMP operations are initiated by the NMS (manager)? (Choose two)',
  o:['Get','Set','Trap','Inform acknowledgment by the agent'],
  a:[0,1],
  e:'Get/Set/GetNext/GetBulk 由 NMS 主動發起；Trap 由 Agent 主動推送。'},
-
-{m:3,q:'Which DHCP message does a client send to renew its lease at 50% of lease time (T1)?',o:['Discover','Unicast Request to the original server','Inform','Decline'],a:1,e:'T1（租期 50%）單播 Request 續約原 Server 失敗才於 T2 廣播。'},
-{m:3,q:'Which NTP concept describes the distance from the authoritative time source?',o:['Offset','Stratum','Delay','Jitter'],a:1,e:'Stratum 層級：0=參考鐘、每同步一層 +1，最大 15，16 表示未同步。'},
 {m:3,q:'Which TWO commands can verify the DNS server configured on a router? (Choose two)',
  o:['show hosts','show running-config | include name-server','show ip route static','show vlan brief'],
  a:[0,1],
  e:'ip name-server 設定後，可用 show hosts（解析器快取與設定）或 show run | include name-server 查看；路由表與 VLAN 資訊與 DNS 解析器無關。'},
-
 {m:3,q:'What is the primary benefit of using an external syslog server?',o:['Centralized log storage independent of device memory','Faster routing','Encrypted management','Automatic configuration backup only'],a:0,e:'本機 logging buffered 有容量上限且重開即失；集中式 Syslog 利於稽核與關聯分析。'},
 {m:3,q:'Which severity level would a “link up/down” interface message typically fall into?',o:['Level 5 notifications','Level 0 emergency','Level 2 critical','Level 7 debugging'],a:0,e:'介面 up/down 屬 Level 5 notification；%LINK-5-CHANGED 是經典範例。'},
 {m:3,q:'Which two statements about DNS ports are correct? (Choose two)',
  o:['Standard queries typically use UDP port 53','Zone transfers use TCP port 53','DNS uses TCP port 23','DNS queries use UDP port 67'],
  a:[0,1],
  e:'查詢走 UDP 53、Zone Transfer 走 TCP 53；67 是 DHCP Server。'},
-
-{m:3,q:'What does the DHCP option 66 provide to clients?',o:['DNS server address','TFTP server address','Default gateway','Lease duration'],a:1,e:'Option 66=TFTP server（常用於 IP Phone 自動佈署）；Option 3=router/gateway；Option 6=DNS。'},
 {m:3,q:'Which three items does a DHCP server typically provide to a client? (Choose three)',
  o:['IP address and subnet mask','Default gateway (Option 3)','DNS server (Option 6)','MAC address of the client'],
  a:[0,1,2],
  e:'DHCP 提供 IP/Mask/Gateway/DNS 等網路參數；MAC 位址是 Client 自己帶來的，不是伺服器配發。'},
-
-{m:3,q:'Which statement about NTP authentication is true?',o:['It encrypts time packets end-to-end','It verifies the authenticity of the time source using keys','It replaces the need for stratum hierarchy','It requires MD5 disabled'],a:1,e:'NTP auth 用金鑰驗證來源真偽（防時間欺騙），不加密封包本身內容。'},
-{m:3,q:'Which SNMP operation retrieves multiple values in a single request efficiently?',o:['GetNext','GetBulk (v2c/v3)','Set','Trap'],a:1,e:'GetBulk 減少輪詢往返次數，適合大表格抓取；v1 只有 Get/GetNext/Set。'},
-{m:3,q:'What is the MIB in SNMP architecture?',o:['Management Information Base — hierarchical database of managed objects','Message Interface Board','Multi-user Internet Bridge','Managed IP Blocklist'],a:0,e:'MIB 以 OID 樹狀結構定義可管理物件；NMS 與 Agent 透過 OID 讀寫資料。'},
-{m:3,q:'Which QoS mechanism marks traffic at Layer 3?',o:['CoS','DSCP','802.1p priority bits only','MAC classification'],a:1,e:'DSCP 位於 IP ToS 前 6 bit（L3）；CoS/802.1p 在 L2；跨三層邊界需重新映射。'},
 {m:3,q:'Which two statements about SPAN are correct? (Choose two)',
  o:['Traffic is copied from source ports or VLANs to a destination monitoring port','SPAN does not affect normal forwarding of the original traffic','SPAN encrypts mirrored frames by default','SPAN requires a dedicated trunk to the NMS at Layer 3'],
  a:[0,1],
  e:'SPAN 複製流量到監聽埠供分析且不影響原始轉發；無加密機制，也不需 L3 trunk。'},
 
+
+{m: 3,
+  q: 'When Lightweight APs boot up and obtain an IP address via DHCP, which DHCP Option provides the IPv4 address of the Wireless LAN Controller (WLC) to enable CAPWAP discovery?',
+  o: [
+    'Option 43',
+    'Option 66',
+    'Option 150',
+    'Option 3'
+  ],
+  a: 0,
+  e: '【DHCP Option 考點】：\n• Option 43：提供 WLC IP 給 Lightweight AP 建立 CAPWAP 連線\n• Option 150：Cisco 專屬，提供 TFTP IP 清單給 IP Phone\n• Option 66：標準 TFTP 伺服器名稱/IP\n• Option 3：Default Gateway'
+},
+{m: 3,
+  q: 'How does an iterative DNS query differ from a recursive DNS query in name resolution workflows?',
+  o: [
+    'In an iterative query, the contacted DNS server returns the best referral answer it knows (such as the next authoritative name server) rather than resolving the complete domain name itself',
+    'An iterative query forces the DNS server to contact all root servers and return the final IP to the client',
+    'Iterative queries encrypt domain lookups using HTTPS (DoH)',
+    'Iterative queries operate exclusively over TCP port 53'
+  ],
+  a: 0,
+  e: '【DNS 迭代 vs 遞迴查詢】：遞迴查詢（Recursive）由本機向 Local DNS 發起，要求伺服器「必須回傳最終 IP」；迭代查詢（Iterative）是 DNS 伺服器之間互相查詢，被詢問的伺服器若無該筆紀錄，會回傳下一層權威 Name Server 的轉介（Referral）資訊。'
+},
+{m: 3,
+  q: 'An engineer configures a core router with "ntp master 3". What is the operational effect of this command?',
+  o: [
+    'The router acts as an authoritative NTP clock source at Stratum 3 if external NTP synchronization fails or is unavailable',
+    'The router limits its local NTP associations to a maximum of 3 clients',
+    'The router synchronizes only from Stratum 3 upstream public servers',
+    'The router disables NTP authentication for the first 3 interface groups'
+  ],
+  a: 0,
+  e: '【NTP Master 角色設定】：`ntp master [stratum]` 讓路由器在無法連通外部標準時鐘源時，以自身硬體時鐘為基準充當 NTP Server，並對外宣告指定的 Stratum 等級（此處為 Stratum 3），確保內部網路設備時間維持一致。'
+}, 
+{m: 3,
+  q: 'Which command must be configured within a Cisco IOS DHCP pool to distribute the default gateway address to clients?',
+  o: [
+    'ip default-gateway <ip>',
+    'default-router <ip>',
+    'gateway-list <ip>',
+    'ip helper-address <ip>'
+  ],
+  a: 1,
+  e: '【DHCP Pool 預設閘道指令】：在 `ip dhcp pool` 設定模式下，指派預設閘道（DHCP Option 3）的正確指令為 `default-router <ip>`；`ip default-gateway` 是交換器處於二層模式時的管理閘道指令。'
+},
+{m: 3,
+  q: 'An administrator enters the global configuration command "logging trap 4" on a Cisco router. Which syslog severity levels will be forwarded to the syslog server?',
+  o: [
+    'Only level 4 (Warnings)',
+    'Levels 0 through 4 (Emergency, Alert, Critical, Error, Warning)',
+    'Levels 4 through 7 (Warning, Notification, Informational, Debugging)',
+    'All levels from 0 to 7'
+  ],
+  a: 1,
+  e: '【Syslog Trap 過濾等級邏輯】：`logging trap <level>` 會傳送「小於或等於（即嚴重度更高或相等）」該等級的所有訊息。Level 4 為 Warning，因此會轉發 Level 0 (Emergency) 至 Level 4 (Warning) 共 5 個等級的日誌。'
+},
+
+{m:3,q:'Which configuration is NOT required before enabling SSH login?',o:['hostname and ip domain-name','crypto key generate rsa','login local under line vty','enable secret level 15'],a:3,e:'SSH 需要 hostname+domain-name 產生 RSA 金鑰+vty 本地認證；enable secret 非必要。'},
+{m:3,q:'An NTP stratum 2 server synchronizes from which source?',o:['stratum 0','stratum 1','stratum 3','Internet root servers'],a:1,e:'stratum 0=權威鐘（原子鐘/GPS）、1 直接收 stratum 0、2 收 stratum 1，逐層遞增。'},
+{m:3,q:'Which DSCP marking is recommended for voice traffic in QoS?',o:['AF31 (26)','EF (46)','CS1 (8)','BE (0)'],a:1,e:'EF=Expedited Forwarding 給語音；AF31 給呼叫信令；BE 預設盡力而為。'},
+
+
+{m:3,q:'Which output confirms successful NTP synchronization?',o:['unsynchronized','synchronized','stratum 16','offset 9999'],a:1,e:'show ntp status 出現 synchronized 即成功；stratum 16 代表未同步。'},
+{m:3,q:'Where should the QoS trust boundary be placed?',o:['Core switches','At the first hop where traffic enters the network','Data center egress','On firewalls'],a:1,e:'第一跳標記 DSCP 後，內部設備信任該標記直通，避免重複分類。'},
+{m:3,q:'When replying with an Offer, what addressing does the DHCP server use?',o:['Broadcast or unicast depending on the client’s broadcast flag','Multicast only','Anycast only','Link-local only'],a:0,e:'Discover 廣播出去；Offer 依 Client 的 broadcast flag 決定回廣播或單播。'},
+{m:3,q:'Which port does SSH use by default?',o:['21','22','23','69'],a:1,e:'SSH=TCP 22；Telnet=TCP 23；FTP=20/21；TFTP=UDP 69。'},
+{m:3,q:'Which command generates the RSA key pair required for SSH?',o:['crypto key generate rsa modulus 1024','ssh keygen rsa 2048','crypto rsa create key','key generate ssh 1024'],a:0,e:'IOS 指令 crypto key generate rsa [modulus <bits>]；現代安全基線建議 modulus ≥2048（舊考題常見 1024）。'},
+{m:3,q:'Which transport setting restricts vty lines to SSH only?',o:['transport input telnet','transport input ssh','transport preferred all','transport output none'],a:1,e:'transport input ssh 禁止 Telnet 明文登入，是安全基線配置。'},
+{m:3,q:'What is the UDP destination port of DNS queries?',o:['53','67','68','161'],a:0,e:'DNS=UDP/TCP 53；DHCP Server=67、Client=68；SNMP=161。'},
+{m:3,q:'Which DHCP message does a client send to renew its lease at 50% of lease time (T1)?',o:['Discover','Unicast Request to the original server','Inform','Decline'],a:1,e:'T1（租期 50%）單播 Request 續約原 Server 失敗才於 T2 廣播。'},
+{m:3,q:'Which NTP concept describes the distance from the authoritative time source?',o:['Offset','Stratum','Delay','Jitter'],a:1,e:'Stratum 層級：0=參考鐘、每同步一層 +1，最大 15，16 表示未同步。'},
+
+
+{m:3,q:'What does the DHCP option 66 provide to clients?',o:['DNS server address','TFTP server address','Default gateway','Lease duration'],a:1,e:'Option 66=TFTP server（常用於 IP Phone 自動佈署）；Option 3=router/gateway；Option 6=DNS。'},
+ 
+{m:3,q:'Which statement about NTP authentication is true?',o:['It encrypts time packets end-to-end','It verifies the authenticity of the time source using keys','It replaces the need for stratum hierarchy','It requires MD5 disabled'],a:1,e:'NTP auth 用金鑰驗證來源真偽（防時間欺騙），不加密封包本身內容。'},
+{m:3,q:'Which SNMP operation retrieves multiple values in a single request efficiently?',o:['GetNext','GetBulk (v2c/v3)','Set','Trap'],a:1,e:'GetBulk 減少輪詢往返次數，適合大表格抓取；v1 只有 Get/GetNext/Set。'},
+{m:3,q:'What is the MIB in SNMP architecture?',o:['Management Information Base — hierarchical database of managed objects','Message Interface Board','Multi-user Internet Bridge','Managed IP Blocklist'],a:0,e:'MIB 以 OID 樹狀結構定義可管理物件；NMS 與 Agent 透過 OID 讀寫資料。'},
+{m:3,q:'Which QoS mechanism marks traffic at Layer 3?',o:['CoS','DSCP','802.1p priority bits only','MAC classification'],a:1,e:'DSCP 位於 IP ToS 前 6 bit（L3）；CoS/802.1p 在 L2；跨三層邊界需重新映射。'},
 {m:3,q:'Which command sets the device clock manually before NTP converges?',o:['clock set hh:mm:ss day month year','set time now','datetime configure','ntp manual set'],a:0,e:'clock set 格式為 HH:MM:SS Day Month Year（例：clock set 14:00:00 1 Jun 2024）；NTP 同步後會覆蓋。'},
 {m:3,q:'What does CDP/LLDP timer “holdtime” define?',o:['How long neighbor information is kept before expiring','Port security hold period','STP forward delay','DHCP lease time'],a:1,e:'CDP holdtime 預設 180 秒（3×發送間隔 60 秒）；LLDP 預設 holdtime 120 秒。'},
 {m:3,q:'A router interface is configured with "ip address dhcp". What role does the router play?',o:['DHCP Server','DHCP Client','DHCP Relay Agent','DHCP Snooping device'],a:1,e:'ip address dhcp 讓介面本身以 Client 角色向上游 Server 取得 IP；ip helper-address 才是 Relay Agent 角色。'},
@@ -4420,18 +4819,10 @@ const quiz=[
  o:['Use SSH instead of Telnet','Configure enable secret instead of enable password','Enable HTTP server for easy access','Use service password-encryption as the sole protection for secrets'],
  a:[0,1],
  e:'SSH 加密傳輸、enable secret 使用單向雜湊；HTTP 明文管理應關閉；Type 7 只是弱混淆。'},
-
-{m:4,q:'In AAA, which element answers “what are you allowed to do?”',o:['Authentication','Authorization','Accounting','Auditing'],a:1,e:'Authentication=你是誰、Authorization=你能做什麼、Accounting=你做了什麼。'},
-{m:4,q:'Which VPN type connects a branch office network to headquarters?',o:['Remote Access VPN','Site-to-Site VPN','SSL VPN','Clientless VPN'],a:1,e:'Site-to-Site 閘道器對閘道器、使用者無感免客戶端。'},
 {m:4,q:'Which two attacks does DHCP snooping combined with DAI defend against? (Choose two)',
  o:['Rogue DHCP servers','ARP spoofing/poisoning','DNS cache poisoning','Brute-force password attacks'],
  a:[0,1],
  e:'DHCP Snooping 防 Rogue DHCP；DAI 借助 snooping binding 表防 ARP 欺騙。'},
-
-{m:4,q:'What is the major security risk of Telnet compared to SSH?',o:['Slower speed','Transmits credentials and data in cleartext','Does not support passwords','Limited to LAN only'],a:1,e:'Telnet TCP 23 全程明文；SSH TCP 22 加密，一律選 SSH。'},
-{m:4,q:'If both enable secret and enable password are configured, which takes effect?',o:['password','secret (takes precedence)','Both required','System error'],a:1,e:'enable secret 使用雜湊儲存且優先於明文的 enable password。'},
-{m:4,q:'Which attack does DHCP Snooping defend against?',o:['ARP spoofing','Rogue DHCP servers distributing fake gateways','IP spoofing','MAC flooding'],a:1,e:'Snooping 防 Rogue DHCP；DAI 防 ARP Spoofing；IPSG 防 IP Spoofing。'},
-{m:4,q:'What is the attack that floods fake source MACs to overflow the CAM table called?',o:['ARP poisoning','MAC flooding','DHCP starvation','VLAN hopping'],a:1,e:'CAM 表滿後交換器退化成 Flood 行為，可被竊聽；Port Security 可防禦。'},
 {m:4,q:'Which two statements about symmetric encryption are correct? (Choose two)',
  o:['The same key is used for both encryption and decryption','AES is a common example','RSA is a common example','It solves key distribution over insecure networks by itself'],
  a:[0,1],
@@ -4442,35 +4833,110 @@ const quiz=[
  o:['Phishing','Tailgating','Pretexting social engineering calls','Buffer overflow exploits'],
  a:[0,1,2],
  e:'釣魚、尾隨、話術皆屬社會工程類攻擊；緩衝區溢位是技術性漏洞利用。'},
-
-{m:4,q:'What distinguishes TACACS+ from RADIUS?',o:['TACACS+ uses UDP','TACACS+ encrypts the entire payload and supports per-command authorization','RADIUS encrypts whole packets','Both use TCP 49'],a:1,e:'TACACS+=TCP 49 全程加密+逐指令授權；RADIUS=UDP 1812 僅加密密碼欄位。'},
-{m:4,q:'On what authentication framework is WPA2-Enterprise based?',o:['PSK shared keys','802.1X/EAP with RADIUS','SAE','WEP'],a:1,e:'企業版用 802.1X 動態派發憑證；Personal 版才用 PSK。'},
-{m:4,q:'What is a common defense against VLAN hopping?',o:['Enable CDP','Move native VLAN to an unused ID and disable DTP (switchport nonegotiate)','Increase trunk bandwidth','Enable PoE'],a:1,e:'雙重標籤攻擊利用 Native VLAN；改閒置 VLAN+nonegotiate 可阻斷。'},
 {m:4,q:'Which two differences between IDS and IPS are correct? (Choose two)',
  o:['IPS is deployed inline and can block traffic in real time','IDS is deployed out-of-band and primarily detects and alerts','IDS blocks malicious packets before they reach the target','IPS cannot inspect encrypted-adjacent traffic at all'],
  a:[0,1],
  e:'IPS inline 主動阻擋、IDS promiscuous 被動告警。'},
-
-{m:4,q:'What is the limitation of service password-encryption?',o:['Completely secure encryption','Only weak reversible Type 7 encoding','Encrypts only enable secret','Requires reload'],a:1,e:'Type 7 是可逆的弱混淆；敏感密碼仍應用 secret（MD5/SCRYPT）。'},
-{m:4,q:'Which physical control is classified as “detective”?',o:['Electronic door locks','CCTV surveillance cameras','Biometric access','Security guards'],a:1,e:'攝影機偵測記錄但不阻擋；門禁/警衛屬防護阻擋型。'},
 {m:4,q:'Which TWO statements describe characteristics of symmetric encryption? (Choose two)',
  o:['The same key encrypts and decrypts','It is faster than asymmetric encryption','It uses public/private key pairs','It is ideal for key exchange over insecure links'],
  a:[0,1],
  e:'對稱式（AES）速度快、金鑰管理難；非對稱式（RSA）用公私鑰解決金鑰交換，兩者常混用（如 TLS 握手）。'},
-
-{m:4,q:'What should be configured on vty lines per password best practices?',o:['password cisco','login local with transport input ssh','no login','transport input telnet'],a:1,e:'login local 使用本地帳號資料庫；transport input ssh 禁止 Telnet。'},
-{m:4,q:'What is the primary goal of a DoS attack?',o:['Steal data','Disrupt service availability','Escalate privileges','Sniff traffic'],a:1,e:'DoS/DDoS 目標是 Availability（可用性），非機密性。'},
 {m:4,q:'Which two features protect against unauthorized devices connecting to switch ports? (Choose two)',
  o:['802.1X port-based authentication','Port security with maximum MAC count','CDP neighbor discovery','LLDP TLV exchange'],
  a:[0,1],
  e:'802.1X 強制認證、Port Security 限制 MAC 數量；CDP/LLDP 只是發現協定無防護作用。'},
-
-{m:4,q:'What is the most effective defense against social engineering?',o:['Stronger firewalls','User security awareness training','Disk encryption','VLAN segmentation'],a:1,e:'釣魚/尾隨等攻擊鎖定人的弱點，教育訓練是第一道防線。'},
 {m:4,q:'Which two statements about WPA security versions are correct? (Choose two)',
  o:['WPA3-Personal uses SAE instead of PSK','WEP is deprecated due to RC4 weaknesses','TKIP is the strongest current encryption','WPA2-Enterprise uses pre-shared keys only'],
  a:[0,1],
  e:'WPA3-Personal 用 SAE 抗字典攻擊；WEP 已淘汰；企業版用 802.1X/EAP 非 PSK；TKIP 已被 AES 取代。'},
+{m:4,q:'Which two VPN types match their descriptions correctly? (Choose two)',
+ o:['Site-to-Site VPN connects entire networks between gateways','Remote Access VPN serves individual users via client software','Site-to-Site VPN requires per-user client installation','Remote Access VPN is transparent to end users without any client'],
+ a:[0,1],
+ e:'Site-to-Site 閘道對閘道、使用者無感免客戶端；Remote Access 由個別使用者透過 Client 連入。'},
+{m:4,q:'Which three components form the AAA framework? (Choose three)',
+ o:['Authentication','Authorization','Accounting','Automation'],
+ a:[0,1,2],
+ e:'AAA=你是誰、你能做什麼、你做了什麼。'},
+{m: 4,
+  q: 'Which three validation checks can be enabled under Dynamic ARP Inspection (DAI) on a Cisco Catalyst switch? (Choose three)',
+  o: [
+    'ip arp inspection validate src-mac — checks source MAC in Ethernet header against ARP payload sender MAC',
+    'ip arp inspection validate dst-mac — checks destination MAC in Ethernet header against ARP payload target MAC',
+    'ip arp inspection validate ip — validates ARP IP addresses for invalid values such as 0.0.0.0 or multicast IPs',
+    'ip arp inspection validate ttl — validates IP Time-to-Live field decrement'
+  ],
+  a: [0, 1, 2],
+  e: '【DAI 三項進階檢查】：`ip arp inspection validate [src-mac | dst-mac | ip]` 可深入檢查：\n• `src-mac`：L2 Header 來源 MAC 是否與 ARP Payload 內 Sender MAC 相符\n• `dst-mac`：L2 Header 目的 MAC 是否與 Target MAC 相符（針對 ARP Reply）\n• `ip`：阻擋 Sender IP 為 0.0.0.0、255.255.255.255 或組播/廣播 IP'
+},
 
+
+{m: 4,
+  q: 'Which password hash type in Cisco IOS-XE provides the highest level of cryptographic security and resistance against offline hardware brute-force attacks?',
+  o: [
+    'Type 9 (Scrypt algorithm)',
+    'Type 8 (PBKDF2 SHA-256)',
+    'Type 5 (MD5 hash)',
+    'Type 7 (Vigenère weak reversible encryption)'
+  ],
+  a: 0,
+  e: '【Cisco 密碼雜湊安全等級】：Type 9 (`algorithm-type scrypt`) 採用記憶體硬化（Memory-hard）的 Scrypt 演算法，對 GPU/ASIC 離線暴力破解具備最高防禦力；Type 8 為 SHA-256；Type 5 為 MD5；Type 7 只是弱混淆（極易被線上工具秒解）。'
+},
+{m: 4,
+  q: 'An enterprise security policy requires Multi-Factor Authentication (MFA). Which combination represents two distinct authentication factor categories?',
+  o: [
+    'A personal 6-digit PIN and a cryptographic software authenticator token (Something you know + Something you have)',
+    'A complex alphanumeric password and a personal 8-digit PIN',
+    'A fingerprint scan and a facial recognition scan',
+    'A hardware RSA SecurID token and a mobile push notification'
+  ],
+  a: 0,
+  e: '【MFA 多因素認證三大範疇】：\n1. 所知（Something you know）：密碼、PIN\n2. 所有（Something you have）：實體權杖、手機 App 驗證碼、智慧卡\n3. 所具（Something you are）：指紋、虹膜、臉部生物辨識\nPIN（所知）搭配 Authenticator Token（所有）屬於合法雙因素。'
+},
+
+{m: 4,
+  q: 'An engineer must configure a local user account on a Cisco IOS-XE device with the strongest possible password hashing algorithm. Which command should be used?',
+  o: [
+    'username admin secret 5 cisco123',
+    'username admin algorithm-type scrypt secret cisco123',
+    'username admin algorithm-type sha256 password cisco123',
+    'service password-encryption'
+  ],
+  a: 1,
+  e: '【Cisco 密碼雜湊強度】：Cisco IOS 密碼類型中，`algorithm-type scrypt`（Type 9）採用 Scrypt 演算法，具備最高的抗硬體暴力破解強度；Type 8 為 SHA-256，Type 5 為 MD5，Type 7 為可逆弱混淆，Type 0 為明文。'
+},
+{m: 4,
+  q: 'An administrator wants to restrict VTY remote management access to permit only the management host 10.10.10.50. Which command correctly applies the ACL to the VTY lines?',
+  o: [
+    'line vty 0 15 / ip access-group 10 in',
+    'line vty 0 15 / access-class 10 in',
+    'line vty 0 15 / access-group 10 in',
+    'interface vty 0 15 / ip access-class 10 in'
+  ],
+  a: 1,
+  e: '【VTY 線路存取控制指令】：在 `line vty 0 15` 設定模式下，掛載 ACL 限制管理連線的專用指令為 `access-class <ACL編號|名稱> in`；`ip access-group` 僅用於實體介面或 SVI 的資料平面流量過濾。'
+},
+{m: 4,
+  q: 'Which IPsec encapsulation mode encrypts the entire original IP packet (including header and payload) and prepends a new IP header for transit across public networks?',
+  o: ['Transport mode', 'Tunnel mode', 'AH integrity mode', 'ESP stateless mode'],
+  a: 1,
+  e: '【IPsec Tunnel vs Transport Mode】：Tunnel Mode（隧道模式）會將「整個原始 IP 封包（Header + Data）」完整加密，並在最外層加上新的公開 IP 標頭，是 Site-to-Site VPN 的標準模式；Transport Mode 僅加密 Layer 4 Payload，保留原始 IP 標頭，常用於 Host-to-Host 或 GRE over IPsec。'
+},
+
+
+{m:4,q:'In AAA, which element answers “what are you allowed to do?”',o:['Authentication','Authorization','Accounting','Auditing'],a:1,e:'Authentication=你是誰、Authorization=你能做什麼、Accounting=你做了什麼。'},
+{m:4,q:'Which VPN type connects a branch office network to headquarters?',o:['Remote Access VPN','Site-to-Site VPN','SSL VPN','Clientless VPN'],a:1,e:'Site-to-Site 閘道器對閘道器、使用者無感免客戶端。'},
+{m:4,q:'What is the major security risk of Telnet compared to SSH?',o:['Slower speed','Transmits credentials and data in cleartext','Does not support passwords','Limited to LAN only'],a:1,e:'Telnet TCP 23 全程明文；SSH TCP 22 加密，一律選 SSH。'},
+{m:4,q:'If both enable secret and enable password are configured, which takes effect?',o:['password','secret (takes precedence)','Both required','System error'],a:1,e:'enable secret 使用雜湊儲存且優先於明文的 enable password。'},
+{m:4,q:'Which attack does DHCP Snooping defend against?',o:['ARP spoofing','Rogue DHCP servers distributing fake gateways','IP spoofing','MAC flooding'],a:1,e:'Snooping 防 Rogue DHCP；DAI 防 ARP Spoofing；IPSG 防 IP Spoofing。'},
+{m:4,q:'What is the attack that floods fake source MACs to overflow the CAM table called?',o:['ARP poisoning','MAC flooding','DHCP starvation','VLAN hopping'],a:1,e:'CAM 表滿後交換器退化成 Flood 行為，可被竊聽；Port Security 可防禦。'},
+{m:4,q:'What distinguishes TACACS+ from RADIUS?',o:['TACACS+ uses UDP','TACACS+ encrypts the entire payload and supports per-command authorization','RADIUS encrypts whole packets','Both use TCP 49'],a:1,e:'TACACS+=TCP 49 全程加密+逐指令授權；RADIUS=UDP 1812 僅加密密碼欄位。'},
+{m:4,q:'On what authentication framework is WPA2-Enterprise based?',o:['PSK shared keys','802.1X/EAP with RADIUS','SAE','WEP'],a:1,e:'企業版用 802.1X 動態派發憑證；Personal 版才用 PSK。'},
+{m:4,q:'What is a common defense against VLAN hopping?',o:['Enable CDP','Move native VLAN to an unused ID and disable DTP (switchport nonegotiate)','Increase trunk bandwidth','Enable PoE'],a:1,e:'雙重標籤攻擊利用 Native VLAN；改閒置 VLAN+nonegotiate 可阻斷。'},
+{m:4,q:'What is the limitation of service password-encryption?',o:['Completely secure encryption','Only weak reversible Type 7 encoding','Encrypts only enable secret','Requires reload'],a:1,e:'Type 7 是可逆的弱混淆；敏感密碼仍應用 secret（MD5/SCRYPT）。'},
+{m:4,q:'Which physical control is classified as “detective”?',o:['Electronic door locks','CCTV surveillance cameras','Biometric access','Security guards'],a:1,e:'攝影機偵測記錄但不阻擋；門禁/警衛屬防護阻擋型。'},
+{m:4,q:'What should be configured on vty lines per password best practices?',o:['password cisco','login local with transport input ssh','no login','transport input telnet'],a:1,e:'login local 使用本地帳號資料庫；transport input ssh 禁止 Telnet。'},
+{m:4,q:'What is the primary goal of a DoS attack?',o:['Steal data','Disrupt service availability','Escalate privileges','Sniff traffic'],a:1,e:'DoS/DDoS 目標是 Availability（可用性），非機密性。'},
+{m:4,q:'What is the most effective defense against social engineering?',o:['Stronger firewalls','User security awareness training','Disk encryption','VLAN segmentation'],a:1,e:'釣魚/尾隨等攻擊鎖定人的弱點，教育訓練是第一道防線。'},
 {m:4,q:'Which threat category involves encrypting victim data and demanding payment?',o:['Phishing','Ransomware','DDoS','Insider threat'],a:1,e:'勒索軟體=加密挾持資料索取贖金，近年最常見的營利型攻擊之一。'},
 {m:4,q:'What is the difference between a virus and a worm?',o:['Worms self-replicate without host files or user action; viruses attach to files','Viruses spread faster than worms','Worms require user execution always','They are identical'],a:0,e:'病毒需附著宿主檔案/使用者觸發；蠕蟲可自主透過網路散播（如 WannaCry 混合特性）。'},
 {m:4,q:'Which technique tricks users into revealing credentials via fake login pages?',o:['Phishing','Spoofing at L2','Buffer overflow','Brute force'],a:0,e:'釣魚=社會工程+假頁面騙取憑證；暴力破解=窮舉密碼，兩者不同類別。'},
@@ -4479,11 +4945,6 @@ const quiz=[
 {m:4,q:'Which zone-based firewall concept places interfaces into security zones?',o:['Zones define policy boundaries; traffic between zones requires policies','Zones replace ACLs entirely','Zones are physical groupings only','Zones disable routing'],a:0,e:'CBAC/ZBF：同區域內預設允許，跨區域需明確 policy 定義 inspect/pass/drop。'},
 {m:4,q:'What is the function of an ACL in firewall terms when applied to a router interface?',o:['Stateless packet filtering based on criteria like IP/port','Deep packet inspection','Application proxying','Encryption enforcement'],a:0,e:'Router ACL 是無狀態過濾，需自行處理回程流量；防火牆才有狀態追蹤。'},
 {m:4,q:'Which AAA protocol separates authentication, authorization, and accounting into distinct processes?',o:['RADIUS','TACACS+','Kerberos','LDAP'],a:1,e:'TACACS+ 三功能分離、逐指令授權，適合設備管理；RADIUS 三合一較適合網路接入。'},
-{m:4,q:'Which two VPN types match their descriptions correctly? (Choose two)',
- o:['Site-to-Site VPN connects entire networks between gateways','Remote Access VPN serves individual users via client software','Site-to-Site VPN requires per-user client installation','Remote Access VPN is transparent to end users without any client'],
- a:[0,1],
- e:'Site-to-Site 閘道對閘道、使用者無感免客戶端；Remote Access 由個別使用者透過 Client 連入。'},
-
 {m:4,q:'What is the default port for HTTPS management access?',o:['80','443','8443 only','22'],a:1,e:'HTTPS 標準port 443；HTTP=80（應禁用明文管理）。'},
 {m:4,q:'Which command encrypts all plaintext passwords in the configuration?',o:['service password-encryption','encrypt passwords all','password encryption enable','secret encrypt all'],a:0,e:'service password-encryption 啟用 Type 7 弱編碼；enable secret 本身已是雜湊不受影響。'},
 {m:4,q:'What is a common indicator of a compromised account?',o:['Login attempts outside normal hours or geographies','Normal business-hour usage','Single successful login','Regular password rotation'],a:0,e:'異地/異時登入、多次失敗後成功等都是 SIEM 告警的典型指標（IoC）。'},
@@ -4495,63 +4956,127 @@ const quiz=[
 {m:4,q:'Which command creates a local user account with the highest privilege level?',o:['username admin privilege 15 secret <pass>','username admin password cisco level 15','user add admin /admin','privilege user admin full'],a:0,e:'username … privilege 15 secret … 同時設定等級與雜湊密碼，搭配 line vty login local 使用。'},
 {m:4,q:'Which statement about DHCP starvation attacks is true?',o:['Attacker exhausts the address pool by requesting many leases','Attacker floods the CAM table','Attacker spoofs ARP replies','Attacker poisons DNS cache'],a:0,e:'餓死攻擊用偽造 MAC 大量索取租約耗盡位址池；Port Security 限制每埠 MAC 數可緩解。'},
 {m:4,q:'What does VPN tunneling provide for data crossing untrusted networks?',o:['Encapsulation and encryption of traffic','Faster throughput always','Free public IPs','Removal of routing tables'],a:0,e:'隧道=封裝+加密，讓私有流量安全穿越公網；IPSec 常見於 Site-to-Site。'},
-{m:4,q:'Which three components form the AAA framework? (Choose three)',
- o:['Authentication','Authorization','Accounting','Automation'],
- a:[0,1,2],
- e:'AAA=你是誰、你能做什麼、你做了什麼。'},
-
 {m:4,q:'Which hash algorithm is recommended over MD5 for integrity today?',o:['SHA-256','MD5 with salt','CRC32','Base64'],a:0,e:'MD5 已有碰撞攻擊實證，改用 SHA-256 以上；CRC 只是錯誤檢測非加密雜湊。'},
 
 // ══════════ Module 5: Automation & Programmability（25題）══════════
-{m:5,q:'Which three planes/functions exist in the traditional networking model? (Choose three)',
+{m:5,
+ q:'Which three planes/functions exist in the traditional networking model? (Choose three)',
  o:['Data plane — forwards frames/packets per the tables','Control plane — builds routing tables using OSPF/BGP','Management plane — CLI/SNMP/API access for administration','Encryption plane — dedicated hardware-only layer'],
  a:[0,1,2],
  e:'三大平面：資料面轉發、控制面運算路由、管理面提供管理介面；無所謂「加密平面」。'},
-{m:5,q:'What is a core characteristic of REST APIs?',o:['Stateful sessions','Stateless, using HTTP verbs to operate on resources','XML support only','Requires proprietary binary protocols'],a:1,e:'Stateless+JSON 主流；GET/POST/PUT/PATCH/DELETE 對應 CRUD。'},
-{m:5,q:'Which two statements about SDN architecture are correct? (Choose two)',
- o:['The controller exposes Northbound REST APIs to applications','Southbound interfaces such as OpenFlow program the forwarding devices','All control logic remains distributed on each device','SDN removes the need for a management plane entirely'],
- a:[0,1],
- e:'SDN 北向 REST 給應用、南向 OpenFlow/NETCONF 下發設備；控制邏輯集中化是其核心特徵。'},
-
-{m:5,q:'Which direction and technology describe a Northbound API?',o:['Controller → devices via NETCONF','Controller → upper-layer applications via REST API','Devices → controller via OpenFlow','Applications → controller via SNMP'],a:1,e:'北向上（REST）、南向下（NETCONF/OpenFlow）。'},
+ 
 {m:5,q:'Which three Ansible concepts match their roles correctly? (Choose three)',
  o:['Inventory — lists managed hosts','Playbook — defines tasks to execute','Module — the unit of work executed on hosts','Vault — discovers neighbor devices automatically'],
  a:[0,1,2],
  e:'Inventory 列主機、Playbook 定義劇本、Module 是執行單元；Vault 用於加密機敏變數，與鄰居發現無關。'},
-
-{m:5,q:'Which tool should you choose to provision infrastructure as code?',o:['Ansible','Terraform','Puppet','Wireshark'],a:1,e:'Terraform 定位 IaC 佈建；Ansible/Puppet 是配置管理；Ansible Agentless。'},
-{m:5,q:'Which HTTP verb is used to update a resource?',o:['GET','POST','PUT','DELETE'],a:2,e:'GET=Read、POST=Create、PUT=Update、DELETE=Delete；PATCH 部分更新。'},
+{m:5,q:'Which two statements about SDN architecture are correct? (Choose two)',
+ o:['The controller exposes Northbound REST APIs to applications','Southbound interfaces such as OpenFlow program the forwarding devices','All control logic remains distributed on each device','SDN removes the need for a management plane entirely'],
+ a:[0,1],
+ e:'SDN 北向 REST 給應用、南向 OpenFlow/NETCONF 下發設備；控制邏輯集中化是其核心特徵。'},
 {m:5,q:'Which two HTTP status code descriptions are correct? (Choose two)',
  o:['201 Created — resource successfully created','401 Unauthorized — authentication required','301 Moved Permanently means the request body was too large','500 Internal Server Error indicates a client-side typo'],
  a:[0,1],
  e:'201=建立成功、401=未授權；301 是永久重導向、500 是伺服器端錯誤。'},
-
-{m:5,q:'In JSON, how is a collection of multiple values represented?',o:['{} object','[] array','<> tags','Indentation levels'],a:1,e:'JSON：{}=物件、[]=陣列、鍵值對 key:value；YAML 用縮排、XML 用標籤。'},
-{m:5,q:'What is the role of the Southbound API in SDN architecture?',o:['Controller communicates with upper applications','Controller communicates with underlying network devices','Users communicate with controller','Devices communicate with each other'],a:1,e:'北向上（REST）、南向下（NETCONF/OpenFlow）控制底層設備。'},
 {m:5,q:'Which two data serialization formats are commonly used with network automation APIs? (Choose two)',
  o:['JSON','YAML','CSV binary dumps','Proprietary frame formats'],
  a:[0,1],
  e:'JSON 是 REST API 主流回應格式；YAML 廣用於 Ansible Playbook 與組態檔。'},
+{m:5,q:'Which two Python constructs are relevant when consuming REST APIs? (Choose two)',
+ o:['requests library to send HTTP calls','json.loads() to parse JSON responses','spanning-tree debug macros','vlan database commands'],
+ a:[0,1],
+ e:'requests 發請求、json.loads() 解析字串為物件（或直接用 .json() 方法）。'},
+{m:5,q:'Which two statements about Ansible and Terraform are correct? (Choose two)',
+ o:['Ansible is agentless configuration management','Terraform focuses on infrastructure provisioning (IaC)','Ansible is primarily an IaC provisioning tool','Terraform requires an agent on every managed host'],
+ a:[0,1],
+ e:'Ansible=Agentless 配置管理（SSH/API 推送）；Terraform=IaC 佈建，兩者定位互補。'},
+{m:5,q:'Which TWO protocols operate as Southbound APIs in an SDN architecture? (Choose two)',
+ o:['NETCONF','OpenFlow','REST API to applications','SNMP polling by NMS'],a:[0,1],e:'南向協定（NETCONF/OpenFlow）用於 Controller 下發配置至設備；北向 REST API 供上層應用呼叫；NMS 輪詢屬傳統管理而非 SDN 南向介面。'},
+{m:5,q:'Which two statements about NETCONF and RESTCONF are correct? (Choose two)',
+ o:['NETCONF uses XML encoding over SSH port 830','RESTCONF runs over HTTPS and supports JSON','RESTCONF requires a dedicated TCP port 830 session','Both are Northbound API protocols'],
+ a:[0,1],
+ e:'NETCONF=XML+SSH 830；RESTCONF=HTTPS 443（支援 JSON/XML）；兩者皆屬 Southbound。'},
 
+
+{m: 5,
+  q: 'When interacting with a REST API on a network controller, which HTTP status code indicates that a DELETE or PUT request was executed successfully but contains no response body?',
+  o: [
+    '200 OK',
+    '201 Created',
+    '204 No Content',
+    '403 Forbidden'
+  ],
+  a: 2,
+  e: '【HTTP 狀態碼考點】：\n• 200 OK：請求成功且回傳資料本文\n• 201 Created：資源成功建立（常見於 POST）\n• 204 No Content：請求已成功執行，但回應不需包含本文（常見於 DELETE/PUT）\n• 403 Forbidden：已通過認證但權限不足'
+},
+{m: 5,
+  q: 'How does the Chef configuration management tool enforce target device configurations across the enterprise?',
+  o: [
+    'The Chef client agent installed on the managed node connects to the Chef Infra Server and pulls its assigned configuration recipes from the Cookbook',
+    'The Chef Infra Server executes YAML playbooks over SSH pushing changes without requiring any local agent',
+    'Chef uses NETCONF over TCP port 830 to compile YANG models on core routers',
+    'Managed nodes execute Ruby manifests triggered solely by broadcast discovery'
+  ],
+  a: 0,
+  e: '【Chef 組態管理特性】：Chef 屬於「基於代理（Agent-based）」與「拉取模式（Pull model）」。被控節點上安裝 Chef Client Daemon，定期向 Chef Infra Server 查詢並 Pull 由 Ruby 撰寫的 Cookbooks/Recipes 執行狀態同步。'
+},
+{m: 5,
+  q: 'Which core capability does Cisco Catalyst Center (DNA Center) Network Assurance provide to network operators?',
+  o: [
+    'Correlates network telemetry with AI/ML to proactively detect performance issues, identify root causes, and provide guided remediation steps',
+    'Replaces the requirement for physical routers by virtualizing all Layer 3 forwarding into the cloud',
+    'Eliminates the need for spanning-tree protocol across all multi-tier campus networks',
+    'Restricts all device configuration solely to manual CLI entry'
+  ],
+  a: 0,
+  e: '【Catalyst Center Assurance 核心效益】：DNA Center / Catalyst Center 的 Network Assurance 透過 Streaming Telemetry 與 AI/ML 分析引擎，提供全網健全度評分（Health Score）、主動異常偵測、時光機回溯以及引導式排錯建議（Guided Remediation）。'
+}, 
+{m: 5,
+  q: 'In the following JSON snippet, what data type is represented by the "interfaces" key?\n{\n  "device": "Switch1",\n  "interfaces": ["GigabitEthernet0/1", "GigabitEthernet0/2"]\n}',
+  o: ['Object', 'Array', 'String', 'Key-value dictionary'],
+  a: 1,
+  e: '【JSON 語法結構解析】：在 JSON 中，方括號 `[...]` 代表「陣列 (Array)」，用於儲存有序的多個元素集合；大括號 `{...}` 代表「物件 (Object)」；引號字串 `"..."` 代表 String。'
+},
+{m: 5,
+  q: 'Which characteristic accurately describes the operational model of Ansible in network automation?',
+  o: [
+    'Agent-based architecture that requires installing custom daemons on each network device',
+    'Agentless architecture that uses SSH or RESTCONF/NETCONF to push configurations defined in YAML Playbooks',
+    'Pull-based model where network switches periodically download recipes from a central master',
+    'Declarative language requiring Ruby DSL code compilation'
+  ],
+  a: 1,
+  e: '【Ansible 自動化核心特性】：Ansible 為「無代理架構 (Agentless)」，不需要在交換器或路由器上安裝 Client Agent；它透過 SSH 或 API 直接由 Control Node 向被控設備「推送 (Push)」由 YAML 語法撰寫的 Playbook 任務。'
+},
+
+ {m: 5,
+  q: 'Which Cisco SD-Access (SDA) fabric role is responsible for tracking all endpoints in the fabric site using LISP and mapping their locations to fabric nodes?',
+  o: ['Fabric Border Node',
+    'Fabric Edge Node',
+    'Fabric Control Plane Node',
+    'Fabric Intermediate Node'
+  ],
+  a: 2,
+  e: '【SDA Fabric 4 大角色核心分工】：\n• Fabric Control Plane Node：以 LISP 協定維護 Host Tracking 資料庫，記錄端點 (EID) 與 Edge 節點 (RLOC) 的映射。\n• Fabric Edge Node：接入終端，執行 VXLAN 封裝/解封裝。\n• Fabric Border Node：連接 SDA Fabric 與外部網路 (WAN/Internet) 的閘道。\n• Fabric Intermediate Node：底層 Underlay 設備，僅執行純 IP 轉發，不運行 VXLAN。'
+},
+
+{m:5,q:'What is a core characteristic of REST APIs?',o:['Stateful sessions','Stateless, using HTTP verbs to operate on resources','XML support only','Requires proprietary binary protocols'],a:1,e:'Stateless+JSON 主流；GET/POST/PUT/PATCH/DELETE 對應 CRUD。'},
+{m:5,q:'Which direction and technology describe a Northbound API?',o:['Controller → devices via NETCONF','Controller → upper-layer applications via REST API','Devices → controller via OpenFlow','Applications → controller via SNMP'],a:1,e:'北向上（REST）、南向下（NETCONF/OpenFlow）。'},
+
+{m:5,q:'Which tool should you choose to provision infrastructure as code?',o:['Ansible','Terraform','Puppet','Wireshark'],a:1,e:'Terraform 定位 IaC 佈建；Ansible/Puppet 是配置管理；Ansible Agentless。'},
+{m:5,q:'Which HTTP verb is used to update a resource?',o:['GET','POST','PUT','DELETE'],a:2,e:'GET=Read、POST=Create、PUT=Update、DELETE=Delete；PATCH 部分更新。'},
+{m:5,q:'In JSON, how is a collection of multiple values represented?',o:['{} object','[] array','<> tags','Indentation levels'],a:1,e:'JSON：{}=物件、[]=陣列、鍵值對 key:value；YAML 用縮排、XML 用標籤。'},
+{m:5,q:'What is the role of the Southbound API in SDN architecture?',o:['Controller communicates with upper applications','Controller communicates with underlying network devices','Users communicate with controller','Devices communicate with each other'],a:1,e:'北向上（REST）、南向下（NETCONF/OpenFlow）控制底層設備。'},
 {m:5,q:'What is the core characteristic of Ansible?',o:['Agent-based architecture','Agentless — pushes configuration over SSH/API','Uses Ruby DSL','Focused purely on IaC provisioning'],a:1,e:'Ansible Agentless+YAML Playbook 做配置管理；IaC 佈建選 Terraform。'},
 {m:5,q:'Where does the management plane reside in a controller-based network?',o:['Locally on each device','Centrally on the controller','In a cloud database only','On end hosts'],a:1,e:'SDN 將管理/控制平面集中於 Controller，資料平面仍在設備本地轉發。'},
 {m:5,q:'To which API category does NETCONF belong?',o:['Northbound','Southbound','East-Westbound','Client-side'],a:1,e:'NETCONF/OpenFlow 是 Southbound，用於 Controller 下發配置至設備。'},
 {m:5,q:'Which data format is most common in REST API responses?',o:['XML','JSON','CSV','Plain text'],a:1,e:'JSON 機器友善、輕量，是 REST API 主流格式。'},
 {m:5,q:'Which of the following is a configuration management tool rather than a provisioning tool?',o:['Terraform','Ansible','CloudFormation','OpenTofu'],a:1,e:'Ansible/Puppet/Chef=配置管理；Terraform/CloudFormation=IaC 佈建。'},
-{m:5,q:'Which two Python constructs are relevant when consuming REST APIs? (Choose two)',
- o:['requests library to send HTTP calls','json.loads() to parse JSON responses','spanning-tree debug macros','vlan database commands'],
- a:[0,1],
- e:'requests 發請求、json.loads() 解析字串為物件（或直接用 .json() 方法）。'},
 
 {m:5,q:'What role does DNA Center play in Cisco’s architecture?',o:['A southbound protocol','Cisco’s SDN controller / management platform','A routing protocol','An encryption algorithm'],a:1,e:'DNA Center 提供北向 REST API 供程式呼叫，南向管理網路設備（現更名 Catalyst Center）。'},
 {m:5,q:'What is the defining feature of YAML format?',o:['Paired tags','Hierarchy expressed through indentation; highly human-readable','Single-line requirement','Numeric values only'],a:1,e:'YAML 縮排階層無括號，Ansible Playbook 即採用 YAML。'},
 {m:5,q:'What does “stateless” mean?',o:['Server remembers each connection state','Each request carries complete information (e.g., token); server keeps no session','Concurrent connections disallowed','Only GET allowed'],a:1,e:'REST 無狀態：每個請求獨立攜帶認證資訊，利於水平擴展。'},
 {m:5,q:'Which tool is best for pushing commands via SSH to 100 switches in batch?',o:['Wireshark','Ansible','Postman','Ping'],a:1,e:'Ansible Agentless+Playbook 天生適合批次配置管理。'},
 {m:5,q:'Which protocol uses XML/RPC over SSH (TCP 830) to manage network device configurations?',o:['NETCONF','RESTCONF','SNMPv3','Syslog'],a:0,e:'NETCONF=XML 編碼+SSH port 830；RESTCONF=RESTful 風格走 HTTPS port 443（支援 JSON/XML）。'},
-{m:5,q:'Which two statements about Ansible and Terraform are correct? (Choose two)',
- o:['Ansible is agentless configuration management','Terraform focuses on infrastructure provisioning (IaC)','Ansible is primarily an IaC provisioning tool','Terraform requires an agent on every managed host'],
- a:[0,1],
- e:'Ansible=Agentless 配置管理（SSH/API 推送）；Terraform=IaC 佈建，兩者定位互補。'},
 
 {m:5,q:'What does YANG define in model-driven programmability?',o:['Data models describing device configuration and state','A transport protocol','An encryption standard','A QoS marking scheme'],a:0,e:'YANG 是資料建模語言，供 NETCONF/RESTCONF 描述結構化配置與狀態資料。'},
 {m:5,q:'Which HTTP status code indicates “resource successfully created”?',o:['200 OK','201 Created','301 Redirect','404 Not Found'],a:1,e:'常見碼：200 成功、201 建立、204 無內容、400 錯誤請求、401 未授權、500 伺服器錯誤。'},
@@ -4559,27 +5084,22 @@ const quiz=[
 {m:5,q:'Which Python construct is commonly used to parse JSON returned from a REST call?',o:['json.loads()','xml.parse()','csv.reader()','yaml.dump() only'],a:0,e:'json.loads() 將字串轉為 Python 物件；requests 模組的 .json() 方法亦常用。'},
 {m:5,q:'What is the benefit of infrastructure as code (IaC)?',o:['Version-controlled, repeatable, consistent deployments','Eliminates all hardware','Removes the need for testing','Guarantees zero latency'],a:0,e:'IaC 以程式碼描述基礎架構：可版本控管、可重複部署、減少人為不一致（configuration drift）。'},
 {m:5,q:'In the three-plane model, which plane runs OSPF/BGP to build the routing table?',o:['Data plane','Control plane','Management plane','Service plane'],a:1,e:'Control plane 執行 OSPF/BGP 等協定「建立」路由表；Data plane 依表「執行轉送」；Management plane 供 CLI/SNMP/API 管理。'},
-{m:5,q:'Which TWO protocols operate as Southbound APIs in an SDN architecture? (Choose two)',
- o:['NETCONF','OpenFlow','REST API to applications','SNMP polling by NMS'],a:[0,1],e:'南向協定（NETCONF/OpenFlow）用於 Controller 下發配置至設備；北向 REST API 供上層應用呼叫；NMS 輪詢屬傳統管理而非 SDN 南向介面。'},
 
 {m:5,q:'Which statement about traditional networking versus SDN is true?',o:['Traditional distributes control per device; SDN centralizes control logic','SDN removes the data plane entirely','Traditional networks cannot be automated at all','SDN requires no controllers'],a:0,e:'傳統網路每台設備各自運算路由（分散式控制面）；SDN 抽離控制邏輯集中於控制器。'},
 {m:5,q:'Which Ansible component defines the tasks to execute against managed hosts?',o:['Playbook','Inventory','Module library only','Vault'],a:0,e:'Inventory 列主機、Playbook 定義任務劇本、Module 是執行單元、Vault 加密機敏資料。'},
-{m:5,q:'Which two statements about NETCONF and RESTCONF are correct? (Choose two)',
- o:['NETCONF uses XML encoding over SSH port 830','RESTCONF runs over HTTPS and supports JSON','RESTCONF requires a dedicated TCP port 830 session','Both are Northbound API protocols'],
- a:[0,1],
- e:'NETCONF=XML+SSH 830；RESTCONF=HTTPS 443（支援 JSON/XML）；兩者皆屬 Southbound。'},
-
 {m:5,q:'Which tool would you use to send a GET request to https://dnac.example.com/dna/intent/api/v1/network-device and inspect the response headers?',o:['Postman','Wireshark only','Ping traceroute','Spanning tree debug'],a:0,e:'呼叫 DNA Center 北向 REST API 的典型做法：Postman/curl + Token 認證 + JSON 回應解析。'}
 
 ];
 
+
 /* ==========================================================================
-   CCNA 200-301 模擬測驗核心引擎 (Quiz & Wrongbook Engine v2.0)
-   - 支援單選（Single-select）即時反饋
-   - 支援複選（Multi-select）切換與確認提交機制
+   CCNA 200-301 模擬測驗核心引擎 (Quiz Engine v3.0 - 動態雙層亂序與防窺引擎)
+   - Fisher-Yates 題庫隨機洗牌演算法
+   - 動態選項亂序（Option Shuffling）與指標重映射（Index Remapping）
+   - 閉包封裝防止 DevTools / F12 靜態屬性透視
    - 健全的錯題本 (LocalStorage) 與弱點診斷數據流
    ========================================================================== */
-/* ================= 模擬測驗引擎、錯題本與弱點雷達診斷 ================= */
+
 let answered = 0;
 let correct = 0;
 let activeQuizFilter = 'all';
@@ -4591,36 +5111,62 @@ const ansEl = document.getElementById('answered');
 const corEl = document.getElementById('correct');
 const finalScoreEl = document.getElementById('final-score');
 
-// 1. 建立模組分類篩選列
-const quizFilterBar = document.createElement('div');
-quizFilterBar.className = 'quiz-filter';
+// 1. 建立模組分類篩選列（若未建立則動態掛載）
+let quizFilterBar = document.querySelector('.quiz-filter');
+if (!quizFilterBar) {
+  quizFilterBar = document.createElement('div');
+  quizFilterBar.className = 'quiz-filter';
+  qa.parentNode.insertBefore(quizFilterBar, qa);
+}
 quizFilterBar.innerHTML = `<button class="active" data-m="all">全部 (${quiz.length})</button>` +
   QM.map((m, i) => `<button data-m="${i}">${m} (${quiz.filter(q => q.m === i).length})</button>`).join('');
-qa.parentNode.insertBefore(quizFilterBar, qa);
 
 // 2. 建立作答進度條
-const pbar = document.createElement('div');
-pbar.id = 'quiz-progress-bar';
-pbar.innerHTML = '<div id="quiz-progress-fill"></div>';
-qa.parentNode.insertBefore(pbar, qa);
+let pbar = document.getElementById('quiz-progress-bar');
+if (!pbar) {
+  pbar = document.createElement('div');
+  pbar.id = 'quiz-progress-bar';
+  pbar.innerHTML = '<div id="quiz-progress-fill"></div>';
+  qa.parentNode.insertBefore(pbar, qa);
+}
 
 // 3. 建立即時計分狀態面板
-const panel = document.createElement('div');
-panel.className = 'score-panel';
+let panel = document.querySelector('.score-panel');
+if (!panel) {
+  panel = document.createElement('div');
+  panel.className = 'score-panel';
+  qa.parentNode.insertBefore(panel, qa);
+}
 panel.innerHTML = `已作答：<b id="p-ans">0</b> / <span class="q-total">0</span> ✅ 正確：<b id="p-cor" style="color:#22c55e">0</b> 🎯 正確率：<b id="p-rate" style="color:#38bdf8">0%</b>`;
-qa.parentNode.insertBefore(panel, qa);
 
-// 輔助函式：判斷是否為複選題
+/* ================= 核心輔助演算法 ================= */
+
+/**
+ * 標準 Fisher-Yates (Knuth) 無偏隨機洗牌演算法
+ * @template T
+ * @param {T[]} array 原始陣列
+ * @returns {T[]} 洗牌後的全新陣列副本
+ */
+function shuffleArray(array) {
+  const result = [...array];
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
+
+// 判斷是否為複選題
 function isMultiSelect(item) {
   return Array.isArray(item.a);
 }
 
-// 輔助函式：取得題目選項字母 (0 -> A, 1 -> B ...)
+// 取得題目選項字母 (0 -> A, 1 -> B ...)
 function getOptionLetter(idx) {
   return String.fromCharCode(65 + idx);
 }
 
-// 輔助函式：格式化選項標籤與文字（支援單選與多選索引）
+// 格式化選項標籤與文字（支援單選與多選索引）
 function formatOptionsText(item, target) {
   if (Array.isArray(target)) {
     return target
@@ -4631,21 +5177,27 @@ function formatOptionsText(item, target) {
   return `[${getOptionLetter(target)}] ${item.o[target]}`;
 }
 
-// 題目唯一識別 Key 生成函式
+// 題目唯一識別 Key 生成函式（綁定題幹原始特徵，不受亂序影響）
 function getQuestionKey(item) {
   return `Q_${item.m}_${item.q.trim().replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '').slice(0, 32)}`;
 }
 
-// 4. 測驗渲染主流程
+/* ================= 測驗動態渲染主流程 ================= */
+
 function renderQuiz(mod) {
   activeQuizFilter = mod;
   qa.innerHTML = '';
   answered = 0;
   correct = 0;
 
-  const list = mod === 'all' ? quiz : quiz.filter(q => q.m === mod);
-  totalEl.textContent = list.length;
-  document.querySelectorAll('.q-total').forEach(el => el.textContent = list.length);
+  // 1. 篩選目標模組題庫
+  const rawList = mod === 'all' ? quiz : quiz.filter(q => q.m === mod);
+
+  // 2. 第一層洗牌：題目順序隨機化 (Question Order Shuffle)
+  const randomizedQuestions = shuffleArray(rawList);
+
+  totalEl.textContent = randomizedQuestions.length;
+  document.querySelectorAll('.q-total').forEach(el => el.textContent = randomizedQuestions.length);
   ansEl.textContent = '0';
   corEl.textContent = '0';
   document.getElementById('p-ans').textContent = '0';
@@ -4658,20 +5210,51 @@ function renderQuiz(mod) {
     finalScoreEl.innerHTML = '';
   }
 
-  list.forEach((item, i) => {
-    const isMulti = isMultiSelect(item);
-    const requiredCount = isMulti ? item.a.length : 1;
+  // 3. 第二層洗牌：選項順序隨機化與動態指標重映射 (Option Shuffle & Index Remapping)
+  const runtimeList = randomizedQuestions.map((rawItem, i) => {
+    const isMulti = isMultiSelect(rawItem);
+    const numOptions = rawItem.o.length;
 
+    // 建立選項原始索引序列並洗牌，例如 [0, 1, 2, 3] -> [2, 0, 3, 1]
+    const optIndices = Array.from({ length: numOptions }, (_, idx) => idx);
+    const shuffledIndices = shuffleArray(optIndices);
+
+    // 依隨機索引重組選項文字
+    const shuffledOptions = shuffledIndices.map(idx => rawItem.o[idx]);
+
+    // 動態重映射正確答案索引（New Answer Indices）
+    let remappedAnswer;
+    if (isMulti) {
+      remappedAnswer = rawItem.a
+        .map(origIdx => shuffledIndices.indexOf(origIdx))
+        .sort((a, b) => a - b);
+    } else {
+      remappedAnswer = shuffledIndices.indexOf(rawItem.a);
+    }
+
+    // 建立運行時題目實體（Runtime Item Closure）
+    const runtimeItem = {
+      raw: rawItem,
+      m: rawItem.m,
+      q: rawItem.q,
+      e: rawItem.e,
+      o: shuffledOptions,
+      a: remappedAnswer,
+      isMulti: isMulti,
+      requiredCount: isMulti ? remappedAnswer.length : 1
+    };
+
+    // 渲染卡片 DOM（注意：DOM 上完全不輸出 data-ans 屬性，防 F12 靜態透視）
     const card = document.createElement('div');
     card.className = 'quiz-q';
     card.id = `quiz-q-${i}`;
 
     card.innerHTML = `
       <p>
-        <b>Q${i + 1}.</b> ${item.q}
-        <span class="tag">${QM[item.m]}</span>
+        <b>Q${i + 1}.</b> ${runtimeItem.q}
+        <span class="tag">${QM[runtimeItem.m]}</span>
         <span class="tag" style="background:${isMulti ? 'rgba(56,189,248,0.15)' : 'rgba(245,158,11,0.12)'}; color:${isMulti ? '#38bdf8' : '#f59e0b'}; border-color:${isMulti ? 'rgba(56,189,248,0.4)' : 'rgba(245,158,11,0.3)'}">
-          ${isMulti ? `複選題 (選 ${requiredCount} 項)` : '單選題'}
+          ${isMulti ? `複選題 (選 ${runtimeItem.requiredCount} 項)` : '單選題'}
         </span>
       </p>
     `;
@@ -4680,27 +5263,27 @@ function renderQuiz(mod) {
     optContainer.className = 'opt-container';
     const selectedIndices = new Set();
 
-    item.o.forEach((opt, j) => {
+    runtimeItem.o.forEach((optText, optIdx) => {
       const btn = document.createElement('button');
       btn.className = 'opt';
-      btn.innerHTML = `<b>${getOptionLetter(j)}.</b> ${opt}`;
+      btn.innerHTML = `<b>${getOptionLetter(optIdx)}.</b> ${optText}`;
 
       btn.onclick = () => {
         if (card.dataset.done) return;
 
         if (!isMulti) {
-          // 單選題：立即判分
-          processSubmission(card, item, j, [j]);
+          // 單選題：立即判分提交
+          processSubmission(card, runtimeItem, optIdx, [optIdx], runtimeList);
         } else {
           // 複選題：切換選取狀態
-          if (selectedIndices.has(j)) {
-            selectedIndices.delete(j);
+          if (selectedIndices.has(optIdx)) {
+            selectedIndices.delete(optIdx);
             btn.classList.remove('selected');
             btn.style.borderColor = '';
             btn.style.background = '';
           } else {
-            if (selectedIndices.size < requiredCount) {
-              selectedIndices.add(j);
+            if (selectedIndices.size < runtimeItem.requiredCount) {
+              selectedIndices.add(optIdx);
               btn.classList.add('selected');
               btn.style.borderColor = 'var(--accent-cyan)';
               btn.style.background = 'rgba(14, 165, 233, 0.15)';
@@ -4708,10 +5291,10 @@ function renderQuiz(mod) {
           }
           const submitBtn = card.querySelector('.btn-submit-multi');
           if (submitBtn) {
-            submitBtn.disabled = (selectedIndices.size !== requiredCount);
-            submitBtn.textContent = selectedIndices.size === requiredCount 
-              ? `✔ 確認送出 (${selectedIndices.size}/${requiredCount})` 
-              : `請選擇 ${requiredCount} 項 (已選 ${selectedIndices.size})`;
+            submitBtn.disabled = (selectedIndices.size !== runtimeItem.requiredCount);
+            submitBtn.textContent = selectedIndices.size === runtimeItem.requiredCount
+              ? `✔ 確認送出 (${selectedIndices.size}/${runtimeItem.requiredCount})`
+              : `請選擇 ${runtimeItem.requiredCount} 項 (已選 ${selectedIndices.size})`;
           }
         }
       };
@@ -4720,24 +5303,24 @@ function renderQuiz(mod) {
 
     card.appendChild(optContainer);
 
-    // 複選題：提交確認按鈕
+    // 複選題追加確認提交按鈕
     if (isMulti) {
       const submitBox = document.createElement('div');
       submitBox.style.marginTop = '12px';
       submitBox.style.display = 'flex';
       submitBox.style.alignItems = 'center';
-      submitBox.style.gap = '10px';
+      submitBox.gap = '10px';
 
       const submitBtn = document.createElement('button');
       submitBtn.className = 'btn btn-submit-multi';
       submitBtn.disabled = true;
-      submitBtn.textContent = `請選擇 ${requiredCount} 項 (已選 0)`;
+      submitBtn.textContent = `請選擇 ${runtimeItem.requiredCount} 項 (已選 0)`;
       submitBtn.style.padding = '8px 20px';
 
       submitBtn.onclick = () => {
-        if (card.dataset.done || selectedIndices.size !== requiredCount) return;
+        if (card.dataset.done || selectedIndices.size !== runtimeItem.requiredCount) return;
         const picks = Array.from(selectedIndices).sort((a, b) => a - b);
-        processSubmission(card, item, picks, picks);
+        processSubmission(card, runtimeItem, picks, picks, runtimeList);
       };
 
       submitBox.appendChild(submitBtn);
@@ -4745,35 +5328,38 @@ function renderQuiz(mod) {
     }
 
     qa.appendChild(card);
+    return runtimeItem;
   });
 
-  updateWeakAnalysis(list);
+  updateWeakAnalysis(runtimeList);
 }
 
-// 5. 統一交卷判分與 UI 渲染
-function processSubmission(card, item, userPick, userPicksArray) {
+/* ================= 統一交卷判分與 UI 渲染 ================= */
+
+function processSubmission(card, runtimeItem, userPick, userPicksArray, currentList) {
   card.dataset.done = '1';
   answered++;
 
-  const isMulti = isMultiSelect(item);
+  const isMulti = runtimeItem.isMulti;
   let isCorrect = false;
 
-  const correctPicks = isMulti ? [...item.a].sort((a, b) => a - b) : [item.a];
+  const correctPicks = isMulti ? [...runtimeItem.a].sort((a, b) => a - b) : [runtimeItem.a];
   const userSorted = [...userPicksArray].sort((a, b) => a - b);
 
   if (isMulti) {
-    isCorrect = (correctPicks.length === userSorted.length) && 
+    isCorrect = (correctPicks.length === userSorted.length) &&
                 correctPicks.every((val, idx) => val === userSorted[idx]);
   } else {
-    isCorrect = (userPick === item.a);
+    isCorrect = (userPick === runtimeItem.a);
   }
 
+  // 鎖定所有選項按鈕並標註正確/錯誤色彩
   const optButtons = card.querySelectorAll('.opt');
   optButtons.forEach((b, idx) => {
     b.disabled = true;
     b.style.pointerEvents = 'none';
 
-    const isAnswer = isMulti ? item.a.includes(idx) : (idx === item.a);
+    const isAnswer = isMulti ? runtimeItem.a.includes(idx) : (idx === runtimeItem.a);
     const isPicked = userPicksArray.includes(idx);
 
     if (isAnswer) b.classList.add('correct');
@@ -4785,31 +5371,32 @@ function processSubmission(card, item, userPick, userPicksArray) {
 
   if (isCorrect) {
     correct++;
-    resolveWrong(item);
+    resolveWrong(runtimeItem.raw);
   } else {
-    recordWrong(item, userPick);
+    recordWrong(runtimeItem, userPick);
   }
 
+  // 渲染詳解面板
   const ex = document.createElement('div');
   ex.className = 'explain';
-  const correctText = formatOptionsText(item, item.a);
+  const correctText = formatOptionsText(runtimeItem, runtimeItem.a);
   ex.innerHTML = `
     ${isCorrect 
       ? '<span style="color:#4ade80;font-weight:700">✅ 答對了！</span>' 
       : `<span style="color:#f87171;font-weight:700">❌ 答錯了！正確答案為：${correctText}</span>`
     }
-    <div style="margin-top:6px;line-height:1.65">${item.e}</div>
+    <div style="margin-top:6px;line-height:1.65">${runtimeItem.e}</div>
   `;
   card.appendChild(ex);
 
+  // 更新即時計分面板與進度條
   ansEl.textContent = answered;
   corEl.textContent = correct;
   document.getElementById('p-ans').textContent = answered;
   document.getElementById('p-cor').textContent = correct;
   const rate = Math.round((correct / answered) * 100) || 0;
   document.getElementById('p-rate').textContent = `${rate}%`;
-  
-  const currentList = activeQuizFilter === 'all' ? quiz : quiz.filter(q => q.m === activeQuizFilter);
+
   document.getElementById('quiz-progress-fill').style.width = `${(answered / currentList.length) * 100}%`;
 
   updateWeakAnalysis(currentList);
@@ -4818,7 +5405,8 @@ function processSubmission(card, item, userPick, userPicksArray) {
   }
 }
 
-// 6. 測驗結算面板
+/* ================= 測驗結算面板 ================= */
+
 function showFinal(list) {
   if (!finalScoreEl) return;
   finalScoreEl.style.display = 'block';
@@ -4848,7 +5436,7 @@ function showFinal(list) {
         : '❌ <b>未達及格標準（<65%）！</b> 建議回到 30 天配速表重跑觀念與 Packet Tracer 實作。'}
     </p>
     ${wrongItems.length > 0 ? `<p style="font-size:.85rem;color:#94a3b8">本次錯題共 ${wrongItems.length} 題，已自動記錄於下方錯題本。</p>` : ''}
-    <button onclick="resetQuiz()" class="btn" style="margin-top:14px;padding:9px 24px;border-radius:20px;">🔄 重新測驗本單元</button>
+    <button onclick="resetQuiz()" class="btn" style="margin-top:14px;padding:9px 24px;border-radius:20px;">🔄 重新測驗本單元（重新洗牌）</button>
   `;
   finalScoreEl.scrollIntoView({ behavior: 'smooth' });
 }
@@ -4868,6 +5456,7 @@ quizFilterBar.querySelectorAll('button').forEach(b => {
 });
 
 /* ================= 錯題本管理 (LocalStorage) ================= */
+
 function loadWB() {
   try {
     return JSON.parse(localStorage.getItem('ccna-wrongbook') || '{}');
@@ -4885,16 +5474,17 @@ function saveWB(wb) {
   }
 }
 
-function recordWrong(item, userPick) {
+function recordWrong(runtimeItem, userPick) {
   const wb = loadWB();
-  const key = getQuestionKey(item);
-  
+  const rawItem = runtimeItem.raw || runtimeItem;
+  const key = getQuestionKey(rawItem);
+
   wb[key] = {
-    q: item.q,
-    correct: formatOptionsText(item, item.a),
-    yourAns: formatOptionsText(item, userPick),
-    m: item.m,
-    e: item.e,
+    q: runtimeItem.q,
+    correct: formatOptionsText(runtimeItem, runtimeItem.a),
+    yourAns: formatOptionsText(runtimeItem, userPick),
+    m: runtimeItem.m,
+    e: runtimeItem.e,
     resolved: false,
     count: (wb[key]?.count || 0) + 1,
     last: new Date().toLocaleDateString('zh-TW')
@@ -4903,9 +5493,9 @@ function recordWrong(item, userPick) {
   renderWB();
 }
 
-function resolveWrong(item) {
+function resolveWrong(rawItem) {
   const wb = loadWB();
-  const key = getQuestionKey(item);
+  const key = getQuestionKey(rawItem);
   if (wb[key]) {
     wb[key].resolved = true;
     saveWB(wb);
