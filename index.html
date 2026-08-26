@@ -1380,7 +1380,9 @@ details .body {
   animation: sectionFadeIn 0.25s ease-out;
 }
 
-/* 4. 弱點分析診斷雷達 (Weakness Radar) */
+/* ════════════════════════════════════════════════════════════════
+   弱點分析診斷雷達：雙層流體 RWD 佈局與狀態徽章
+   ════════════════════════════════════════════════════════════════ */
 #weak-analysis {
   background: var(--bg-surface);
   border-radius: 12px;
@@ -1389,49 +1391,104 @@ details .body {
   border: 1px solid rgba(56, 189, 248, 0.3);
   box-shadow: var(--shadow-sm);
 }
+
+/* 雙層容器：垂直排列，避免橫向空間死鎖 */
 .weak-bar-row {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  margin: 8px 0;
-  font-size: 0.86rem;
+  flex-direction: column;
+  gap: 6px;
+  margin: 12px 0;
 }
+
+/* 上層：考點標題與右側統計徽章 */
+.weak-bar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+}
+
 .weak-bar-label {
-  width: 200px;
-  flex-shrink: 0;
   color: var(--text-main);
-  text-align: right;
-  font-weight: 500;
-}
-.weak-bar-track {
+  font-size: 0.86rem;
+  font-weight: 600;
+  line-height: 1.45;
+  text-align: left;
   flex: 1;
+}
+
+/* 狀態徽章 (Badge Pill) */
+.weak-pct-badge {
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 12px;
+  white-space: nowrap;
+  font-family: Consolas, monospace;
+  flex-shrink: 0;
+}
+
+.weak-pct-danger {
+  background: rgba(239, 68, 68, 0.18);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.35);
+}
+
+.weak-pct-warn {
+  background: rgba(245, 158, 11, 0.18);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+}
+
+.weak-pct-good {
+  background: rgba(16, 185, 129, 0.18);
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.35);
+}
+
+/* 下層：100% 全寬進度條軌道 */
+.weak-bar-track {
+  width: 100%;
   background: var(--bg-input);
   border: 1px solid var(--border-subtle);
   border-radius: 6px;
-  height: 16px;
+  height: 10px;
   overflow: hidden;
 }
+
 .weak-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, #ef4444 0%, #f59e0b 100%);
   border-radius: 4px;
-  transition: width 0.4s ease-out;
+  transition: width 0.45s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.weak-pct {
-  width: 80px;
-  font-size: 0.78rem;
-  color: var(--text-muted);
-  flex-shrink: 0;
-}
+
+/* 深度補強建議面板 */
 #weak-tip {
-  margin-top: 14px;
-  padding: 12px 16px;
+  margin-top: 16px;
+  padding: 14px 16px;
   background: var(--accent-amber-bg);
   border-radius: 8px;
   font-size: 0.86rem;
   line-height: 1.7;
   border-left: 4px solid var(--accent-amber);
   color: #fef3c7;
+}
+
+@media (max-width: 600px) {
+  #weak-analysis {
+    padding: 14px 12px;
+  }
+  .weak-bar-label {
+    font-size: 0.82rem;
+  }
+  .weak-pct-badge {
+    font-size: 0.72rem;
+    padding: 1px 6px;
+  }
+  .weak-bar-track {
+    height: 8px;
+  }
 }
 
 /* 5. 錯題本面板 (Wrongbook Panel) */
@@ -5537,31 +5594,625 @@ function renderWB() {
 }
 
 /* ================= 弱點章節診斷分析 ================= */
-const CONCEPT_MAP = [
-  ['Subnetting / Wildcard', ['subnet', '主機數', '遮罩', 'wildcard', '網路位址', 'block', '彙總', 'cidr']],
-  ['OSPF 鄰居與狀態機', ['ospf', '鄰居', 'exstart', 'dr/bdr', 'hello', 'router-id', 'cost', 'timer']],
-  ['路由仲裁（前綴/AD/Metric）', ['prefix', 'ad', 'metric', 'static', '浮動', 'default route', '0.0.0.0']],
-  ['VLAN / Trunk / Native', ['vlan', 'trunk', 'native', '802.1q']],
-  ['STP / EtherChannel', ['stp', 'rstp', '根橋', 'lacp', 'pagp', 'etherchannel', 'port-channel']],
-  ['Port Security / L2 防護', ['port-security', 'sticky', 'snooping', 'arp inspection', 'mac table', 'cam']],
-  ['ACL / NAT', ['acl', 'access-list', 'nat', 'pat', 'overload', 'inside']],
-  ['DHCP / NTP / Syslog', ['dhcp', 'dora', 'ntp', 'syslog', 'stratum', 'helper']],
-  ['QoS / SNMP', ['dscp', 'cos', 'qos', 'snmp', 'trap', 'inform', 'authpriv']],
-  ['無線（WPA/WLC/頻段）', ['wpa', 'wlc', 'capwap', 'ghz', 'ap', 'ssid', 'channel', 'sae']],
-  ['安全基礎（AAA/VPN/SSH）', ['aaa', 'vpn', 'tacacs', 'radius', 'ssh', 'telnet', '802.1x', 'secret']],
-  ['IPv6 基礎與配置', ['ipv6', 'fe80', 'slaac', 'eui-64', 'link-local', 'ndp']],
-  ['TCP/IP 與 OSI 模型', ['osi', 'tcp', 'udp', '三向交握', 'port ', 'port 443', 'http', '光纖', 'utp']],
-  ['自動化 / SDN / API', ['rest', 'json', 'yaml', 'ansible', 'terraform', 'sdn', 'netconf', 'northbound', 'southbound', 'dna']]
+/* ==========================================================================
+   CCNA 200-301 精準技術特徵矩陣與加權識別引擎 (Weighted Taxonomy Engine)
+   - 22 個官方考綱細粒度次領域 (Sub-domain Taxonomy)
+   - 支援英文關鍵字權重計分 (Keyword Weight Scoring)
+   - 模組領域關聯綁定 (Domain Affinity)，避免跨領域貪婪誤判
+   - 100% 消除「綜合基礎」無效診斷
+   ========================================================================== */
+
+const CCNA_TAXONOMY = [
+  // ── 1. Network Fundamentals (20%) ──
+  {
+    m: 0,
+    name: '1.1 實體層排錯、纜線與光纖規格 (L1/Cabling/Optics)',
+    tokens: [
+      ['late collision', 10], ['late collisions', 10], ['collision', 4], ['duplex', 6],
+      ['100-meter', 6], ['csma/cd', 8], ['single-mode', 8], ['multimode', 8],
+      ['9-micron', 8], ['smf', 6], ['mmf', 6], ['cat6a', 6], ['cat5e', 6],
+      ['1000base', 6], ['fiber', 4], ['straight-through', 6], ['crossover', 6],
+      ['poe', 6], ['802.3at', 8], ['802.3af', 8], ['802.3bt', 8], ['cable', 4]
+    ]
+  },
+  {
+    m: 0,
+    name: '1.2 IPv4 定址、VLSM 與子網劃分 (IPv4/Subnetting)',
+    tokens: [
+      ['rfc 3021', 10], ['/31', 8], ['/32', 6], ['/29', 6], ['/30', 6], ['/28', 6],
+      ['/26', 6], ['/27', 6], ['/20', 6], ['usable host', 8], ['subnet mask', 8],
+      ['wildcard mask', 8], ['255.255', 6], ['192.168', 5], ['172.16', 5], ['172.17', 5],
+      ['10.0.0.0', 5], ['rfc 1918', 8], ['private ip', 6], ['apipa', 8],
+      ['169.254', 8], ['loopback 127', 6], ['class c', 6], ['binary', 5]
+    ]
+  },
+  {
+    m: 0,
+    name: '1.3 IPv6 定址、SLAAC 與 EUI-64 (IPv6 Fundamentals)',
+    tokens: [
+      ['eui-64', 10], ['slaac', 10], ['ipv6', 6], ['ff02::', 8], ['fe80::', 8],
+      ['2001:', 6], ['compressed form', 8], ['link-local', 6], ['solicited-node', 8],
+      ['router advertisement', 8], ['6to4', 8], ['nat64', 8], ['dual stack', 8]
+    ]
+  },
+  {
+    m: 0,
+    name: '1.4 TCP/IP 與 OSI 模型封裝 (TCP/UDP/OSI Layers)',
+    tokens: [
+      ['three-way handshake', 10], ['syn-ack', 8], ['syn', 6], ['full-duplex', 6],
+      ['tcp', 4], ['udp', 4], ['osi', 5], ['segment', 6], ['packet', 4],
+      ['frame', 4], ['bit', 4], ['encapsulation', 6], ['pdu', 6], ['ttl', 6],
+      ['checksum', 6], ['layer 4', 6], ['l2 / l3', 6]
+    ]
+  },
+  {
+    m: 0,
+    name: '1.5 雲端運算架構與虛擬化技術 (Cloud/Virtualization)',
+    tokens: [
+      ['hybrid cloud', 10], ['public cloud', 8], ['private cloud', 8], ['iaas', 8],
+      ['paas', 8], ['saas', 8], ['hypervisor', 10], ['esxi', 8], ['type 1', 8],
+      ['type 2', 8], ['containers', 8], ['docker', 8], ['virtual machine', 6]
+    ]
+  },
+  {
+    m: 0,
+    name: '1.6 基礎網路服務與拓撲 (Topology/ARP/DNS/Gateway)',
+    tokens: [
+      ['full mesh', 8], ['topology', 6], ['default gateway', 8], ['arp cache', 8],
+      ['arp request', 8], ['arp', 5], ['127.0.0.1', 6], ['mx record', 8],
+      ['dns cache', 8], ['dns', 5], ['spine', 8], ['leaf', 8]
+    ]
+  },
+
+  // ── 2. Network Access (20%) ──
+  {
+    m: 1,
+    name: '2.1 VLAN、Trunking 與 Native VLAN (VLAN/802.1Q)',
+    tokens: [
+      ['native vlan', 10], ['allowed vlan', 8], ['802.1q', 8], ['trunk', 6],
+      ['voice vlan', 8], ['switchport', 6], ['dtp', 8], ['nonegotiate', 8],
+      ['dynamic auto', 8], ['dynamic desirable', 8], ['vlan 1', 6], ['vtp', 8],
+      ['transparent', 8], ['vlan', 4]
+    ]
+  },
+  {
+    m: 1,
+    name: '2.2 STP/RSTP 根橋選舉與保護機制 (STP/RSTP/Guard)',
+    tokens: [
+      ['spanning-tree', 8], ['stp', 6], ['rstp', 8], ['root bridge', 8],
+      ['bpdu guard', 10], ['root guard', 10], ['loop guard', 10], ['portfast', 8],
+      ['alternate port', 8], ['backup port', 8], ['discarding', 6],
+      ['superior bpdu', 10], ['24576', 8], ['28672', 8]
+    ]
+  },
+  {
+    m: 1,
+    name: '2.3 EtherChannel 鏈路綑綁與模式 (EtherChannel/LACP)',
+    tokens: [
+      ['etherchannel', 10], ['lacp', 8], ['pagp', 8], ['channel-group', 8],
+      ['active', 5], ['passive', 5], ['desirable', 6], ['port-channel', 8],
+      ['min-links', 10], ['(su)', 8], ['(p)', 6]
+    ]
+  },
+  {
+    m: 1,
+    name: '2.4 企業級無線網路 WLC 與 AP 架構 (Wireless/WLC/AP)',
+    tokens: [
+      ['wlc', 10], ['lightweight', 8], ['autonomous', 8], ['capwap', 10],
+      ['split-mac', 10], ['2.4 ghz', 8], ['5 ghz', 8], ['channels 1, 6, and 11', 10],
+      ['wpa2', 6], ['wpa3', 8], ['sae', 8], ['dragonfly', 8], ['roaming', 8],
+      ['reassociation', 10], ['rrm', 8], ['rssi', 8], ['band select', 10],
+      ['aaa override', 10], ['oeap', 10], ['flexconnect', 10], ['ssid', 6], ['rf', 5]
+    ]
+  },
+  {
+    m: 1,
+    name: '2.5 交換器轉發原理與探索協定 (Switch/CDP/LLDP)',
+    tokens: [
+      ['mac address table', 8], ['cam table', 8], ['flooding', 6], ['unknown unicast', 8],
+      ['cdp', 8], ['lldp', 8], ['802.1ab', 8], ['tlv', 8], ['holdtime', 6]
+    ]
+  },
+
+  // ── 3. IP Connectivity (25%) ──
+  {
+    m: 2,
+    name: '3.1 路由表解析與選路仲裁 (Routing Table/LPM/AD)',
+    tokens: [
+      ['longest prefix match', 10], ['administrative distance', 8], ['ad', 6],
+      ['metric', 6], ['show ip route', 8], ['candidate default', 8],
+      ['route print', 6], ['fib', 6], ['rib', 6], ['prefix', 5]
+    ]
+  },
+  {
+    m: 2,
+    name: '3.2 靜態路由、預設與浮動備援 (Static/Default/Floating)',
+    tokens: [
+      ['static route', 8], ['default route', 8], ['0.0.0.0 0.0.0.0', 8],
+      ['floating static', 10], ['gateway of last resort', 8], ['next-hop', 6],
+      ['exit interface', 6], ['s*', 8]
+    ]
+  },
+  {
+    m: 2,
+    name: '3.3 OSPFv2/OSPFv3 鄰居條件與狀態機 (OSPF Neighbors/LSA)',
+    tokens: [
+      ['ospf', 8], ['ospfv2', 8], ['ospfv3', 8], ['router id', 8], ['router-id', 8],
+      ['area 0', 6], ['hello and dead', 10], ['hello', 4], ['dead', 4],
+      ['exstart', 10], ['2-way', 8], ['dr/bdr', 10], ['224.0.0.5', 8], ['224.0.0.6', 8],
+      ['type 1', 6], ['type 2', 6], ['lsa', 6], ['reference-bandwidth', 8],
+      ['passive-interface', 8], ['default-information originate', 10]
+    ]
+  },
+  {
+    m: 2,
+    name: '3.4 跨 VLAN 路由 SVI 與 ROAS (Inter-VLAN Routing)',
+    tokens: [
+      ['router-on-a-stick', 10], ['subinterface', 8], ['encapsulation dot1q', 8],
+      ['svi', 8], ['interface vlan', 8], ['ip routing', 8]
+    ]
+  },
+  {
+    m: 2,
+    name: '3.5 第一跳閘道備援協定 (FHRP/HSRP/VRRP/GLBP)',
+    tokens: [
+      ['fhrp', 8], ['hsrp', 8], ['vrrp', 8], ['glbp', 8], ['standby preempt', 10],
+      ['standby', 6], ['virtual ip', 8], ['virtual mac', 8], ['0000.0c07.ac', 10],
+      ['0000.5e00.01', 10], ['tracking', 6]
+    ]
+  },
+
+  // ── 4. IP Services (10%) ──
+  {
+    m: 3,
+    name: '4.1 NAT 與 PAT 埠位址轉換 (NAT/PAT/Overload)',
+    tokens: [
+      ['inside local', 10], ['inside global', 10], ['outside local', 8],
+      ['outside global', 8], ['static nat', 8], ['dynamic nat', 8],
+      ['pat', 8], ['overload', 8], ['ip nat inside', 8], ['ip nat outside', 8]
+    ]
+  },
+  {
+    m: 3,
+    name: '4.2 DHCP 服務與 Relay 中繼代理 (DHCP/Relay Agent)',
+    tokens: [
+      ['dhcp', 6], ['dora', 10], ['discover', 6], ['offer', 6], ['request', 4],
+      ['acknowledge', 6], ['ip helper-address', 10], ['udp 67', 8], ['udp 68', 8],
+      ['option 43', 10], ['option 150', 10], ['option 66', 8], ['option 3', 8],
+      ['default-router', 8], ['lease', 6]
+    ]
+  },
+  {
+    m: 3,
+    name: '4.3 時間同步、日誌與監控 (NTP/Syslog/SNMP)',
+    tokens: [
+      ['ntp master', 10], ['ntp', 6], ['stratum', 8], ['synchronized', 8],
+      ['syslog', 8], ['severity', 8], ['emergency', 6], ['debugging', 6],
+      ['logging trap', 10], ['snmpv3', 10], ['snmpv2c', 8], ['snmp', 6],
+      ['usm', 8], ['getbulk', 8], ['inform', 8], ['authpriv', 8], ['trap', 6],
+      ['mib', 6], ['oid', 6]
+    ]
+  },
+  {
+    m: 3,
+    name: '4.4 QoS 服務品質分類與標記 (QoS/CoS/DSCP)',
+    tokens: [
+      ['qos', 8], ['dscp', 8], ['cos', 8], ['expedited forwarding', 10],
+      ['ef', 6], ['af31', 8], ['best effort', 6], ['policing', 8],
+      ['shaping', 8], ['trust boundary', 10], ['queue', 6], ['buffer', 6]
+    ]
+  },
+
+  // ── 5. Security Fundamentals (15%) ──
+  {
+    m: 4,
+    name: '5.1 Layer 2 安全防護 (Port Sec/Snooping/DAI)',
+    tokens: [
+      ['port security', 10], ['port-security', 10], ['violation', 8], ['protect', 6],
+      ['restrict', 6], ['shutdown', 5], ['sticky', 8], ['errdisable', 8],
+      ['dhcp snooping', 10], ['untrusted', 8], ['trusted', 6],
+      ['dynamic arp inspection', 10], ['dai', 8], ['arp spoofing', 8],
+      ['cam overflow', 8], ['mac flooding', 8]
+    ]
+  },
+  {
+    m: 4,
+    name: '5.2 ACL 存取控制清單 (Standard/Extended/Named ACL)',
+    tokens: [
+      ['access-list', 8], ['acl', 6], ['standard acl', 8], ['extended acl', 8],
+      ['named acl', 8], ['implicit deny', 10], ['ip access-group', 8],
+      ['access-class', 10], ['line vty', 6]
+    ]
+  },
+  {
+    m: 4,
+    name: '5.3 AAA 架構、身分認證與密碼強化 (AAA/802.1X/Passwords)',
+    tokens: [
+      ['tacacs+', 10], ['radius', 8], ['802.1x', 10], ['supplicant', 8],
+      ['authenticator', 8], ['authentication', 6], ['authorization', 6],
+      ['accounting', 6], ['enable secret', 8], ['algorithm-type scrypt', 10],
+      ['type 9', 8], ['type 8', 8], ['type 5', 8], ['type 7', 8],
+      ['service password-encryption', 8], ['mfa', 8]
+    ]
+  },
+  {
+    m: 4,
+    name: '5.4 VPN 隧道與密碼學基礎 (VPN/IPsec/Encryption)',
+    tokens: [
+      ['site-to-site', 8], ['remote access', 8], ['ipsec', 8], ['tunnel mode', 10],
+      ['transport mode', 10], ['esp', 8], ['ah', 8], ['ike', 8], ['sha-256', 6],
+      ['aes', 6], ['rsa', 6], ['symmetric', 6], ['asymmetric', 6], ['vpn', 6],
+      ['phishing', 8], ['ransomware', 8], ['social engineering', 8], ['ids', 6], ['ips', 6]
+    ]
+  },
+
+  // ── 6. Automation & Programmability (10%) ──
+  {
+    m: 5,
+    name: '6.1 SDN 控制器與 DNA/Catalyst Center (SDN/DNA-C)',
+    tokens: [
+      ['sdn', 8], ['dna center', 10], ['catalyst center', 10], ['intent-based', 8],
+      ['assurance', 8], ['fabric', 8], ['lisp', 8], ['vxlan', 8], ['control plane', 6],
+      ['data plane', 6], ['management plane', 6], ['controller', 6]
+    ]
+  },
+  {
+    m: 5,
+    name: '6.2 REST API、HTTP 狀態碼與資料格式 (REST/JSON/YAML)',
+    tokens: [
+      ['rest api', 8], ['rest', 6], ['northbound', 8], ['southbound', 8],
+      ['200 ok', 8], ['201 created', 8], ['204 no content', 10],
+      ['401 unauthorized', 8], ['403 forbidden', 10], ['404 not found', 8],
+      ['500 internal server error', 8], ['json', 6], ['yaml', 6], ['xml', 6],
+      ['yang', 8], ['netconf', 8], ['restconf', 8], ['postman', 8]
+    ]
+  },
+  {
+    m: 5,
+    name: '6.3 自動化組態管理與 IaC 工具 (Ansible/Terraform/Python)',
+    tokens: [
+      ['ansible', 10], ['agentless', 8], ['playbook', 8], ['terraform', 10],
+      ['iac', 8], ['puppet', 8], ['chef', 8], ['json.loads()', 8],
+      ['requests', 6], ['netmiko', 8], ['python', 6]
+    ]
+  }
 ];
 
-function detectConcept(qText) {
-  const t = qText.toLowerCase();
-  for (const [name, kws] of CONCEPT_MAP) {
-    if (kws.some(k => t.includes(k.toLowerCase()))) return name;
+/**
+ * 加權概念識別引擎 (Weighted Concept Detector)
+ * @param {string|Object} qInput 題幹字串或題目物件實體
+ * @param {number} [mIndex] 題目所屬的官方考綱模組編號 (0-5)
+ * @returns {string} 精準對應的 CCNA 知識點名稱
+ */
+function detectConcept(qInput, mIndex) {
+  let text = '';
+  let targetM = (typeof mIndex === 'number') ? mIndex : -1;
+
+  if (typeof qInput === 'object' && qInput !== null) {
+    text = (qInput.q || '') + ' ' + (qInput.e || '');
+    if (typeof qInput.m === 'number') targetM = qInput.m;
+  } else {
+    text = String(qInput || '');
   }
-  return '綜合基礎';
+
+  const cleanText = text.toLowerCase();
+  let bestConcept = null;
+  let maxScore = -1;
+
+  for (const item of CCNA_TAXONOMY) {
+    let score = 0;
+
+    // 模組同域加成 (Domain Affinity Bonus)
+    if (targetM >= 0 && item.m === targetM) {
+      score += 4;
+    }
+
+    // 累計各 Token 加權得分
+    for (const [kw, weight] of item.tokens) {
+      if (cleanText.includes(kw)) {
+        score += weight;
+      }
+    }
+
+    if (score > maxScore) {
+      maxScore = score;
+      bestConcept = item.name;
+    }
+  }
+
+  // 若完全無特徵命中，依模組預設兜底（絕不回傳「綜合基礎」）
+  if (maxScore <= 0 || !bestConcept) {
+    const fallbackMap = {
+      0: '1.4 TCP/IP 與 OSI 模型封裝 (TCP/UDP/OSI Layers)',
+      1: '2.1 VLAN、Trunking 與 Native VLAN (VLAN/802.1Q)',
+      2: '3.1 路由表解析與選路仲裁 (Routing Table/LPM/AD)',
+      3: '4.3 時間同步、日誌與監控 (NTP/Syslog/SNMP)',
+      4: '5.2 ACL 存取控制清單 (Standard/Extended/Named ACL)',
+      5: '6.2 REST API、HTTP 狀態碼與資料格式 (REST/JSON/YAML)'
+    };
+    return fallbackMap[targetM] || '1.4 TCP/IP 與 OSI 模型封裝 (TCP/UDP/OSI Layers)';
+  }
+
+  return bestConcept;
 }
 
+/* ==========================================================================
+   CCNA 200-301 弱點診斷與考點導流推薦引擎 (Remediation & Routing Engine)
+   - 深度整合 22 大考綱次領域之多維度補強矩陣
+   - 動態錯誤率門檻視覺化 (危險紅 ≥40% / 警告黃 20~39% / 良好綠 <20%)
+   - 提供「一鍵直達複習」跳轉互動，自動切換分頁並填入檢索關鍵字
+   ========================================================================== */
+
+/**
+ * 22 大考點專屬深度複習導流矩陣 (Deep Remediation Matrix)
+ */
+const REMEDIATION_GUIDE = {
+  '1.1 實體層排錯、纜線與光纖規格 (L1/Cabling/Optics)': {
+    day: 'Day 1（實體層與纜線規格）',
+    tab: 'tables',
+    kw: '光纖',
+    labKw: 'vlan',
+    pitKw: '光纖',
+    summary: '重點複習單模 (SMF 9µm Laser) vs 多模 (MMF 50µm LED) 光纖特性、雙絞線長度限制 (100m) 與 Late Collision 雙工排錯。'
+  },
+  '1.2 IPv4 定址、VLSM 與子網劃分 (IPv4/Subnetting)': {
+    day: 'Day 3（IPv4 子網路劃分 — 每日 20 題）',
+    tab: 'calc',
+    kw: 'IPv4',
+    labKw: 'RFC 3021',
+    pitKw: 'Subnetting',
+    summary: '善用本儀表板的「IPv4 Subnetting 計算機」演練 RFC 3021 /31 點對點鏈路與 /32 主機遮罩運算。'
+  },
+  '1.3 IPv6 定址、SLAAC 與 EUI-64 (IPv6 Fundamentals)': {
+    day: 'Day 4（IPv6 位址類型與縮寫規則）',
+    tab: 'tables',
+    kw: 'IPv6',
+    labKw: 'IPv6',
+    pitKw: 'IPv6',
+    summary: '聚焦 EUI-64 第 7 bit 反轉（U/L bit）、Link-Local (FE80::/10) 與 SLAAC 搭配 Router Advertisement (RA) 流程。'
+  },
+  '1.4 TCP/IP 與 OSI 模型封裝 (TCP/UDP/OSI Layers)': {
+    day: 'Day 2（TCP/IP 與 OSI 七層對照、TCP 三向交握）',
+    tab: 'tables',
+    kw: 'TCP',
+    labKw: 'vlan',
+    pitKw: 'TCP',
+    summary: '重溫 TCP 三向交握 (SYN→SYN-ACK→ACK)、常見 Port 埠號 (HTTP 80/HTTPS 443/SSH 22/DNS 53) 與 L1-L4 PDU 封裝。'
+  },
+  '1.5 雲端運算架構與虛擬化技術 (Cloud/Virtualization)': {
+    day: 'Day 1（打地基：虛擬化與雲端服務）',
+    tab: 'tables',
+    kw: '虛擬化',
+    labKw: 'SDN',
+    pitKw: 'JSON',
+    summary: '比較 Type 1 (Bare-Metal/ESXi) vs Type 2 (Hosted) Hypervisor，以及 Container 共享 OS Kernel 的輕量特性。'
+  },
+  '1.6 基礎網路服務與拓撲 (Topology/ARP/DNS/Gateway)': {
+    day: 'Day 1–2（網路拓撲與基礎通訊）',
+    tab: 'tables',
+    kw: 'ARP',
+    labKw: 'DNS',
+    pitKw: 'DNS',
+    summary: '理解跨網段封裝先發 ARP 請求預設閘道 MAC、Full-Mesh 連線數公式 $n(n-1)/2$ 與 DNS 遞迴查詢。'
+  },
+  '2.1 VLAN、Trunking 與 Native VLAN (VLAN/802.1Q)': {
+    day: 'Day 5 與 Day 13（交換原理、VLAN 與 Trunking）',
+    tab: 'labs',
+    kw: 'Native VLAN',
+    labKw: 'Trunking',
+    pitKw: 'Native VLAN',
+    summary: '重跑 Lab 2，注意 802.1Q Native VLAN 預設明文不打標，兩端 ID 不匹配將導致 VLAN 洩漏與廣播域合併。'
+  },
+  '2.2 STP/RSTP 根橋選舉與保護機制 (STP/RSTP/Guard)': {
+    day: 'Day 15（STP/RSTP 根橋選舉與 Port Cost）',
+    tab: 'tables',
+    kw: 'STP',
+    labKw: 'Rapid-PVST+',
+    pitKw: 'STP',
+    summary: '熟記 Bridge Priority (4096 倍數) + 最低 MAC 選舉原則；區分 BPDU Guard (邊緣鎖埠) 與 Root Guard (下游防奪權)。'
+  },
+  '2.3 EtherChannel 鏈路綑綁與模式 (EtherChannel/LACP)': {
+    day: 'Day 16（EtherChannel 模式匹配矩陣）',
+    tab: 'tables',
+    kw: 'EtherChannel',
+    labKw: 'EtherChannel',
+    pitKw: 'EtherChannel',
+    summary: '複習 LACP (active/passive) 與 PAgP (desirable/auto) 模式匹配矩陣，注意成員埠 (s) 代表參數不一致被掛起。'
+  },
+  '2.4 企業級無線網路 WLC 與 AP 架構 (Wireless/WLC/AP)': {
+    day: 'Day 17–18（無線架構：Autonomous vs Lightweight、WPA3）',
+    tab: 'tables',
+    kw: 'WLAN',
+    labKw: 'WLC',
+    pitKw: 'Wireless',
+    summary: '聚焦 Split-MAC 架構中 CAPWAP 控制 (UDP 5246) / 資料 (UDP 5247) 傳輸，以及 WPA3-SAE Dragonfly 抗字典攻擊機制。'
+  },
+  '2.5 交換器轉發原理與探索協定 (Switch/CDP/LLDP)': {
+    day: 'Day 5 與 Day 19（交換原理與探索協定）',
+    tab: 'tables',
+    kw: 'CDP',
+    labKw: 'LLDP',
+    pitKw: 'CDP',
+    summary: '區別 Cisco 專屬 CDP (預設啟用) 與 IEEE 802.1AB 開放標準 LLDP (需手動 lldp run)；掌握未知單播 Flooding 行為。'
+  },
+  '3.1 路由表解析與選路仲裁 (Routing Table/LPM/AD)': {
+    day: 'Day 6（路由仲裁黃金律）',
+    tab: 'tables',
+    kw: 'Longest Prefix',
+    labKw: '靜態路由',
+    pitKw: '路由仲裁',
+    summary: '落實查表三部曲：① 最長前綴匹配 (LPM) > ② 管理距離 (AD) > ③ 度量值 (Metric)；/28 路由必優先於 /24 路由。'
+  },
+  '3.2 靜態路由、預設與浮動備援 (Static/Default/Floating)': {
+    day: 'Day 6 與 Day 11（靜態路由與浮動備援）',
+    tab: 'labs',
+    kw: '浮動備援',
+    labKw: '靜態路由',
+    pitKw: '浮動靜態',
+    summary: '實作 Lab 13，理解浮動靜態路由 AD 必須大於動態協定 (如設為 120)，且乙太網路介面必須指定下一跳 IP。'
+  },
+  '3.3 OSPFv2/OSPFv3 鄰居條件與狀態機 (OSPF Neighbors/LSA)': {
+    day: 'Day 8–9（OSPFv2 鄰居狀態機、Timer 與 DR 選舉）',
+    tab: 'pitfalls',
+    kw: 'OSPF',
+    labKw: 'OSPFv2',
+    pitKw: 'OSPF',
+    summary: '排查 OSPF 鄰居 7 大匹配條件；卡在 ExStart 檢查 MTU 與重複 Router-ID；DR 選舉採最高 Priority 且不具搶佔性。'
+  },
+  '3.4 跨 VLAN 路由 SVI 與 ROAS (Inter-VLAN Routing)': {
+    day: 'Day 13（VLAN 間路由：ROAS 與 SVI）',
+    tab: 'labs',
+    kw: 'SVI',
+    labKw: 'ROAS',
+    pitKw: 'ROAS',
+    summary: '比對 Router-on-a-Stick 子介面 dot1q 封裝與 L3 Switch SVI (需 ip routing) 的轉發原理。'
+  },
+  '3.5 第一跳閘道備援協定 (FHRP/HSRP/VRRP/GLBP)': {
+    day: 'Day 10（FHRP 第一跳冗餘與 HSRP）',
+    tab: 'tables',
+    kw: 'HSRP',
+    labKw: 'HSRP',
+    pitKw: 'FHRP',
+    summary: '演練 HSRPv2 虛擬 MAC (0000.0C9F.Fxxx)、standby preempt 搶佔機制，以及 VRRP (Master/Backup) 開放標準差異。'
+  },
+  '4.1 NAT 與 PAT 埠位址轉換 (NAT/PAT/Overload)': {
+    day: 'Day 12（NAT / PAT 完整演練）',
+    tab: 'labs',
+    kw: 'NAT',
+    labKw: 'NAT',
+    pitKw: 'PAT',
+    summary: '實作 Lab 23，Inside/Outside 方向不可顛倒；PAT 多對一上網必須加上 overload 關鍵字以透過 L4 Port 區分連線。'
+  },
+  '4.2 DHCP 服務與 Relay 中繼代理 (DHCP/Relay Agent)': {
+    day: 'Day 23（DHCP Relay 與 DORA 流程）',
+    tab: 'labs',
+    kw: 'DHCP',
+    labKw: 'DHCP',
+    pitKw: 'DHCP Relay',
+    summary: '掌握 DORA 四步驟；ip helper-address 必須配置在靠近客戶端的入口介面，將廣播轉為單播並填入 giaddr 選池。'
+  },
+  '4.3 時間同步、日誌與監控 (NTP/Syslog/SNMP)': {
+    day: 'Day 22（NTP、Syslog 嚴重度與 SNMPv3）',
+    tab: 'tables',
+    kw: 'Syslog',
+    labKw: 'Syslog',
+    pitKw: 'Syslog',
+    summary: '記憶 Syslog 嚴重度 0 (Emergency) 至 7 (Debugging)；NTP Stratum 16 代表未同步；SNMPv3 authPriv 具備加密防護。'
+  },
+  '4.4 QoS 服務品質分類與標記 (QoS/CoS/DSCP)': {
+    day: 'Day 23（QoS 分類標記、Policing 與 Shaping）',
+    tab: 'tables',
+    kw: 'QoS',
+    labKw: 'QoS',
+    pitKw: 'QoS',
+    summary: '語音標記為 EF (DSCP 46 / CoS 5)；Policing (丟棄/重標記) 支援雙向，Shaping (佇列緩衝平滑) 僅支援 Outbound。'
+  },
+  '5.1 Layer 2 安全防護 (Port Sec/Snooping/DAI)': {
+    day: 'Day 20（Port Security、DHCP Snooping 與 DAI）',
+    tab: 'labs',
+    kw: 'Port Security',
+    labKw: 'Port Security',
+    pitKw: 'Port Security',
+    summary: '熟悉 Port Security 三大違規模式 (Protect/Restrict/Shutdown)；DAI 依賴 DHCP Snooping 建立的 IP-MAC 綁定表防 ARP 欺騙。'
+  },
+  '5.2 ACL 存取控制清單 (Standard/Extended/Named ACL)': {
+    day: 'Day 11（ACL 基本語法與放置位置原則）',
+    tab: 'tables',
+    kw: 'ACL',
+    labKw: 'ACL',
+    pitKw: 'ACL',
+    summary: 'Standard ACL (僅來源 IP) 放靠近目的地；Extended ACL (五元組) 放靠近來源；由上而下逐條匹配且末端隱含 Deny Any。'
+  },
+  '5.3 AAA 架構、身分認證與密碼強化 (AAA/802.1X/Passwords)': {
+    day: 'Day 19（AAA 架構、802.1X 與密碼強化）',
+    tab: 'tables',
+    kw: 'TACACS+',
+    labKw: 'AAA',
+    pitKw: 'TACACS+',
+    summary: 'TACACS+ (TCP 49 全加密/逐指令授權) vs RADIUS (UDP 1812/1813 僅加密密碼)；Type 9 Scrypt 雜湊具最高防破解強度。'
+  },
+  '5.4 VPN 隧道與密碼學基礎 (VPN/IPsec/Encryption)': {
+    day: 'Day 20（Site-to-Site VPN 與 IPsec 機制）',
+    tab: 'tables',
+    kw: 'VPN',
+    labKw: 'VPN',
+    pitKw: 'VPN',
+    summary: 'IPsec Tunnel Mode 加密整個原始封包並加新標頭；ESP (Protocol 50) 提供加密與認證，AH (Protocol 51) 僅認證不加密。'
+  },
+  '6.1 SDN 控制器與 DNA/Catalyst Center (SDN/DNA-C)': {
+    day: 'Day 26（SDN 架構、Controller 與 DNA Center）',
+    tab: 'tables',
+    kw: 'Controller',
+    labKw: 'SDN',
+    pitKw: 'DNA Center',
+    summary: 'SDN 將控制與管理平面集中於 Controller，資料平面留於本地線速轉發；DNA-C 提供 Assurance 遙測主動健康分析。'
+  },
+  '6.2 REST API、HTTP 狀態碼與資料格式 (REST/JSON/YAML)': {
+    day: 'Day 24–25（REST API、HTTP 動詞與 JSON/YAML）',
+    tab: 'tables',
+    kw: 'REST API',
+    labKw: 'REST API',
+    pitKw: 'JSON',
+    summary: 'CRUD 對應 POST(201)/GET(200)/PUT(200)/DELETE(204)；401 代表未驗證，403 代表權限不足；JSON 鍵名必須使用雙引號。'
+  },
+  '6.3 自動化組態管理與 IaC 工具 (Ansible/Terraform/Python)': {
+    day: 'Day 27（Terraform、Ansible 與 Python 自動化）',
+    tab: 'tables',
+    kw: 'Ansible',
+    labKw: 'Ansible',
+    pitKw: 'Ansible',
+    summary: 'Ansible 為 Agentless + Push 模式 (走 SSH/YAML Playbook)；Terraform 為宣告式 IaC 基礎設施佈建工具。'
+  }
+};
+
+/**
+ * 一鍵直達特定分頁與檢索功能 (Universal Jump & Search Navigator)
+ * @param {string} targetTab 目標導航分頁 ID ('schedule' | 'takeaways' | 'tables' | 'labs' | 'pitfalls' | 'calc')
+ * @param {string} searchKeyword 欲自動填入並觸發過濾的關鍵字
+ */
+function jumpToReview(targetTab, searchKeyword) {
+  // 1. 切換上方導航列
+  const navBtn = document.querySelector(`#nav button[data-s="${targetTab}"]`);
+  if (navBtn) {
+    navBtn.click();
+  }
+
+  // 2. 針對目標分頁自動注入搜尋字串並觸發過濾更新
+  setTimeout(() => {
+    if (targetTab === 'tables') {
+      const searchInput = document.getElementById('cmp-search');
+      if (searchInput && typeof renderCmp === 'function') {
+        searchInput.value = searchKeyword || '';
+        renderCmp();
+        searchInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    } else if (targetTab === 'labs') {
+      const searchInput = document.getElementById('lab-search');
+      if (searchInput && typeof renderLabs === 'function') {
+        searchInput.value = searchKeyword || '';
+        renderLabs();
+        searchInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    } else if (targetTab === 'pitfalls') {
+      const searchInput = document.getElementById('pit-search');
+      if (searchInput && typeof renderPitfalls === 'function') {
+        searchInput.value = searchKeyword || '';
+        renderPitfalls();
+        searchInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    } else if (targetTab === 'calc') {
+      const calcSection = document.getElementById('calc');
+      if (calcSection) {
+        calcSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  }, 100);
+}
+
+/**
+ * 重構：多維度弱點診斷雷達更新函式 (Enhanced Weakness Analysis Engine with Two-Tier RWD)
+ * @param {Array<Object>} list 當前測驗題庫實體陣列
+ */
 function updateWeakAnalysis(list) {
   const box = document.getElementById('weak-analysis');
   if (!box) return;
@@ -5569,13 +6220,19 @@ function updateWeakAnalysis(list) {
   const stats = {};
   let totalAnsweredInView = 0;
 
+  // 1. 統計各細粒度考點作答與錯誤數據
   list.forEach((item, i) => {
     const card = document.getElementById(`quiz-q-${i}`);
     if (!card || !card.dataset.done) return;
 
     totalAnsweredInView++;
-    const concept = detectConcept(item.q);
-    if (!stats[concept]) stats[concept] = { w: 0, t: 0 };
+    const concept = (typeof detectConcept === 'function') 
+      ? detectConcept(item, item.m) 
+      : (item.q || '基礎網路概念');
+
+    if (!stats[concept]) {
+      stats[concept] = { w: 0, t: 0 };
+    }
     stats[concept].t++;
 
     if (card.querySelector('.opt.wrong')) {
@@ -5583,56 +6240,126 @@ function updateWeakAnalysis(list) {
     }
   });
 
+  // 2. 計算錯誤率並排序 (錯誤率高者優先，答錯數多者次之)
   const rows = Object.entries(stats)
     .filter(([, s]) => s.t >= 1)
-    .map(([c, s]) => ({ c, ...s, rate: s.w / s.t }))
+    .map(([conceptName, s]) => ({
+      concept: conceptName,
+      w: s.w,
+      t: s.t,
+      rate: s.w / s.t
+    }))
     .sort((a, b) => b.rate - a.rate || b.w - a.w);
 
+  // 若尚無作答資料則隱藏面板
   if (!rows.length || totalAnsweredInView === 0) {
     box.style.display = 'none';
     return;
   }
   box.style.display = 'block';
 
-  document.getElementById('weak-bars').innerHTML = rows.map(r => {
-    const pct = Math.round(r.rate * 100);
-    return `
-      <div class="weak-bar-row">
-        <span class="weak-bar-label">${r.c}</span>
-        <div class="weak-bar-track">
-          <div class="weak-bar-fill" style="width:${pct}%"></div>
-        </div>
-        <span class="weak-pct">錯 ${pct}% (${r.w}/${r.t})</span>
-      </div>`;
-  }).join('');
+  // 3. 渲染雙層自適應進度條 (Two-Tier Responsive Bars)
+  const barsContainer = document.getElementById('weak-bars');
+  if (barsContainer) {
+    barsContainer.innerHTML = rows.map(r => {
+      const pct = Math.round(r.rate * 100);
+      const isDanger = pct >= 40;
+      const isWarn = pct >= 20 && pct < 40;
 
-  const worst = rows.filter(r => r.rate >= 0.4);
+      // 動態色階：≥40% 危險紅、20%~39% 警告黃、<20% 良好青綠
+      const barColor = isDanger
+        ? 'linear-gradient(90deg, #ef4444 0%, #dc2626 100%)'
+        : isWarn
+        ? 'linear-gradient(90deg, #f59e0b 0%, #d97706 100%)'
+        : 'linear-gradient(90deg, #10b981 0%, #0ea5e9 100%)';
+
+      const badgeClass = isDanger
+        ? 'weak-pct-danger'
+        : isWarn
+        ? 'weak-pct-warn'
+        : 'weak-pct-good';
+
+      return `
+        <div class="weak-bar-row">
+          <div class="weak-bar-header">
+            <span class="weak-bar-label">${r.concept}</span>
+            <span class="weak-pct-badge ${badgeClass}">
+              錯 ${pct}% (${r.w}/${r.t})
+            </span>
+          </div>
+          <div class="weak-bar-track">
+            <div class="weak-bar-fill" style="width: ${pct}%; background: ${barColor};"></div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // 4. 渲染深度補強診斷建議 (Deep Actionable Remediation Cards)
   const tipEl = document.getElementById('weak-tip');
   if (tipEl) {
-    tipEl.innerHTML = worst.length
-      ? '🎯 <b>優先補強診斷建議（錯誤率 ≥40%）：</b><ul style="padding-left:20px;margin-top:6px">' +
-        worst.map(r => {
-          const dayMap = {
-            'Subnetting / Wildcard': 'Day 3（子網路每日 20 題）',
-            'OSPF 鄰居與狀態機': 'Day 8–9 + Lab「OSPFv2 單區域」',
-            '路由仲裁（前綴/AD/Metric）': 'Day 6 與 Day 11',
-            'VLAN / Trunk / Native': 'Day 5 與 Day 13',
-            'STP / EtherChannel': 'Day 15–16',
-            'Port Security / L2 防護': 'Day 20',
-            'ACL / NAT': 'Day 11–12',
-            'DHCP / NTP / Syslog': 'Day 22–23',
-            'QoS / SNMP': 'Day 22–23',
-            '無線（WPA/WLC/頻段）': 'Day 17–18',
-            '安全基礎（AAA/VPN/SSH）': 'Day 19–20',
-            'IPv6 基礎與配置': 'Day 4',
-            'TCP/IP 與 OSI 模型': 'Day 1–2',
-            '自動化 / SDN / API': 'Day 24–27'
-          }[r.c] || '對應模組翻卡與易混淆對照表';
-          return `<li><b>${r.c}</b> → 建議回到 <b style="color:#38bdf8">${dayMap}</b> 重溫概念，並搭配 IOS 指令實作。</li>`;
-        }).join('') + '</ul>'
-      : '✅ 目前各概念答對率均達 60% 以上，觀念扎實，持續保持！';
+    const highRiskList = rows.filter(r => r.rate >= 0.35 || (r.w >= 2 && r.rate > 0));
+
+    if (highRiskList.length > 0) {
+      tipEl.innerHTML = `
+        <div style="font-size: 0.95rem; font-weight: 700; color: #fbbf24; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+          <span>🎯</span> 官方考綱深度補強建議（高頻失分領域）：
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          ${highRiskList.map(r => {
+            const guide = (typeof REMEDIATION_GUIDE !== 'undefined' && REMEDIATION_GUIDE[r.concept]) ? REMEDIATION_GUIDE[r.concept] : {
+              day: '對應考綱單元複習',
+              tab: 'tables',
+              kw: '',
+              summary: '建議回到對應章節重溫核心觀念並加強實作演練。'
+            };
+
+            return `
+              <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(245, 158, 11, 0.3); border-left: 4px solid #ef4444; border-radius: 8px; padding: 12px 14px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; margin-bottom: 6px;">
+                  <span style="color: #ffffff; font-weight: 700; font-size: 0.9rem;">📌 ${r.concept}</span>
+                  <span style="background: rgba(239, 68, 68, 0.2); color: #fca5a5; font-size: 0.75rem; padding: 2px 8px; border-radius: 10px; font-weight: 600; border: 1px solid rgba(239, 68, 68, 0.3);">
+                    錯誤率 ${Math.round(r.rate * 100)}% (${r.w} 題)
+                  </span>
+                </div>
+                <div style="color: #cbd5e1; font-size: 0.84rem; line-height: 1.6; margin-bottom: 8px;">
+                  ${guide.summary}
+                </div>
+                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; padding-top: 8px; border-top: 1px dashed rgba(51, 65, 85, 0.6); font-size: 0.8rem; color: #94a3b8;">
+                  <span>📅 建議排程：<b style="color: #38bdf8;">${guide.day}</b></span>
+                  <div style="display: flex; gap: 6px;">
+                    ${guide.kw ? `
+                      <button onclick="jumpToReview('${guide.tab}', '${guide.kw}')" style="background: rgba(14, 165, 233, 0.2); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); padding: 3px 10px; border-radius: 4px; font-size: 0.76rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                        🔍 查對照表
+                      </button>
+                    ` : ''}
+                    ${guide.labKw ? `
+                      <button onclick="jumpToReview('labs', '${guide.labKw}')" style="background: rgba(16, 185, 129, 0.2); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.4); padding: 3px 10px; border-radius: 4px; font-size: 0.76rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                        🧪 查IOS指令+練實作 Lab
+                      </button>
+                    ` : ''}
+                    ${guide.pitKw ? `
+                      <button onclick="jumpToReview('pitfalls', '${guide.pitKw}')" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); padding: 3px 10px; border-radius: 4px; font-size: 0.76rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                        ⚠️ 看避坑卡
+                      </button>
+                    ` : ''}
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+    } else {
+      tipEl.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 8px; color: #4ade80; font-size: 0.9rem; font-weight: 600;">
+          <span>✅</span> 各項核心技術答對率均達 70% 以上，觀念扎實！請繼續保持高頻刷題手感。
+        </div>
+      `;
+    }
   }
 }
+
 
 // 初始化執行
 renderQuiz('all');
