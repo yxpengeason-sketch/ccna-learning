@@ -2369,7 +2369,7 @@ pre.bin {
 </div>
 
 <!-- ============ 模擬測驗 ============ -->
-<h2>知識點測驗 <span class="tag">僅為知識點測驗，練習盡量 ≤40 秒/題。還是記得要刷考古題！</span></h2>
+<h2>知識點測驗 <span class="tag">此單元僅為知識點測驗，練習盡量 ≤40 秒/題。<br> 還是記得要刷考古題！</span></h2>
 <div id="score-bar"><span>已答：<b id="answered">0</b>/<span id="total"></span></span><span>答對：<b id="correct" style="color:#22c55e">0</b></span><button class="btn" onclick="resetQuiz()" style="margin:0;padding:6px 14px">重新開始</button></div>
 <div id="quiz-area"></div>
 <div id="final-score" style="display:none;text-align:center;margin-top:20px"></div>
@@ -2599,7 +2599,7 @@ pre.bin {
 </section>
 
 </main>
-<footer>Vibe Coding Project · CCNA 200-30x Offline Study Dashboard · 進度自動儲存於 localStorage</footer>
+<footer>Vibe Coding Project (yxpengeason) · CCNA Offline Study Dashboard · 進度自動儲存於 localStorage</footer>
 
 <script>
 
@@ -4249,6 +4249,63 @@ const quiz=[
   a: 0,
   e: '【Spine-Leaf 架構特性】：Spine-Leaf 拓撲中 Leaf 交換機與所有 Spine 交換機兩兩全互連（Full-Mesh），Leaf 與 Leaf 之間、Spine 與 Spine 之間均不相連；任何伺服器跨 Leaf 通訊皆固定為 2 跳（Leaf → Spine → Leaf），延遲極度一致且利於東西向（East-West）流量擴展。'
 },
+{m: 0,
+  q: 'A router interface has MAC address 12-a0-ab-dd-00-02. When the interface is configured for IPv6 on prefix 2001:db8:44:90::/64 using the EUI-64 format, which IPv6 address is generated?',
+  o: [
+    '2001:db8:44:90:10a0:abff:fedd:2/64',
+    '2001:db8:44:90:12a0:abff:fedd:2/64',
+    '2001:db8:44:90:13a0:abff:fedd:2/64',
+    '2001:db8:44:90:12a0:abfe:ffdd:2/64'
+  ],
+  a: 0,
+  e: '【EUI-64 實戰運算陷阱】：MAC 位址中段插入 FFFE 形成 12a0:abFF:FEdd:0002；接著將第一個 Byte（0x12 = 二進位 0001 0010）的第 7 位元（U/L bit）反轉變成 0001 0000 = 0x10，組合產生 2001:db8:44:90:10a0:abff:fedd:2/64。'
+},
+{m: 0,
+  q: 'An engineer executes "show interface gigabitethernet0/1" and observes a steadily increasing count of CRC errors with zero collisions. What is the most probable root cause?',
+  o: [
+    'A duplex mismatch between the switch and the connected device',
+    'A damaged physical cable, loose connector, or high electromagnetic interference (EMI)',
+    'A broadcast storm overwhelming the switch buffer',
+    'Excessive network traffic requiring QoS traffic shaping'
+  ],
+  a: 1,
+  e: '【介面排錯計數器判讀】：CRC / FCS 錯誤代表實體層訊框校驗失敗。在「無 Collision（碰撞為 0）」的情況下持續增加 CRC，典型肇因為實體線路損壞、接頭接觸不良或電磁干擾（EMI）；若為雙工不匹配（Duplex Mismatch），通常會伴隨大量 Collisions 與 Late Collisions。'
+},
+
+{m: 0,
+  q: 'What is a defining operational characteristic of a data center Spine-and-Leaf architecture?',
+  o: [
+    'Spine switches forward traffic directly to each other to minimize latency',
+    'Every leaf switch connects to every spine switch, providing identical hop counts and predictable latency between all servers',
+    'Leaf switches connect to each other in a full mesh to handle east-west traffic',
+    'Spanning-Tree Protocol is used across all links between spine and leaf layers to prevent loops'
+  ],
+  a: 1,
+  e: '【Spine-Leaf 架構通訊特性】：Spine-Leaf 拓撲中每個 Leaf 與所有 Spine 交換機全互連（Full-Mesh），Leaf 之間與 Spine 之間互不相連；任意兩台跨 Leaf 的伺服器通訊皆固定為 2 跳（Leaf → Spine → Leaf），提供可預測的低延遲與高頻寬東西向轉發。'
+},
+{m: 0,
+  q: 'In Wi-Fi network engineering, how is "noise" technically defined in RF metrics?',
+  o: [
+    'The signal attenuation caused by walls and solid obstacles',
+    'Any non-802.11 RF energy present in the frequency spectrum that degrades the desired Wi-Fi signal',
+    'Transmission collisions occurring between adjacent 802.11 access points on the same channel',
+    'The degradation of data throughput when multiple clients connect to an SSID'
+  ],
+  a: 1,
+  e: '【無線射頻雜訊 (Noise) 定義】：Noise 指來自非 802.11 裝置（微波爐、藍牙、無繩電話、雷達等）散逸的非預期射頻能量背景底噪（Noise Floor）；來自其他 Wi-Fi 基地台的干擾則稱為同頻干擾（CCI）或鄰頻干擾（ACI）。'
+},
+{m: 0,
+  q: 'Which IPv6 address property is a defining characteristic of an Anycast address compared to a Unicast address?',
+  o: [
+    'It is assigned to multiple interfaces on different nodes and routes traffic to the nearest interface, but cannot be used as a source address',
+    'It uses the dedicated address prefix FF00::/8 to forward frames to a group',
+    'It is dynamically created on a link whenever IPv6 is enabled on an interface',
+    'It is only routable within an organization and prohibited on the Internet'
+  ],
+  a: 0,
+  e: '【IPv6 Anycast 核心特性】：Anycast（任意播）位址將同一個單播位址指派給多台不同節點的介面，路由協定會將封包導向距離最近（Lowest Routing Metric）的節點。Anycast 只能作為「目的位址」，絕不可作為封包的「來源位址（Source IP）」。'
+},
+
 
 {m:0,q:'In the OSI model, at which layers do a Switch and a Router primarily operate?',o:['L1 / L2','L2 / L3','L3 / L4','L2 / L7'],a:1,e:'Switch 是 L2（Frame/MAC），Router 是 L3（Packet/IP）；Hub 才是 L1。'},
 {m:0,q:'What is the correct order of the TCP three-way handshake?',o:['SYN → ACK → SYN-ACK','SYN → SYN-ACK → ACK','ACK → SYN → FIN','SYN → FIN → ACK'],a:1,e:'建立連線 SYN→SYN-ACK→ACK；斷線四次揮手 FIN→ACK→FIN→ACK。'},
@@ -4274,7 +4331,28 @@ const quiz=[
 {m:0,q:'What does DNS record type MX identify?',o:['Host IPv4 address','Mail server for a domain','Domain name alias','Name server'],a:1,e:'MX=郵件伺服器、A=IPv4、AAAA=IPv6、CNAME=別名、NS=name server。'},
 {m:0,q:'An engineer must choose a cable to connect a router Ethernet port directly to a PC NIC. Which type is required (assuming Auto-MDIX is disabled)?',o:['Straight-through','Crossover','Rollover','Console cable'],a:1,e:'同類設備（router↔PC）用 Crossover；Rollover 是 Cisco Console 線。'},
 {m:0,q:'What is the purpose of the FCS field in an Ethernet frame?',o:['Identify upper-layer protocol','Error detection via CRC','Priority marking','Fragmentation control'],a:1,e:'FCS 使用 CRC 校驗影框完整性，錯誤即丟棄；Type 欄位才是識別上層協定。'},
-{m:0,q:'Which IPv6 address type is automatically configured using the EUI-64 process on an interface?',o:['Global unicast from DHCPv6','Modified EUI-64 interface identifier in SLAAC','Loopback','Unique local only'],a:1,e:'SLAAC 用 Router Advertisement 前綴 + EUI-64（MAC 中插入 FF:FE 並反轉第 7 bit）產生介面 ID。'},
+{m: 0,
+  q: 'Which IPv6 address type is automatically generated on an interface using the modified EUI-64 format as soon as IPv6 is enabled?',
+  o: [
+    'Global unicast address from DHCPv6',
+    'Link-local address (FE80::/10)',
+    'Loopback address (::1/128)',
+    'Unique local address (FC00::/7)'
+  ],
+  a: 1,
+  e: '【Link-Local 自動生成機制】：在介面啟用 IPv6 時，設備會自動使用 FE80::/10 前綴搭配由實體 MAC 位址透過 Modified EUI-64 演算法（插入 FFFE 並反轉第 7 位元）計算出來的 64-bit 介面識別碼，組成 Link-Local 單播位址。'
+},
+{m: 0,
+  q: 'Which dynamic mechanism uses the EUI-64 process to generate a 64-bit interface identifier from a prefix learned in a Router Advertisement?',
+  o: [
+    'Stateful DHCPv6',
+    'SLAAC (Stateless Address Autoconfiguration)',
+    'Static Route mapping',
+    'DHCPv6 Relay'
+  ],
+  a: 1,
+  e: '【SLAAC 定址機制】：SLAAC 透過接收路由器發送的 Router Advertisement (RA) 取得 /64 前綴，並結合 EUI-64 演算法（將 MAC 中間插入 FFFE 並將第 7 位元 U/L bit 反轉）自動產生 64-bit 介面識別碼 (Interface ID)。'
+},
 {m:0,q:'Which statement about IPv6 solicited-node multicast is true?',o:['It replaces broadcast for neighbor discovery','It uses prefix FF01::/16','Every host joins ff02::1 only','It is used by OSPFv2'],a:0,e:'Solicited-node multicast (FF02::1:FFxx:xxxx) 取代 ARP 廣播做 ND 解析。'},
 {m:0,q:'What is the valid range of the first octet for Class C addresses?',o:['1–126','128–191','192–223','224–239'],a:2,e:'A=1–126、B=128–191、C=192–223；127 是 loopback、224+ 是 multicast。'},
 {m:0,q:'Which term describes the ability of a network to expand without redesign?',o:['Availability','Scalability','Security','Manageability'],a:1,e:'可擴展性=不需重新設計即可成長；可用性=不停機；CCNA 常考架構四大目標。'},
@@ -4359,8 +4437,6 @@ const quiz=[
   a: [0, 1],
   e: '【WLC WLAN 進階功能】：Client Band Select 會延遲回應 2.4 GHz 的 Probe 訊框，主動引導雙頻終端關聯至干擾較少、頻寬較大的 5 GHz 頻段；Allow AAA Override 允許 WLC 套用 RADIUS 認證通過後回傳的 IETF 64/65/81 屬性以動態劃分 VLAN。'
 },
-
-
 {m: 1,
   q: 'Which statement correctly describes the behavior of a Cisco switch operating in VTP Transparent mode?',
   o: [
@@ -4370,7 +4446,62 @@ const quiz=[
     'It blocks all VLAN traffic from traversing trunk ports unless configured as a VTP Client'
   ],
   a: 0,
-  e: '【VTP Transparent 模式】：Transparent 模式不參與 VTP 網域同步，但會透過 Trunk 轉發收到的 VTP 宣告；它允許配置 Extended Range VLAN（1006–4094），且其 VLAN 資訊儲存於 `running-config` / `startup-config` 而非 `vlan.dat`。'
+  e: '【VTP Transparent 模式】：Transparent 模式不參與 VTP 網域同步，但會透過 Trunk 轉發收到的 VTP 宣告；支援 Extended VLAN（1006–4094），且其 VLAN 資訊儲存於 `running-config` / `startup-config` 而非 `vlan.dat`。'
+},
+{m: 1,
+  q: 'An engineer configures a switch port connected to a Cisco IP Phone that has a workstation attached to its PC data port. Which command configures the switch to overwrite PC data traffic to CoS 0 (Best Effort) while trusting the IP phone markings?',
+  o: [
+    'switchport priority extend trust',
+    'switchport priority extend cos 0',
+    'mls qos trust cos',
+    'switchport voice vlan dot1p'
+  ],
+  a: 1,
+  e: '【IP Phone 信任延伸防偽】：`switchport priority extend cos 0` 指示 IP Phone 將後方 PC 送來的資料訊框 CoS 強制重設為 0（Best Effort），防止終端惡意偽造高優先權 Voice 標記；`trust` 則會無條件信任 PC 的標記。'
+},
+{m: 1,
+  q: 'When an Autonomous Access Point is configured to support multiple SSIDs mapped to different VLANs, how must the switch port connecting to the AP be configured?',
+  o: [
+    'As an access port assigned to the management VLAN',
+    'As an 802.1Q trunk port allowing the corresponding VLANs',
+    'As a Layer 3 routed port running OSPF',
+    'As an EtherChannel in active mode'
+  ],
+  a: 1,
+  e: '【Autonomous AP 連接埠配置】：Autonomous AP 需獨立處理 802.11 SSID 與 802.1Q VLAN 映射。若提供多個不同 VLAN 的 SSID，與交換機相連的實體埠必須配置為「802.1Q Trunk Port」以承載多 VLAN 標記流量。'
+},
+{m: 1,
+  q: 'When multiple AP-Manager interfaces are configured on a Cisco WLC, how does the controller determine which AP-Manager interface an AP should use to join?',
+  o: [
+    'The AP-Manager interface with the lowest IP address is always selected',
+    'The AP-Manager interface with the fewest number of connected APs is selected to balance the load',
+    'The controller selects the AP-Manager based on the AP\'s MAC address hash',
+    'The AP joins the first AP-Manager interface that responds to the Discovery Request'
+  ],
+  a: 1,
+  e: '【WLC 多 AP-Manager 負載演算法】：當 WLC 建立多個 AP-Manager 介面時，控制器會指派「目前連線 AP 數量最少（Fewest APs）」的 AP-Manager 介面給新發起 Join Request 的輕量型 AP，以達成負載平衡。'
+},
+{m: 1,
+  q: 'Which global configuration command on a Cisco Catalyst switch enforces 802.1Q tagging on frames across the native VLAN on all trunk ports?',
+  o: [
+    'vlan dot1q tag native',
+    'switchport trunk native vlan tag',
+    'dot1q native-tag enable',
+    'spanning-tree vlan native tag'
+  ],
+  a: 0,
+  e: '【防範 VLAN 雙重標籤攻擊】：Cisco IOS 全域指令 `vlan dot1q tag native` 會強制交換機對 Native VLAN 訊框同樣打上 802.1Q 標籤，徹底消除雙重標籤（Double-Tagging）跳躍攻擊的風險。'
+},
+{m: 1,
+  q: 'What is the correct sequence of events when a Cisco Lightweight Access Point (LAP) discovers and joins a Wireless LAN Controller (WLC)?',
+  o: [
+    'DHCP IP acquisition (Option 43) → CAPWAP Discovery Request/Response → DTLS Handshake → CAPWAP Join Request/Response → Config/Image Download',
+    'CAPWAP Join Request → DHCP IP acquisition → DTLS Handshake → Discovery Request → Config Download',
+    'DTLS Handshake → DHCP IP acquisition → CAPWAP Discovery → Join Request → Association',
+    'DNS Lookup → 802.1X Authentication → CAPWAP Discovery → DHCP IP acquisition'
+  ],
+  a: 0,
+  e: '【Lightweight AP 註冊標準流程】：① 透過 DHCP 取得 IP 與 Option 43（或 DNS/廣播/靜態）取得 WLC IP ➡️ ② 發送 CAPWAP Discovery Request 並接收 Response ➡️ ③ 建立 DTLS 加密通道 ➡️ ④ 發送 Join Request 並接收 Response ➡️ ⑤ 比對韌體 Image 並下載組態。'
 },
 {m: 1,
   q: 'An engineer configures a switch port connected to a Cisco IP Phone that has a workstation attached to its PC data port. Which command configures the switch to trust the priority marking of packets originating directly from the IP phone while overriding the PC data traffic?',
@@ -4588,16 +4719,17 @@ const quiz=[
  e:'224.0.0.5=所有 OSPF 路由器收聽；224.0.0.6=DR/BDR 收聽；224.0.0.9 是 RIPv2。'},
 
 
+
 {m: 2,
-  q: 'Which MAC address format is recognized as a standard VRRP (Virtual Router Redundancy Protocol) IPv4 virtual MAC address for Group 10?',
+  q: 'Which MAC address format is recognized as a standard VRRP (Virtual Router Redundancy Protocol) IPv4 virtual MAC address for Group 25?',
   o: [
-    '0000.5E00.010A',
-    '0000.0C07.AC0A',
-    '0000.0C9F.F00A',
-    '0007.B400.010A'
+    '0000.0C07.AC19',
+    '0000.5E00.0119',
+    '0000.0C9F.F019',
+    '0007.B400.0119'
   ],
-  a: 0,
-  e: '【FHRP 虛擬 MAC 格式對照】：\n• VRRP IPv4：`0000.5E00.01xx`（xx 為 16 進位 Group ID，Group 10 = 0x0A）\n• HSRP v1：`0000.0C07.ACxx`\n• HSRP v2：`0000.0C9F.Fxxx`\n• GLBP：`0007.B400.xxyy`'
+  a: 1,
+  e: '【FHRP 虛擬 MAC 格式對照】：VRRP IPv4 固定為 `0000.5E00.01xx`（xx 為群組號 16 進位，25 轉 16 進位為 0x19 ➡️ `0000.5E00.0119`）；HSRP v1 為 `0000.0C07.ACxx`；HSRP v2 為 `0000.0C9F.Fxxx`；GLBP 為 `0007.B400.xxyy`。'
 },
 {m: 2,
   q: 'Under which condition does the OSPF command "default-information originate" advertise a default route (0.0.0.0/0) into the OSPF domain if the "always" keyword is omitted?',
@@ -4608,7 +4740,51 @@ const quiz=[
     'Only if all connected neighbor interfaces are operating in OSPF Area 0'
   ],
   a: 0,
-  e: '【OSPF 預設路由發布機制】：未加 `always` 關鍵字時，路由器本機路由表必須已經存在有效預設路由（如靜態或 BGP 預設路由），才會向 OSPF 區域產生 Type 5 LSA 注入 0.0.0.0/0；加上 `always` 則無論本機有無預設路由皆強制注入。'
+  e: '【OSPF 預設路由注入機制】：未加 `always` 關鍵字時，路由器本機路由表必須已經存在有效預設路由（如靜態或 BGP 預設路由），才會產生 Type 5 LSA 注入 0.0.0.0/0；加上 `always` 則無論本機有無預設路由皆強制注入。'
+},
+{m: 2,
+  q: 'A network administrator needs a dedicated server at IP 10.10.10.50 to use a high-speed ISP link via next-hop 192.168.1.2, while all other subnet traffic (10.10.10.0/24) uses a default route via 192.168.1.1. Which command should be configured?',
+  o: [
+    'ip route 10.10.10.50 255.255.255.255 192.168.1.2',
+    'ip route 10.10.10.0 255.255.255.0 192.168.1.2',
+    'ip route 10.10.10.50 255.255.255.0 192.168.1.2 250',
+    'ip default-gateway 192.168.1.2'
+  ],
+  a: 0,
+  e: '【主機靜態路由與 LPM 優先權】：`/32` 主機路由（Host Route: 255.255.255.255）在路由查表中擁有最長前綴匹配（Longest Prefix Match）最高優先權，能精準將特定單一主機流量引導至專屬路徑。'
+},
+{m: 2,
+  q: 'How does OSPFv3 differ fundamentally from OSPFv2 regarding interface configuration and addressing?',
+  o: [
+    'OSPFv3 is enabled directly on router interfaces using "ipv6 ospf <pid> area <area>" rather than using global network statements, and uses 32-bit dotted-decimal Router IDs',
+    'OSPFv3 replaces Dijkstra\'s algorithm with Bellman-Ford for IPv6 calculations',
+    'OSPFv3 uses 128-bit IPv6 addresses as its Router ID',
+    'OSPFv3 does not support multi-area hierarchy'
+  ],
+  a: 0,
+  e: '【OSPFv3 核心特性】：OSPFv3 不支援在 `router ospf` 下宣告 `network` 指令，必須於介面模式下鍵入 `ipv6 ospf <pid> area <area>`；此外，OSPFv3 的 Router ID 依然是 32-bit 點分十進位格式（非 IPv6 位址），若無 IPv4 位址則必須手動指定。'
+},
+{m: 2,
+  q: 'What is the operational advantage of configuring a "Fully Specified Static Route" on a multi-access Ethernet interface?',
+  o: [
+    'It specifies both the local exit interface and the next-hop IP address, eliminating recursive route lookups and preventing excessive ARP broadcasts',
+    'It allows dynamic routing protocols to automatically recalculate the path metric',
+    'It bypasses the requirement for an administrative distance',
+    'It forces the switchport to negotiate full-duplex speed'
+  ],
+  a: 0,
+  e: '【完全指定靜態路由 (Fully Specified)】：同時指定出介面與下一跳 IP（如 `ip route 10.0.0.0 255.0.0.0 gi0/0 192.168.1.1`），既能讓路由器直接定位出介面（省去遞迴查表開銷），又能直接取得下一跳 IP 作為 ARP 查詢目標（防止對目標主機直接發起大量 ARP 廣播）。'
+},
+{m: 2,
+  q: 'Which MAC address format is recognized as a standard VRRP (Virtual Router Redundancy Protocol) IPv4 virtual MAC address for Group 10?',
+  o: [
+    '0000.5E00.010A',
+    '0000.0C07.AC0A',
+    '0000.0C9F.F00A',
+    '0007.B400.010A'
+  ],
+  a: 0,
+  e: '【FHRP 虛擬 MAC 格式對照】：\n• VRRP IPv4：`0000.5E00.01xx`（xx 為 16 進位 Group ID，Group 10 = 0x0A）\n• HSRP v1：`0000.0C07.ACxx`\n• HSRP v2：`0000.0C9F.Fxxx`\n• GLBP：`0007.B400.xxyy`'
 },
 {m: 2,
   q: 'An administrator needs to insert a new ACE permitting TCP port 53 (DNS) into an existing named extended ACL "CORP_FILTER" between line sequence 30 and line sequence 40. Which command accomplishes this task efficiently?',
@@ -4783,7 +4959,50 @@ const quiz=[
  a:[0,1],
  e:'SPAN 複製流量到監聽埠供分析且不影響原始轉發；無加密機制，也不需 L3 trunk。'},
 
-
+{m: 3,
+  q: 'Which DHCP Option code is specifically used by Lightweight APs to dynamically discover the IPv4 address of their parent Cisco Wireless LAN Controller (WLC)?',
+  o: [
+    'Option 3',
+    'Option 43',
+    'Option 66',
+    'Option 150'
+  ],
+  a: 1,
+  e: '【高頻 DHCP Option 對照】：\n• Option 43：提供 WLC IP 位址（供 Lightweight AP 建立 CAPWAP 隧道）\n• Option 150：Cisco 專屬，提供 TFTP 伺服器 IP 清單（供 IP Phone 備援下載韌體）\n• Option 66：標準 TFTP 伺服器名稱/IP\n• Option 3：Default Gateway 預設閘道。'
+},
+{m: 3,
+  q: 'An engineer configures a core router with the command "ntp master 2". What does this command accomplish?',
+  o: [
+    'Configures the router to accept time updates only from Stratum 2 NTP servers',
+    'Enables the router to act as an authoritative NTP clock source at Stratum 2 if external NTP servers become unreachable',
+    'Restricts the router to synchronize with a maximum of 2 NTP peers',
+    'Forces the router to adjust its software clock every 2 minutes'
+  ],
+  a: 1,
+  e: '【NTP Master 角色設定】：`ntp master [stratum]` 允許路由器在無法連通外部時間源時，以自身內部時鐘充當 NTP 伺服器，並對外宣告指定的 Stratum 數值（此處為 Stratum 2），確保內部區域網路時間同步不中斷。'
+},
+{m: 3,
+  q: 'How does an iterative DNS query differ fundamentally from a recursive DNS query in name resolution workflows?',
+  o: [
+    'An iterative query requires the DNS server to return the final resolved IP address to the client or an error',
+    'In an iterative query, the contacted DNS server returns the best referral it has (such as the next authoritative server) without resolving the full name itself',
+    'Iterative queries use TCP port 53 exclusively, while recursive queries use UDP port 53',
+    'Iterative queries encrypt all domain lookup packets using TLS'
+  ],
+  a: 1,
+  e: '【DNS 迭代查詢 vs. 遞迴查詢】：客戶端向 Local DNS 發起的是「遞迴查詢（Recursive）」，要求伺服器負責查到底並回傳最終 IP；DNS 伺服器向根域名或頂級域名伺服器發起的是「迭代查詢（Iterative）」，對方若無紀錄則回傳下一層權威 Name Server 的轉介位址（Referral）。'
+},
+{m: 3,
+  q: 'Which QoS congestion avoidance mechanism selectively discards TCP packets based on IP precedence before queue buffers become completely full, preventing TCP global synchronization?',
+  o: [
+    'Tail Drop',
+    'Weighted Random Early Detection (WRED)',
+    'Class-Based Weighted Fair Queuing (CBWFQ)',
+    'Low Latency Queuing (LLQ)'
+  ],
+  a: 1,
+  e: '【QoS 擁塞避免機制 WRED】：傳統 Tail Drop 在佇列滿載時丟棄所有後續封包，會導致所有 TCP 連線同時進入慢啟動（全域同步）；WRED 在佇列達到門檻前隨機預先丟棄部分 TCP 封包，使各連線錯開降速時機，維持高頻寬利用率。'
+},
 {m: 3,
   q: 'When Lightweight APs boot up and obtain an IP address via DHCP, which DHCP Option provides the IPv4 address of the Wireless LAN Controller (WLC) to enable CAPWAP discovery?',
   o: [
@@ -4860,7 +5079,7 @@ const quiz=[
  
 {m:3,q:'Which statement about NTP authentication is true?',o:['It encrypts time packets end-to-end','It verifies the authenticity of the time source using keys','It replaces the need for stratum hierarchy','It requires MD5 disabled'],a:1,e:'NTP auth 用金鑰驗證來源真偽（防時間欺騙），不加密封包本身內容。'},
 {m:3,q:'Which SNMP operation retrieves multiple values in a single request efficiently?',o:['GetNext','GetBulk (v2c/v3)','Set','Trap'],a:1,e:'GetBulk 減少輪詢往返次數，適合大表格抓取；v1 只有 Get/GetNext/Set。'},
-{m:3,q:'What is the MIB in SNMP architecture?',o:['Management Information Base — hierarchical database of managed objects','Message Interface Board','Multi-user Internet Bridge','Managed IP Blocklist'],a:0,e:'MIB 以 OID 樹狀結構定義可管理物件；NMS 與 Agent 透過 OID 讀寫資料。'},
+{m:3,q:'What is the MIB in SNMP architecture?',o:['Management Information Base','Message Interface Board','Multi-user Internet Bridge','Managed IP Blocklist'],a:0,e:'MIB 以 OID 樹狀結構定義可管理物件(hierarchical database of managed objects)；NMS 與 Agent 透過 OID 讀寫資料。'},
 {m:3,q:'Which QoS mechanism marks traffic at Layer 3?',o:['CoS','DSCP','802.1p priority bits only','MAC classification'],a:1,e:'DSCP 位於 IP ToS 前 6 bit（L3）；CoS/802.1p 在 L2；跨三層邊界需重新映射。'},
 {m:3,q:'Which command sets the device clock manually before NTP converges?',o:['clock set hh:mm:ss day month year','set time now','datetime configure','ntp manual set'],a:0,e:'clock set 格式為 HH:MM:SS Day Month Year（例：clock set 14:00:00 1 Jun 2024）；NTP 同步後會覆蓋。'},
 {m:3,q:'What does CDP/LLDP timer “holdtime” define?',o:['How long neighbor information is kept before expiring','Port security hold period','STP forward delay','DHCP lease time'],a:1,e:'CDP holdtime 預設 180 秒（3×發送間隔 60 秒）；LLDP 預設 holdtime 120 秒。'},
@@ -5239,18 +5458,343 @@ function getQuestionKey(item) {
   return `Q_${item.m}_${item.q.trim().replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '').slice(0, 32)}`;
 }
 
-/* ================= 測驗動態渲染主流程 ================= */
 
+/* ==========================================================================
+   CCNA 200-301 錯題專項重考渲染引擎與即時銷題機制 (Wrongbook Quiz Engine)
+   - 支援 renderQuiz('wrongbook') 模式：僅自未克服錯題庫中動態出題
+   - 雙層無偏隨機洗牌：題目順序與選項位置重新映射，防範死記位置
+   - 答對即時消除 (Instant Remediation)：即時標記 resolved 並動態更新按鈕徽章
+   - 漸進式銷題：重考不刪除歷史資料，答對即時標記攻克 (resolved: true)
+   - 錯題本防窺遮蔽：進入錯題重考時自動隱藏 #wrongbook-panel，杜絕看答案
+   - 雙層 Fisher-Yates 隨機洗牌：題目與選項指標重新映射，防止位置記憶
+   - 零錯題空狀態 (Zero-State) 與專項通關結算面板
+   ========================================================================== */
+
+/* ==========================================================================
+   CCNA 200-301 錯題專項沉浸鎖定與安全退出控制器 (Quiz Lockdown Controller)
+   - 進入錯題重考時自動鎖定其他分類按鈕，模擬考場鎖定環境
+   - 攔截非錯題按鈕點擊，提供二階段放棄確認彈窗
+   - 測驗結算 (showFinal) 或確認放棄時自動釋放鎖定狀態
+   ========================================================================== */
+
+/* ==========================================================================
+   CCNA 200-301 全域測驗模式切換器與結算動作排程器 (Unified Mode Switcher)
+   - 封裝 switchToQuizMode(targetMode)，徹底消除行內引號轉義導致的點擊死鎖
+   - 自動調度解鎖 (setQuizFilterLockdown)、篩選列高亮、題庫渲染與視圖平滑滾動
+   - 重構 showFinal 結算按鈕與空狀態卡片，提供 100% 穩健的單向資料流
+   ========================================================================== */
+
+/* ==========================================================================
+   CCNA 200-301 分類導航解鎖與直接事件綁定修復引擎
+   - 移除脆弱的冒泡阻斷，採用直接事件綁定 (Direct Event Binding)
+   - 確保 DOM 初始化與每次解鎖時立即同步事件監聽
+   ========================================================================== */
+
+
+/**
+ * 全域測驗模式切換控制器 (Unified Mode Switcher)
+ * @param {string|number} targetMode 目標模式：'all' | 'wrongbook' | 0~5
+ */
+function switchToQuizMode(targetMode) {
+  // 僅在「真正離開錯題專項」時才解鎖
+  if (targetMode !== 'wrongbook') {
+    setQuizFilterLockdown(false);
+  }
+
+  // 2. 更新頂部按鈕高亮樣式 (.active)
+  const filterBar = document.querySelector('#quiz .quiz-filter');
+  if (filterBar) {
+    filterBar.querySelectorAll('button').forEach(btn => {
+      const btnMode = btn.dataset.m === 'all' 
+        ? 'all' 
+        : (btn.dataset.m === 'wrongbook' ? 'wrongbook' : parseInt(btn.dataset.m, 10));
+      
+      if (btnMode === targetMode) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+  }
+
+  // 3. 調用核心測驗渲染
+  renderQuiz(targetMode);
+
+  // 4. 視圖平滑滾動至測驗計分面板
+  const scoreBar = document.getElementById('score-bar');
+  if (scoreBar) {
+    scoreBar.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+/**
+ * 直接綁定分類篩選列按鈕事件 (Direct Event Binder)
+ * 逐一為每顆按鈕指派原生 onclick，杜絕事件委派被 disabled 阻斷
+ */
+function bindQuizFilterEvents() {
+  const filterBar = document.querySelector('#quiz .quiz-filter');
+  if (!filterBar) return;
+
+  filterBar.querySelectorAll('button').forEach(b => {
+    b.onclick = () => {
+      if (b.disabled || b.classList.contains('filter-locked')) return;
+
+      const targetM = b.dataset.m === 'all' 
+        ? 'all' 
+        : (b.dataset.m === 'wrongbook' ? 'wrongbook' : parseInt(b.dataset.m, 10));
+      const totalQuestions = parseInt(totalEl.textContent, 10) || 0;
+
+      // 若目前在錯題重考進行中，彈出二階段放棄確認
+      if (activeQuizFilter === 'wrongbook' && targetM !== 'wrongbook' && answered < totalQuestions && totalQuestions > 0) {
+        const confirmExit = confirm(
+          '⚠️ 目前正在進行錯題專項重考，確定要中途放棄並切換單元嗎？\n\n' +
+          '• 點擊「確定」：放棄本次重測並切換至所選單元（未作答完畢的錯題仍會保留於錯題本中）\n' +
+          '• 點擊「取消」：繼續完成本次錯題衝刺'
+        );
+
+        if (!confirmExit) {
+          return;
+        }
+      }
+
+      switchToQuizMode(targetM);
+    };
+  });
+}
+
+/**
+ * 動態更新錯題專項重考按鈕之狀態與計數徽章
+ */
+function updateWrongQuizButtonState() {
+  const unresolvedList = (typeof getUnresolvedWrongQuizList === 'function') 
+    ? getUnresolvedWrongQuizList() 
+    : [];
+  const count = unresolvedList.length;
+
+  // 1. 維護上方分類篩選列的錯題專項按鈕
+  let filterBtn = document.querySelector('#quiz .quiz-filter button[data-m="wrongbook"]');
+  const filterBar = document.querySelector('#quiz .quiz-filter');
+
+  if (!filterBtn && filterBar) {
+    filterBtn = document.createElement('button');
+    filterBtn.dataset.m = 'wrongbook';
+    filterBtn.style.borderColor = 'rgba(239, 68, 68, 0.4)';
+    filterBtn.style.color = '#fca5a5';
+    filterBar.appendChild(filterBtn);
+    bindQuizFilterEvents(); // 動態插入後重新綁定事件
+  }
+
+  if (filterBtn) {
+    filterBtn.innerHTML = `📕 錯題專項重考 (${count})`;
+    filterBtn.disabled = (count === 0);
+    filterBtn.style.opacity = count === 0 ? '0.45' : '1';
+    filterBtn.style.cursor = count === 0 ? 'not-allowed' : 'pointer';
+    filterBtn.style.background = count > 0 ? 'rgba(239, 68, 68, 0.12)' : '';
+  }
+
+  // 2. 維護錯題本面板標題列的專屬重考按鈕
+  let wbQuizBtn = document.getElementById('btn-wb-requiz');
+  const wbHeader = document.querySelector('#wrongbook-panel h3');
+  if (!wbQuizBtn && wbHeader) {
+    wbQuizBtn = document.createElement('button');
+    wbQuizBtn.id = 'btn-wb-requiz';
+    wbQuizBtn.className = 'btn';
+    wbQuizBtn.style.cssText = 'padding: 5px 14px; font-size: 0.8rem; font-weight: 700; margin-left: auto; margin-right: 8px; background: linear-gradient(135deg, #d97706 0%, #ea580c 100%); color: #ffffff; border: none; border-radius: 6px; cursor: pointer; transition: all 0.2s;';
+    wbQuizBtn.onclick = startWrongbookQuiz;
+    
+    const clearBtn = wbHeader.querySelector('.btn-wb-clear');
+    if (clearBtn) {
+      wbHeader.insertBefore(wbQuizBtn, clearBtn);
+    } else {
+      wbHeader.appendChild(wbQuizBtn);
+    }
+  }
+
+  if (wbQuizBtn) {
+    wbQuizBtn.innerHTML = `🎯 錯題專項重考 (${count} 題)`;
+    wbQuizBtn.disabled = (count === 0);
+    wbQuizBtn.style.opacity = count === 0 ? '0.45' : '1';
+    wbQuizBtn.style.cursor = count === 0 ? 'not-allowed' : 'pointer';
+  }
+}
+
+/* ==========================================================================
+   CCNA 200-301 測驗分類事件委派與全域解鎖控制器 (Lockdown Controller v4.2)
+   - 強制在所有非錯題模式（'all' 或 0~5 模組）下無條件解鎖分類按鈕
+   - 杜絕初始化或返回全真題庫時按鈕殘留 disabled 狀態
+   ========================================================================== */
+
+/**
+ * 控制測驗分類篩選列之鎖定狀態 (Comprehensive Filter Lockdown Controller)
+ * @param {boolean} locked 是否進入鎖定狀態
+ */
+function setQuizFilterLockdown(locked) {
+  const filterBar = document.querySelector('#quiz .quiz-filter');
+  if (!filterBar) return;
+
+  const buttons = filterBar.querySelectorAll('button');
+  buttons.forEach(btn => {
+    const isWrongbookBtn = (btn.dataset.m === 'wrongbook');
+
+    if (locked) {
+      if (!isWrongbookBtn) {
+        btn.disabled = true;
+        btn.classList.add('filter-locked');
+        btn.style.pointerEvents = 'none';
+        btn.style.opacity = '0.35';
+        btn.style.cursor = 'not-allowed';
+      }
+    } else {
+      // 強制重設所有原生屬性，100% 恢復可點擊狀態
+      btn.disabled = false;
+      btn.classList.remove('filter-locked');
+      btn.style.pointerEvents = 'auto';
+      btn.style.opacity = '';
+      btn.style.cursor = 'pointer';
+    }
+  });
+
+  if (!locked && typeof updateWrongQuizButtonState === 'function') {
+    updateWrongQuizButtonState();
+  }
+}
+
+/**
+ * 全域測驗模式切換控制器 (Unified Mode Switcher)
+ * @param {string|number} targetMode 目標模式：'all' | 'wrongbook' | 0~5
+ */
+function switchToQuizMode(targetMode) {
+  // 1. 強制完全釋放鎖定屬性
+  setQuizFilterLockdown(false);
+
+  // 2. 更新頂部按鈕高亮樣式 (.active)
+  const filterBar = document.querySelector('#quiz .quiz-filter');
+  if (filterBar) {
+    filterBar.querySelectorAll('button').forEach(btn => {
+      const btnMode = btn.dataset.m === 'all' 
+        ? 'all' 
+        : (btn.dataset.m === 'wrongbook' ? 'wrongbook' : parseInt(btn.dataset.m, 10));
+      
+      if (btnMode === targetMode) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+  }
+
+  // 3. 調用核心測驗渲染
+  renderQuiz(targetMode);
+
+  // 4. 視圖平滑滾動至測驗計分面板
+  const scoreBar = document.getElementById('score-bar');
+  if (scoreBar) {
+    scoreBar.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+/**
+ * 直接綁定分類篩選列按鈕事件 (Direct Event Binder)
+ */
+function bindQuizFilterEvents() {
+  const filterBar = document.querySelector('#quiz .quiz-filter');
+  if (!filterBar) return;
+
+  filterBar.querySelectorAll('button').forEach(b => {
+    b.onclick = () => {
+      if (b.disabled || b.classList.contains('filter-locked')) return;
+
+      const targetM = b.dataset.m === 'all' 
+        ? 'all' 
+        : (b.dataset.m === 'wrongbook' ? 'wrongbook' : parseInt(b.dataset.m, 10));
+      const totalQuestions = parseInt(totalEl.textContent, 10) || 0;
+
+      if (activeQuizFilter === 'wrongbook' && targetM !== 'wrongbook' && answered < totalQuestions && totalQuestions > 0) {
+        const confirmExit = confirm(
+          '⚠️ 目前正在進行錯題專項重考，確定要中途放棄並切換單元嗎？\n\n' +
+          '• 點擊「確定」：放棄本次重測並切換至所選單元（未作答完畢的錯題仍會保留於錯題本中）\n' +
+          '• 點擊「取消」：繼續完成本次錯題衝刺'
+        );
+
+        if (!confirmExit) {
+          return;
+        }
+      }
+
+      switchToQuizMode(targetM);
+    };
+  });
+}
+
+/**
+ * 測驗動態渲染主流程（於入口處強制執行防呆解鎖）
+ * @param {string|number} mod 模組索引 (0-5) | 'all' (全部題庫) | 'wrongbook' (錯題專項)
+ */
 function renderQuiz(mod) {
   activeQuizFilter = mod;
   qa.innerHTML = '';
   answered = 0;
   correct = 0;
 
-  // 1. 篩選目標模組題庫
-  const rawList = mod === 'all' ? quiz : quiz.filter(q => q.m === mod);
+  const isWrongbookMode = (mod === 'wrongbook');
+  const wbPanel = document.getElementById('wrongbook-panel');
 
-  // 2. 第一層洗牌：題目順序隨機化 (Question Order Shuffle)
+  // 1. 錯題防窺遮蔽控制
+  if (wbPanel) {
+    wbPanel.style.display = isWrongbookMode ? 'none' : '';
+  }
+
+  // 2. 任何非錯題模式（'all' 或 0~5 模組）進入時，強制 100% 絕對解鎖
+  if (!isWrongbookMode) {
+    setQuizFilterLockdown(false);
+  }
+
+  // 3. 依模式篩選目標題庫
+  let rawList = [];
+  if (isWrongbookMode) {
+    rawList = (typeof getUnresolvedWrongQuizList === 'function') 
+      ? getUnresolvedWrongQuizList() 
+      : [];
+  } else if (mod === 'all') {
+    rawList = quiz;
+  } else {
+    rawList = quiz.filter(q => q.m === mod);
+  }
+
+  // 4. 錯題專項模式空狀態防呆 (Zero-State UI)
+  if (isWrongbookMode && rawList.length === 0) {
+    setQuizFilterLockdown(false);
+    totalEl.textContent = '0';
+    document.querySelectorAll('.q-total').forEach(el => el.textContent = '0');
+    ansEl.textContent = '0';
+    corEl.textContent = '0';
+    document.getElementById('p-ans').textContent = '0';
+    document.getElementById('p-cor').textContent = '0';
+    document.getElementById('p-rate').textContent = '100%';
+    document.getElementById('quiz-progress-fill').style.width = '100%';
+
+    qa.innerHTML = `
+      <div style="text-align: center; padding: 48px 20px; background: var(--bg-surface); border: 1px solid rgba(34, 197, 94, 0.35); border-radius: 12px; margin: 20px 0; box-shadow: var(--shadow-sm);">
+        <div style="font-size: 3rem; margin-bottom: 12px;">🎉</div>
+        <h3 style="color: #4ade80; font-size: 1.3rem; font-weight: 700; margin-bottom: 8px;">太棒了！目前沒有待克服的錯題！</h3>
+        <p style="color: var(--text-muted); font-size: 0.92rem; max-width: 500px; margin: 0 auto 20px; line-height: 1.6;">
+          你的錯題本目前無未攻克項目。核心觀念已掌握，請繼續挑戰全真模擬測驗維持考前作答手感。
+        </p>
+        <button onclick="switchToQuizMode('all')" class="btn" style="padding: 9px 24px; border-radius: 20px;">
+          📚 返回全真題庫測驗
+        </button>
+      </div>
+    `;
+    updateWeakAnalysis([]);
+    return;
+  }
+
+  // 5. 若為錯題專項且有題目，才啟動鎖定
+  if (isWrongbookMode && rawList.length > 0) {
+    setQuizFilterLockdown(true);
+  }
+
+  // 6. 第一層洗牌：題目順序隨機化
   const randomizedQuestions = shuffleArray(rawList);
 
   totalEl.textContent = randomizedQuestions.length;
@@ -5267,19 +5811,15 @@ function renderQuiz(mod) {
     finalScoreEl.innerHTML = '';
   }
 
-  // 3. 第二層洗牌：選項順序隨機化與動態指標重映射 (Option Shuffle & Index Remapping)
+  // 7. 第二層洗牌：選項順序隨機化與動態指標重映射
   const runtimeList = randomizedQuestions.map((rawItem, i) => {
     const isMulti = isMultiSelect(rawItem);
     const numOptions = rawItem.o.length;
 
-    // 建立選項原始索引序列並洗牌，例如 [0, 1, 2, 3] -> [2, 0, 3, 1]
     const optIndices = Array.from({ length: numOptions }, (_, idx) => idx);
     const shuffledIndices = shuffleArray(optIndices);
-
-    // 依隨機索引重組選項文字
     const shuffledOptions = shuffledIndices.map(idx => rawItem.o[idx]);
 
-    // 動態重映射正確答案索引（New Answer Indices）
     let remappedAnswer;
     if (isMulti) {
       remappedAnswer = rawItem.a
@@ -5289,7 +5829,6 @@ function renderQuiz(mod) {
       remappedAnswer = shuffledIndices.indexOf(rawItem.a);
     }
 
-    // 建立運行時題目實體（Runtime Item Closure）
     const runtimeItem = {
       raw: rawItem,
       m: rawItem.m,
@@ -5301,7 +5840,6 @@ function renderQuiz(mod) {
       requiredCount: isMulti ? remappedAnswer.length : 1
     };
 
-    // 渲染卡片 DOM（注意：DOM 上完全不輸出 data-ans 屬性，防 F12 靜態透視）
     const card = document.createElement('div');
     card.className = 'quiz-q';
     card.id = `quiz-q-${i}`;
@@ -5310,6 +5848,7 @@ function renderQuiz(mod) {
       <p>
         <b>Q${i + 1}.</b> ${runtimeItem.q}
         <span class="tag">${QM[runtimeItem.m]}</span>
+        ${isWrongbookMode ? '<span class="tag" style="background:rgba(239,68,68,0.15); color:#f87171; border-color:rgba(239,68,68,0.35);">📕 錯題專項重考 (鎖定中)</span>' : ''}
         <span class="tag" style="background:${isMulti ? 'rgba(56,189,248,0.15)' : 'rgba(245,158,11,0.12)'}; color:${isMulti ? '#38bdf8' : '#f59e0b'}; border-color:${isMulti ? 'rgba(56,189,248,0.4)' : 'rgba(245,158,11,0.3)'}">
           ${isMulti ? `複選題 (選 ${runtimeItem.requiredCount} 項)` : '單選題'}
         </span>
@@ -5329,10 +5868,8 @@ function renderQuiz(mod) {
         if (card.dataset.done) return;
 
         if (!isMulti) {
-          // 單選題：立即判分提交
           processSubmission(card, runtimeItem, optIdx, [optIdx], runtimeList);
         } else {
-          // 複選題：切換選取狀態
           if (selectedIndices.has(optIdx)) {
             selectedIndices.delete(optIdx);
             btn.classList.remove('selected');
@@ -5360,13 +5897,12 @@ function renderQuiz(mod) {
 
     card.appendChild(optContainer);
 
-    // 複選題追加確認提交按鈕
     if (isMulti) {
       const submitBox = document.createElement('div');
       submitBox.style.marginTop = '12px';
       submitBox.style.display = 'flex';
       submitBox.style.alignItems = 'center';
-      submitBox.gap = '10px';
+      submitBox.style.gap = '10px';
 
       const submitBtn = document.createElement('button');
       submitBtn.className = 'btn btn-submit-multi';
@@ -5391,8 +5927,9 @@ function renderQuiz(mod) {
   updateWeakAnalysis(runtimeList);
 }
 
-/* ================= 統一交卷判分與 UI 渲染 ================= */
-
+/**
+ * 統一交卷判分與即時漸進銷題處理
+ */
 function processSubmission(card, runtimeItem, userPick, userPicksArray, currentList) {
   card.dataset.done = '1';
   answered++;
@@ -5410,7 +5947,7 @@ function processSubmission(card, runtimeItem, userPick, userPicksArray, currentL
     isCorrect = (userPick === runtimeItem.a);
   }
 
-  // 鎖定所有選項按鈕並標註正確/錯誤色彩
+  // 鎖定選項
   const optButtons = card.querySelectorAll('.opt');
   optButtons.forEach((b, idx) => {
     b.disabled = true;
@@ -5433,20 +5970,24 @@ function processSubmission(card, runtimeItem, userPick, userPicksArray, currentL
     recordWrong(runtimeItem, userPick);
   }
 
+  if (typeof updateWrongQuizButtonState === 'function') {
+    updateWrongQuizButtonState();
+  }
+
   // 渲染詳解面板
   const ex = document.createElement('div');
   ex.className = 'explain';
   const correctText = formatOptionsText(runtimeItem, runtimeItem.a);
   ex.innerHTML = `
     ${isCorrect 
-      ? '<span style="color:#4ade80;font-weight:700">✅ 答對了！</span>' 
+      ? '<span style="color:#4ade80;font-weight:700">✅ 答對了！' + (activeQuizFilter === 'wrongbook' ? '（已成功銷題）' : '') + '</span>' 
       : `<span style="color:#f87171;font-weight:700">❌ 答錯了！正確答案為：${correctText}</span>`
     }
     <div style="margin-top:6px;line-height:1.65">${runtimeItem.e}</div>
   `;
   card.appendChild(ex);
 
-  // 更新即時計分面板與進度條
+  // 更新計分條
   ansEl.textContent = answered;
   corEl.textContent = correct;
   document.getElementById('p-ans').textContent = answered;
@@ -5462,55 +6003,126 @@ function processSubmission(card, runtimeItem, userPick, userPicksArray, currentL
   }
 }
 
-/* ================= 測驗結算面板 ================= */
-
+/**
+ * 測驗結算面板（全面採用 switchToQuizMode 驅動）
+ */
 function showFinal(list) {
   if (!finalScoreEl) return;
   finalScoreEl.style.display = 'block';
 
+  const isWrongbook = (activeQuizFilter === 'wrongbook');
   const pct = Math.round((correct / list.length) * 100);
-  const wrongItems = [];
-  list.forEach((item, i) => {
-    const card = document.getElementById(`quiz-q-${i}`);
-    if (card && card.querySelector('.opt.wrong')) {
-      wrongItems.push(item);
-    }
-  });
-
+  const remainingUnresolved = (typeof getUnresolvedWrongQuizList === 'function') 
+    ? getUnresolvedWrongQuizList().length 
+    : 0;
   const isPass = pct >= 82;
+
+  let titleHtml = '';
+  let descHtml = '';
+  let buttonHtml = '';
+
+  if (isWrongbook) {
+    // ── 模式 A：錯題專項重考結算 ──
+    const isAllCleaned = (pct === 100);
+
+    titleHtml = `
+      <h2 style="color:${isAllCleaned ? '#22c55e' : '#f59e0b'}; justify-content:center;">
+        🎯 錯題專項結算：成功攻克 ${correct} / ${list.length} 題（克服率 ${pct}%）
+      </h2>
+    `;
+    descHtml = `
+      <p style="font-size:.95rem;margin:10px 0;color:#e2e8f0">
+        ${isAllCleaned
+          ? '🏆 <b>太強了！本次錯題已全數攻克並銷題！</b> 核心概念盲點已順利掃除。'
+          : `⚠️ 本次重測攻克了 <b>${correct}</b> 題，尚有 <b>${list.length - correct}</b> 題待持續補強（目前錯題本總計剩餘 ${remainingUnresolved} 題未克服）。`}
+      </p>
+    `;
+
+    buttonHtml = `
+      <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap; margin-top:16px;">
+        ${!isAllCleaned && remainingUnresolved > 0 ? `
+          <!-- 1. 主行動 (Primary)：高亮橘漸層，引導立刻消滅剩餘錯題 -->
+          <button onclick="switchToQuizMode('wrongbook')" class="btn" style="padding:10px 24px; border-radius:20px; font-weight:700; background:linear-gradient(135deg, #ea580c 0%, #f59e0b 100%); box-shadow:0 4px 14px rgba(234,88,12,0.35); border:none;">
+            🔄 繼續重測剩餘錯題 (${remainingUnresolved} 題)
+          </button>
+          
+          <!-- 2. 次行動 (Secondary)：沉穩深藍邊框，引導檢視詳解與盲點 -->
+          <button onclick="showWrongBookFromFinal()" class="btn" style="padding:10px 20px; border-radius:20px; font-weight:600; background:rgba(30,41,59,0.8); border:1px solid rgba(56,189,248,0.4); color:#38bdf8;">
+            📕 查看錯題本狀態
+          </button>
+
+          <!-- 3. 第三行動 (Tertiary / Ghost)：直接呼叫控制器切換，杜絕字串轉義與死鎖 -->
+          <button onclick="switchToQuizMode('all')" class="btn" style="padding:10px 20px; border-radius:20px; font-weight:500; background:#1e293b; color:#94a3b8; border:1px solid #334155;">
+            📚 仍要返回全題庫 🔙
+          </button>
+        ` : `
+          <!-- 全數攻克時：主行動升級為綠色返回全真題庫 -->
+          <button onclick="switchToQuizMode('all')" class="btn" style="padding:10px 28px; border-radius:20px; font-weight:700; background:linear-gradient(135deg, #10b981 0%, #0ea5e9 100%); box-shadow:0 4px 14px rgba(16,185,129,0.35); border:none;">
+            📚 返回全題庫測驗 👏
+          </button>
+          <button onclick="showWrongBookFromFinal()" class="btn" style="padding:10px 20px; border-radius:20px; font-weight:600; background:rgba(30,41,59,0.8); border:1px solid rgba(56,189,248,0.4); color:#38bdf8;">
+            📕 檢視攻克紀錄
+          </button>
+        `}
+      </div>
+    `;
+  } else {
+    // ── 模式 B：常規模組/全真模擬結算 ──
+    titleHtml = `
+      <h2 style="color:${isPass ? '#22c55e' : pct >= 65 ? '#f59e0b' : '#ef4444'}; justify-content:center;">
+        🎯 測驗結算：${correct} / ${list.length}（得分率 ${pct}%）
+      </h2>
+    `;
+    descHtml = `
+      <p style="font-size:.95rem;margin:10px 0;color:#e2e8f0">
+        ${isPass
+          ? '🏆 <b>恭喜達到通過標準（≥82%）！</b> 核心概念扎實，請保持每日刷題手感。'
+          : pct >= 65
+          ? '⚠️ <b>接近及格門檻（65%~81%）！</b> 請針對下方「弱點診斷」標紅項目進行重點複習。'
+          : '❌ <b>未達及格標準（<65%）！</b> 建議回到 30 天配速表重跑觀念與進到 Packet Tracer 實作。'}
+      </p>
+      ${remainingUnresolved > 0 ? `<p style="font-size:.85rem;color:#94a3b8">目前錯題本累積 ${remainingUnresolved} 題未克服，建議優先進行靶向重練。</p>` : ''}
+    `;
+    buttonHtml = `
+      <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap; margin-top:16px;">
+        <button onclick="resetQuiz()" class="btn" style="padding:10px 24px; border-radius:20px; font-weight:700; background:linear-gradient(135deg, #0284c7 0%, #0ea5e9 100%); border:none;">
+          🔄 重新測驗本單元（重新洗牌）
+        </button>
+        ${remainingUnresolved > 0 ? `
+          <button onclick="switchToQuizMode('wrongbook')" class="btn" style="padding:10px 22px; border-radius:20px; font-weight:700; background:rgba(239,68,68,0.18); color:#fca5a5; border:1px solid rgba(239,68,68,0.4);">
+            📕 立即重練錯題 (${remainingUnresolved} 題)
+          </button>
+        ` : ''}
+      </div>
+    `;
+  }
+
   finalScoreEl.innerHTML = `
-    <h2 style="color:${isPass ? '#22c55e' : pct >= 65 ? '#f59e0b' : '#ef4444'}; justify-content:center;">
-      🎯 測驗結算：${correct} / ${list.length}（得分率 ${pct}%）
-    </h2>
+    ${titleHtml}
     <div style="background:#0f172a;border-radius:8px;height:14px;overflow:hidden;margin:12px auto;max-width:500px">
-      <div style="height:100%;width:${pct}%;background:${isPass ? '#22c55e' : pct >= 65 ? '#f59e0b' : '#ef4444'};transition:width .6s ease-out"></div>
+      <div style="height:100%;width:${pct}%;background:${isPass || (isWrongbook && pct === 100) ? '#22c55e' : pct >= 65 ? '#f59e0b' : '#ef4444'};transition:width .6s ease-out"></div>
     </div>
-    <p style="font-size:.95rem;margin:10px 0;color:#e2e8f0">
-      ${isPass
-        ? '🏆 <b>恭喜達到通過標準（≥82%）！</b> 核心概念扎實，請保持每日刷題手感。'
-        : pct >= 65
-        ? '⚠️ <b>接近及格門檻（65%~81%）！</b> 請針對下方「弱點診斷」標紅的項目與「錯題本」進行重點複習。'
-        : '❌ <b>未達及格標準（<65%）！</b> 建議回到 30 天配速表重跑觀念與 Packet Tracer 實作。'}
-    </p>
-    ${wrongItems.length > 0 ? `<p style="font-size:.85rem;color:#94a3b8">本次錯題共 ${wrongItems.length} 題，已自動記錄於下方錯題本。</p>` : ''}
-    <button onclick="resetQuiz()" class="btn" style="margin-top:14px;padding:9px 24px;border-radius:20px;">🔄 重新測驗本單元（重新洗牌）</button>
+    ${descHtml}
+    ${buttonHtml}
   `;
   finalScoreEl.scrollIntoView({ behavior: 'smooth' });
+}
+
+/**
+ * 結算後手動恢復並滾動至錯題本面板
+ */
+function showWrongBookFromFinal() {
+  const wbPanel = document.getElementById('wrongbook-panel');
+  if (wbPanel) {
+    wbPanel.style.display = '';
+    renderWB();
+    wbPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
 }
 
 function resetQuiz() {
   renderQuiz(activeQuizFilter);
 }
-
-// 綁定模組切換按鈕事件
-quizFilterBar.querySelectorAll('button').forEach(b => {
-  b.onclick = () => {
-    quizFilterBar.querySelectorAll('button').forEach(x => x.classList.remove('active'));
-    b.classList.add('active');
-    const m = b.dataset.m === 'all' ? 'all' : parseInt(b.dataset.m, 10);
-    renderQuiz(m);
-  };
-});
 
 /* ================= 錯題本管理 (LocalStorage) ================= */
 
@@ -5531,6 +6143,97 @@ function saveWB(wb) {
   }
 }
 
+
+/* ==========================================================================
+   CCNA 200-301 錯題本專項資料關聯與路由橋接器 (Wrongbook Data Bridge)
+   - 透過 getQuestionKey 將持久化錯題精準映射回原生題庫物件 (含完整 o 與 a)
+   - 動態掛載與更新「📕 錯題專項重考」按鈕與計數徽章
+   - 提供無未克服錯題時的防呆狀態鎖定
+   ========================================================================== */
+
+/**
+ * 檢索未克服錯題之完整題庫實體陣列 (Unresolved Wrongbook Quiz Resolver)
+ * @returns {Array<Object>} 包含完整 q, o, a, e, m 屬性之原生題目陣列
+ */
+function getUnresolvedWrongQuizList() {
+  const wb = loadWB();
+  // 萃取所有 resolved === false 的題幹 Key 集合
+  const unresolvedKeys = new Set(
+    Object.entries(wb)
+      .filter(([, data]) => !data.resolved)
+      .map(([key]) => key)
+  );
+
+  if (!unresolvedKeys.size) return [];
+
+  // 從全域題庫中過濾出匹配的完整題目實體
+  return quiz.filter(item => unresolvedKeys.has(getQuestionKey(item)));
+}
+
+
+/**
+ * 觸發錯題專項重考模式 (Start Wrongbook Quiz Action)
+ */
+function startWrongbookQuiz() {
+  const unresolvedList = getUnresolvedWrongQuizList();
+  if (!unresolvedList.length) {
+    alert('目前沒有未克服的錯題記錄！💪 保持下去！');
+    return;
+  }
+
+  // 自動將上方篩選列切換至「錯題專項」
+  const filterBtn = document.querySelector('#quiz .quiz-filter button[data-m="wrongbook"]');
+  if (filterBtn) {
+    document.querySelectorAll('#quiz .quiz-filter button').forEach(x => x.classList.remove('active'));
+    filterBtn.classList.add('active');
+  }
+
+  renderQuiz('wrongbook');
+
+  // 畫面平滑滾動至測驗作答區頂端
+  const scoreBar = document.getElementById('score-bar');
+  if (scoreBar) {
+    scoreBar.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+
+
+
+
+/**
+ * 錯題本清空控制器 (Clear Wrongbook Controller)
+ * 包含二階段確認、本地資料庫重設、UI 列表清空、按鈕狀態禁用與視圖感知更新
+ */
+function clearWrongBook() {
+  const unresolvedList = getUnresolvedWrongQuizList();
+  const totalCount = Object.keys(loadWB()).length;
+
+  if (totalCount === 0) {
+    alert('目前錯題本本來就是空的，無需清空！💪');
+    return;
+  }
+
+  if (confirm(`確定要清空所有錯題記錄嗎？\n（包含 ${unresolvedList.length} 題未克服錯題與所有歷史統計）`)) {
+    // 1. 重設 LocalStorage 為空物件
+    saveWB({});
+
+    // 2. 重新渲染錯題本列表
+    renderWB();
+
+    // 3. 強制即時更新所有重考按鈕之計數與禁用狀態
+    updateWrongQuizButtonState();
+
+    // 4. 視圖感知：若當前作答區剛好停留在「錯題專項」模式，立即刷新為空狀態卡片
+    if (typeof activeQuizFilter !== 'undefined' && activeQuizFilter === 'wrongbook') {
+      renderQuiz('wrongbook');
+    }
+  }
+}
+
+/**
+ * 錯題記錄新增或累計更新 (Record Wrong Answer)
+ */
 function recordWrong(runtimeItem, userPick) {
   const wb = loadWB();
   const rawItem = runtimeItem.raw || runtimeItem;
@@ -5548,8 +6251,12 @@ function recordWrong(runtimeItem, userPick) {
   };
   saveWB(wb);
   renderWB();
+  updateWrongQuizButtonState();
 }
 
+/**
+ * 錯題標記攻克消除 (Resolve Wrong Item)
+ */
 function resolveWrong(rawItem) {
   const wb = loadWB();
   const key = getQuestionKey(rawItem);
@@ -5557,16 +6264,13 @@ function resolveWrong(rawItem) {
     wb[key].resolved = true;
     saveWB(wb);
     renderWB();
+    updateWrongQuizButtonState();
   }
 }
 
-function clearWrongBook() {
-  if (confirm('確定清空所有錯題記錄嗎？')) {
-    saveWB({});
-    renderWB();
-  }
-}
-
+/**
+ * 渲染錯題本面板列表 (Render Wrongbook Panel UI)
+ */
 function renderWB() {
   const wb = loadWB();
   const list = document.getElementById('wb-list');
@@ -5575,6 +6279,7 @@ function renderWB() {
   const entries = Object.values(wb);
   if (!entries.length) {
     list.innerHTML = '<p class="dim" style="font-size:.85rem">目前尚無錯題記錄。💪 保持下去！</p>';
+    updateWrongQuizButtonState();
     return;
   }
 
@@ -5591,7 +6296,11 @@ function renderWB() {
       </div>
     </div>
   `).join('');
+
+  // 確保每次渲染列表時同步更新按鈕狀態
+  updateWrongQuizButtonState();
 }
+
 
 /* ================= 弱點章節診斷分析 ================= */
 /* ==========================================================================
@@ -6800,6 +7509,9 @@ if (sqTabs) {
 }
 
 // 初始化執行
+bindQuizFilterEvents();
+renderQuiz('all');
+renderWB();
 calcSubnet();
 newQuiz();
 
