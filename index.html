@@ -1863,20 +1863,6 @@ pre.bin {
   }
 }
 
-/* ── Key Takeaways 優化樣式 ── */
-.module-title{color:#fbbf24;font-size:1.1rem;margin:26px 0 12px;padding:8px 14px;
- background:#1e293b;border-left:5px solid #fbbf24;border-radius:6px;display:flex;justify-content:space-between;align-items:center}
-.module-title .cnt{font-size:.8rem;color:#94a3b8;background:#0f172a;padding:2px 10px;border-radius:10px}
-.kt-filter{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
-.kt-filter button{padding:7px 16px;border-radius:20px;border:1px solid #334155;background:#1e293b;color:#94a3b8;cursor:pointer;font-size:.85rem}
-.kt-filter button.active{background:#0ea5e9;border-color:#0ea5e9;color:#fff}
-.flip{height:auto;min-height:220px}
-.face{flex-direction:column;justify-content:center;gap:8px;padding:16px}
-.front{background:linear-gradient(145deg,#1e293b,#16213a);border:1px solid #38bdf855;font-weight:bold;font-size:.92rem;line-height:1.4}
-.front .num{position:absolute;top:8px;left:12px;font-size:.7rem;color:#64748b;font-weight:normal}
-.front .hint{font-size:.72rem;color:#38bdf8;font-weight:normal;margin-top:auto}
-.back{background:linear-gradient(145deg,#065f46,#064e3b);border:1px solid #22c55e66;font-size:.82rem;line-height:1.6;text-align:left;overflow-y:auto}
-#kt-progress{text-align:center;color:#94a3b8;font-size:.85rem;margin-bottom:12px}
 
 /* ════════════════════════════════════════════════════════════════
    高頻觀念陷阱：搜尋列、模組膠囊過濾器與痛點對比卡片
@@ -3129,7 +3115,7 @@ const cmpModules=[
 
     ['Syslog 系統日誌架構與嚴重度等級', [
       ['', '嚴重度等級 (0–7)', '日誌訊息格式規範', '傳輸與過濾配置', ''],
-      ['等級劃分與含義', '0 Emergency (崩潰) / 1 Alert (急救) / 2 Critical (嚴重) / 3 Error (錯誤) / 4 Warning (警告)', '5 Notification (正常事件，如介面 Up/Down) / 6 Informational (操作紀錄) / 7 Debugging (除錯調試)', '記憶口訣：0E, 1A, 2C, 3E, 4W, 5N, 6I, 7D (Every Alligator Critically Eats Wet New Insects Daily)', '數字越小越緊急；4 以下多代表設備或介面故障異常'],
+      ['等級劃分與含義', '0 Emergency (崩潰) / 1 Alert (急救) / 2 Critical (嚴重) / 3 Error (錯誤) / 4 Warning (警告)', '5 Notification (正常事件，如介面 Up/Down) / 6 Informational (操作紀錄) / 7 Debugging (除錯調試)', '🍦口訣：「Every Awesome Cisco Engineer Will Need Ice cream Daily」（7級對應7字）', '數字越小越緊急；4 以下多代表設備或介面故障異常'],
       ['格式解析與指令', '標準格式：*Timestamp: %FACILITY-SEVERITY-MNEMONIC: Description', '範例：%LINK-3-UPDOWN (3 代表 Error 級別；%SYS-5-CONFIG_I 代表 5 級 Notification)', 'logging trap <level>：設定日誌伺服器發送門檻（例如設 warning 4 則發送 0–4 級日誌）', '預設傳輸走 UDP 514；show logging 檢視記憶體緩衝區 (Buffered) 日誌與配置']
     ]],
 
@@ -3676,7 +3662,7 @@ const pitModules = [
   ['Network Fundamentals', [
 
     ['Subnetting / Wildcard Mask 計算反轉錯誤',
-     '把 Subnet Mask 直接當作反遮罩，例如將 <code>/27 (255.255.255.224)</code> 寫成 <code>0.0.0.128</code> 或 <code>0.0.0.224</code>。',
+     '把 Subnet Mask 直接當作反遮罩，例如將 <code>/27 (255.255.255.224)</code> 寫成 <code>0.0.0.224</code>。',
      '標準計算公式為 <code>255.255.255.255 − Subnet Mask</code>。<br><code>/27 (255.255.255.224)</code> ➡️ 塊長為 32 (256−224)，反遮罩最後一組八位元即為 <code>32 − 1 = 31</code>，故為 <code>0.0.0.31</code>。',
      '反遮罩算式全用 255 減；塊長減一即是末位元'],
 
@@ -4309,7 +4295,7 @@ const quiz=[
 
 {m:0,q:'In the OSI model, at which layers do a Switch and a Router primarily operate?',o:['L1 / L2','L2 / L3','L3 / L4','L2 / L7'],a:1,e:'Switch 是 L2（Frame/MAC），Router 是 L3（Packet/IP）；Hub 才是 L1。'},
 {m:0,q:'What is the correct order of the TCP three-way handshake?',o:['SYN → ACK → SYN-ACK','SYN → SYN-ACK → ACK','ACK → SYN → FIN','SYN → FIN → ACK'],a:1,e:'建立連線 SYN→SYN-ACK→ACK；斷線四次揮手 FIN→ACK→FIN→ACK。'},
-{m:0,q:'Which protocol uses UDP port 69?',o:['SNMP','TFTP','DNS','Syslog'],a:1,e:'TFTP=UDP 69；SNMP=161、DNS=53、Syslog=514（皆 UDP）。'},
+{m:0,q:'Which protocol uses UDP port 69?',o:['SNMP','TFTP','DNS','Syslog'],a:1,e:'TFTP=69；SNMP=161、DNS=53、Syslog=514（皆 UDP Port）。'},
 {m:0,q:'A host shows IP address 169.254.17.5. What is the most likely cause?',o:['Incorrect static route','DHCP server unreachable; host obtained an APIPA address','IPv6 not enabled','Wrong subnet mask'],a:1,e:'169.254.0.0/16 是 APIPA，代表 DHCP 失敗後的自動私有位址。'},
 {m:0,q:'Which cabling type should be used for long-distance backbone fiber runs?',o:['Multimode fiber (LED)','Single-mode fiber (laser)','Cat6a UTP','Coaxial'],a:1,e:'單模：長距離 LR+雷射+黃色接頭；多模：短距離 SR+LED+橘色接頭。'},
 {m:0,q:'What is the correct compressed form of IPv6 address 2001:0db8:0000:0000:0000:ff00:0042:8329?',o:['2001:db8::ff00:42:8329','2001::db8::ff00:42:8329','2001:db8:0:0:0:ff00:4200:8329','2001:db8::::ff00:42:8329'],a:0,e:':: 只能出現一次；每組前導零可刪（0042→42）。'},
@@ -5082,7 +5068,7 @@ const quiz=[
 {m:3,q:'What is the MIB in SNMP architecture?',o:['Management Information Base','Message Interface Board','Multi-user Internet Bridge','Managed IP Blocklist'],a:0,e:'MIB 以 OID 樹狀結構定義可管理物件(hierarchical database of managed objects)；NMS 與 Agent 透過 OID 讀寫資料。'},
 {m:3,q:'Which QoS mechanism marks traffic at Layer 3?',o:['CoS','DSCP','802.1p priority bits only','MAC classification'],a:1,e:'DSCP 位於 IP ToS 前 6 bit（L3）；CoS/802.1p 在 L2；跨三層邊界需重新映射。'},
 {m:3,q:'Which command sets the device clock manually before NTP converges?',o:['clock set hh:mm:ss day month year','set time now','datetime configure','ntp manual set'],a:0,e:'clock set 格式為 HH:MM:SS Day Month Year（例：clock set 14:00:00 1 Jun 2024）；NTP 同步後會覆蓋。'},
-{m:3,q:'What does CDP/LLDP timer “holdtime” define?',o:['How long neighbor information is kept before expiring','Port security hold period','STP forward delay','DHCP lease time'],a:1,e:'CDP holdtime 預設 180 秒（3×發送間隔 60 秒）；LLDP 預設 holdtime 120 秒。'},
+{m:3,q:'What does CDP/LLDP timer “holdtime” define?',o:['How long neighbor information is kept before expiring','Port security hold period','STP forward delay','DHCP lease time'],a:0,e:'CDP holdtime 預設 180 秒（3×發送間隔 60 秒）；LLDP 預設 holdtime 120 秒。'},
 {m:3,q:'A router interface is configured with "ip address dhcp". What role does the router play?',o:['DHCP Server','DHCP Client','DHCP Relay Agent','DHCP Snooping device'],a:1,e:'ip address dhcp 讓介面本身以 Client 角色向上游 Server 取得 IP；ip helper-address 才是 Relay Agent 角色。'},
 {m:3,q:'Which statement about SPAN (port mirroring) is true regarding network analysis services?',o:['Copies traffic from source ports/VLANs to a monitoring port','Encrypts mirrored frames','Balances load across ports','Blocks broadcast storms'],a:0,e:'SPAN 把流量複製到監聽埠供 Wireshark/NMS 抓包分析，不影響原始流量。'},
 
@@ -5657,73 +5643,6 @@ function setQuizFilterLockdown(locked) {
   if (!locked && typeof updateWrongQuizButtonState === 'function') {
     updateWrongQuizButtonState();
   }
-}
-
-/**
- * 全域測驗模式切換控制器 (Unified Mode Switcher)
- * @param {string|number} targetMode 目標模式：'all' | 'wrongbook' | 0~5
- */
-function switchToQuizMode(targetMode) {
-  // 1. 強制完全釋放鎖定屬性
-  setQuizFilterLockdown(false);
-
-  // 2. 更新頂部按鈕高亮樣式 (.active)
-  const filterBar = document.querySelector('#quiz .quiz-filter');
-  if (filterBar) {
-    filterBar.querySelectorAll('button').forEach(btn => {
-      const btnMode = btn.dataset.m === 'all' 
-        ? 'all' 
-        : (btn.dataset.m === 'wrongbook' ? 'wrongbook' : parseInt(btn.dataset.m, 10));
-      
-      if (btnMode === targetMode) {
-        btn.classList.add('active');
-      } else {
-        btn.classList.remove('active');
-      }
-    });
-  }
-
-  // 3. 調用核心測驗渲染
-  renderQuiz(targetMode);
-
-  // 4. 視圖平滑滾動至測驗計分面板
-  const scoreBar = document.getElementById('score-bar');
-  if (scoreBar) {
-    scoreBar.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-}
-
-/**
- * 直接綁定分類篩選列按鈕事件 (Direct Event Binder)
- */
-function bindQuizFilterEvents() {
-  const filterBar = document.querySelector('#quiz .quiz-filter');
-  if (!filterBar) return;
-
-  filterBar.querySelectorAll('button').forEach(b => {
-    b.onclick = () => {
-      if (b.disabled || b.classList.contains('filter-locked')) return;
-
-      const targetM = b.dataset.m === 'all' 
-        ? 'all' 
-        : (b.dataset.m === 'wrongbook' ? 'wrongbook' : parseInt(b.dataset.m, 10));
-      const totalQuestions = parseInt(totalEl.textContent, 10) || 0;
-
-      if (activeQuizFilter === 'wrongbook' && targetM !== 'wrongbook' && answered < totalQuestions && totalQuestions > 0) {
-        const confirmExit = confirm(
-          '⚠️ 目前正在進行錯題專項重考，確定要中途放棄並切換單元嗎？\n\n' +
-          '• 點擊「確定」：放棄本次重測並切換至所選單元（未作答完畢的錯題仍會保留於錯題本中）\n' +
-          '• 點擊「取消」：繼續完成本次錯題衝刺'
-        );
-
-        if (!confirmExit) {
-          return;
-        }
-      }
-
-      switchToQuizMode(targetM);
-    };
-  });
 }
 
 /**
@@ -6588,7 +6507,7 @@ const CCNA_TAXONOMY = [
 ];
 
 /**
- * 加權概念識別引擎 (Weighted Concept Detector)
+ * 加權概念識別引擎 (Weighted Concept Detector - RegExp Bound)
  * @param {string|Object} qInput 題幹字串或題目物件實體
  * @param {number} [mIndex] 題目所屬的官方考綱模組編號 (0-5)
  * @returns {string} 精準對應的 CCNA 知識點名稱
@@ -6604,7 +6523,6 @@ function detectConcept(qInput, mIndex) {
     text = String(qInput || '');
   }
 
-  const cleanText = text.toLowerCase();
   let bestConcept = null;
   let maxScore = -1;
 
@@ -6616,9 +6534,13 @@ function detectConcept(qInput, mIndex) {
       score += 4;
     }
 
-    // 累計各 Token 加權得分
-    for (const [kw, weight] of item.tokens) {
-      if (cleanText.includes(kw)) {
+    // 累計各 Token 正則測試加權得分
+    for (const [reOrStr, weight] of item.tokens) {
+      const isMatch = (reOrStr instanceof RegExp) 
+        ? reOrStr.test(text) 
+        : text.toLowerCase().includes(String(reOrStr).toLowerCase());
+
+      if (isMatch) {
         score += weight;
       }
     }
@@ -6629,7 +6551,7 @@ function detectConcept(qInput, mIndex) {
     }
   }
 
-  // 若完全無特徵命中，依模組預設兜底（絕不回傳「綜合基礎」）
+  // 若完全無特徵命中，依模組預設兜底
   if (maxScore <= 0 || !bestConcept) {
     const fallbackMap = {
       0: '1.4 TCP/IP 與 OSI 模型封裝 (TCP/UDP/OSI Layers)',
@@ -6644,6 +6566,7 @@ function detectConcept(qInput, mIndex) {
 
   return bestConcept;
 }
+
 
 /* ==========================================================================
    CCNA 200-301 弱點診斷與考點導流推薦引擎 (Remediation & Routing Engine)
@@ -7069,11 +6992,6 @@ function updateWeakAnalysis(list) {
   }
 }
 
-
-// 初始化執行
-renderQuiz('all');
-renderWB();
-
 /* ================= IPv4 子網路計算機與實戰隨機題庫演練 ================= */
 
 // 1. 下拉選單初始化（支援 /8 到 /32）
@@ -7324,33 +7242,54 @@ function genHostsQ() {
 }
 
 /* ---------- 題型 ③：反向 — 給主機數求遮罩 ---------- */
-function genMaskQ() {
-  const needPool = [
-    [1000, '/22'], [500, '/23'], [250, '/24'], [120, '/25'],
-    [60, '/26'], [30, '/27'], [14, '/28'], [6, '/29'], [2, '/30']
-  ];
-  const [need, ansCidr] = needPool[rnd(needPool.length)];
-  const ansMask = fmtOfMask(parseInt(ansCidr.slice(1), 10));
+function genMaskQ() { 
+  const needPool = [ 
+    [1000, '/22'], [500, '/23'], [250, '/24'], [120, '/25'], 
+    [60, '/26'], [30, '/27'], [14, '/28'], [6, '/29'], [2, '/30'] 
+  ]; 
+
+  const [need, ansCidr] = needPool[rnd(needPool.length)]; 
   const ci = parseInt(ansCidr.slice(1), 10);
+  const ansMask = fmtOfMask(ci); 
+ 
+  // 隨機偏移產生干擾項，Set 去重
+  const offsets = shuffleArray([-1, 1, -2, 2]); 
+  const cidrs = new Set([ci]); 
 
-  const distract = [ci - 1, ci + 1, ci + 2].filter(c => c >= 8 && c <= 30).map(fmtOfMask);
-  const opts = [...new Set([ansMask, ...distract])].slice(0, 4);
-  while (opts.length < 4) opts.push(fmtOfMask(20));
-  opts.sort();
+  for (const off of offsets) { 
+    if (cidrs.size < 4) { 
+      const c = ci + off; 
+      if (c >= 8 && c <= 30) {
+        cidrs.add(c); 
+      }
+    } 
+  } 
 
-  return {
-    q: `❓ 某部門規劃需要至少 <b>${need.toLocaleString()} 台</b> 可用主機，應選用哪個<b>子網路遮罩</b>？（選滿足需求的最小遮罩）`,
-    type: 'mc',
-    options: opts,
-    answer: opts.indexOf(ansMask),
-    explain() {
-      const c = parseInt(ansCidr.slice(1), 10);
-      const hbits = 32 - c;
+  while (cidrs.size < 4) {
+    cidrs.add(16 + rnd(12)); 
+  } 
+ 
+  // 排序（數值大小）後產生選項
+  const opts = [...cidrs]
+    .sort((a, b) => a - b)
+    .map(fmtOfMask); 
+ 
+  return { 
+    q: `❓ 某部門規劃需要至少 <b>${need.toLocaleString()} 台</b> 可用主機，應選用哪個<b>子網路遮罩</b>？（選滿足需求的最小遮罩）`, 
+    type: 'mc', 
+    options: opts, 
+    answer: opts.indexOf(ansMask), 
+
+    explain() { 
+      const hbits = 32 - ci;
+      const usableHosts = Math.pow(2, hbits) - 2;
+
       return `💡 <b>推算邏輯：</b><br>` +
-        `找滿足 <code>2^h − 2 ≥ ${need}</code> 的最小整數 h → <b>h = ${hbits} bits</b> (可用 ${Math.pow(2, hbits) - 2} 台)。<br>` +
-        `網路遮罩長度 = 32 − ${hbits} = <b>${ansCidr}</b> (${ansMask})。`;
-    }
-  };
+        `找滿足 <code>2^h − 2 ≥ ${need.toLocaleString()}</code> 的最小整數 h → ` +
+        `<b>h = ${hbits} bits</b>（可用 ${usableHosts.toLocaleString()} 台）。<br>` +
+        `網路遮罩長度 = 32 − ${hbits} = <b>${ansCidr}</b> (${ansMask})。`; 
+    } 
+  }; 
 }
 
 /* ---------- 題型 ④：判定兩 IP 是否在同一子網 (Same Subnet) ---------- */
@@ -7509,11 +7448,13 @@ if (sqTabs) {
 }
 
 // 初始化執行
-bindQuizFilterEvents();
-renderQuiz('all');
-renderWB();
-calcSubnet();
-newQuiz();
+document.addEventListener('DOMContentLoaded', () => {
+  bindQuizFilterEvents();
+  renderQuiz('all');
+  renderWB();
+  calcSubnet();
+  newQuiz();
+});
 
 
 </script>
