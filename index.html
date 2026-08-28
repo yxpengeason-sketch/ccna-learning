@@ -2291,7 +2291,7 @@ pre.bin {
 <body>
 <header>
 <h1>🚀 CCNA 200-301 考前 30 天衝刺儀表板</h1>
-<p>離線互動版 v1.2｜配速表 · 翻卡記憶 · 對照表 · IOS指令 · 陷阱避坑 · 模擬測驗 · 子網路計算機</p>
+<p>離線互動版 v1.3｜配速表 · 翻卡記憶 · 對照表 · IOS指令 · 陷阱避坑 · 模擬測驗 · 子網路計算機</p>
 </header>
 
 <nav id="nav">
@@ -2724,36 +2724,36 @@ loadProg();
 /* ================= Key Takeaways 翻卡（高頻考點） ================= */
 const ktModules = [
   ['Network Fundamentals（20%）',[
-    ['OSI 七層模型與對應 設備/PDU？',' L1 Physical (Hub/Bit)、<br> L2 Data Link (Switch/Frame)、<br> L3 Network (Router/Packet)、<br> L4 Transport (Segment)、<br> L5 Session、<br> L6 Presentation [加密/壓縮]、<br> L7 Application <br> 🍕口訣：Please Do Not Throw Sausage Pizza Away'],
-    ['TCP 三向交握順序？','SYN → SYN-ACK → ACK； <br> 斷線四次揮手 <br> FIN → ACK → FIN → ACK'],
-    ['TCP vs UDP 常見埠號？','TCP：HTTP 80 / HTTPS 443 / SSH 22 / FTP 21； <br> <br>  UDP：DNS 53 / DHCP 67,68 / SNMP 161 / TFTP 69 / Syslog 514'],
+    ['OSI 七層模型與對應 設備/PDU？',' L1 Physical (設備：Hub/PDU：Bit)、<br> L2 Data Link (設備：Switch/PDU：Frame)、<br> L3 Network (設備：Router/PDU：Packet)、<br> L4 Transport (PDU：Segment)、<br> L5 Session、<br> L6 Presentation [加密/壓縮]、<br> L7 Application <br> 🍕口訣：Please Do Not Throw Sausage Pizza Away'],
+    ['TCP 三向交握順序？','SYN → SYN-ACK → ACK； <br> <br> 斷線四次揮手 <br> FIN → ACK → FIN → ACK'],
+    ['TCP vs UDP 常見埠號 (Port Numbers)？','TCP：HTTP 80 / HTTPS 443 / SSH 22 / FTP 21； <br> <br>  UDP：DNS 53 / DHCP 67,68 / SNMP 161 / TFTP 69 / Syslog 514'],
     ['IPv4 私有位址範圍？','10.0.0.0/8、172.16.0.0/12、192.168.0.0/16； <br> APIPA 自動私有位址 169.254.0.0/16（DHCP 失敗時）'],
     ['單模 vs 多模光纖？','單模(SMF)：長距離LR、雷射光源、黃色接頭； <br> 多模(MMF)：短距離SR、LED 光源、橘色接頭'],
     ['UTP 纜線類型？','直通線（不同類設備）、跳接線（同類設備）； <br> Gigabit 以上四對全用；Cat5e=1G、Cat6a=10G'],
     ['IPv6 位址縮寫規則？',':: 每位址限一次（RFC 5952）； <br> 只能刪每組前導零，不可刪尾零'],
     ['IPv6 位址類型？','Global Unicast (2000::/3)、 <br> Link-local (FE80::/10)、 <br> Unique Local (FD00::/8 實務使用，L bit=1)、 <br> Multicast (FF00::/8)；無廣播'],
-    ['IPv6 取代廣播的方式？','Multicast（ff02::1 所有節點 / ff02::2 所有路由器）+ NDP 取代 ARP'],
-    ['Subnetting 可用主機數公式？','2^(主機位元數) − 2；Block Size = 256 − 最後非零遮罩值； <br> Wildcard = 255.255.255.255 − 遮罩'],
-    ['虛擬化 Type 1 vs Type 2 Hypervisor？','Type 1 裸機（ESXi/KVM）； <br> Type 2 架於 OS 上（Workstation）； <br> Container 共享 OS Kernel 更輕量']
+    ['IPv6 取代廣播的方式？','<b>1. 核心機制：</b>改用多播 (Multicast) 與 Anycast。<br><b>2. 常考核心多播位址：</b>• ff02::1：網段內 所有節點(All Nodes)，等同 IPv4 的 255.255.255.255。<br>• ff02::2：網段內 所有路由器(All Routers)。<br><b>3. 代替 ARP：</b>使用 NDP 協定 搭配 Solicited-Node 多播位址 (ff02::1:ffxx:xxxx) 來解析 MAC 位址。'],
+    ['Subnetting 可用主機數公式？','可用主機數：2^(主機位元數) − 2；<br><br> Block Size (子網段大小) = 2^8 − 最後非零遮罩值； <br><br> 子網切分：「新遮罩」-「舊遮罩」，<br>相差n個Bit，切出2^n子網 ；<br><br> Wildcard = 255.255.255.255 − 遮罩'],
+    ['虛擬化 Type 1 vs Type 2 Hypervisor？','Type 1 裸機（ESXi/KVM）； <br> Type 2 架於 OS 上（VMware Workstation）； <br> Container 共享 OS Kernel 更輕量']
   ]],
   ['Network Access（20%）',[
     ['STP 根橋選舉順序？','最低 Bridge Priority → 最低 MAC； <br> Gigabit Port Cost 預設 4'],
-    ['STP 保護機制？','PortFast（接端點跳過 Listening/Learning）+ BPDU Guard（接收到 BPDU 即 err-disable）+ Root Guard + Loop Guard'],
-    ['RSTP 收斂機制？','Proposal/Agreement 握手 + Alternate Port 即時備援，數秒內收斂'],
+    ['STP 保護機制？','PortFast（接端點跳過 Listening/Learning）<br> + BPDU Guard（接收到 BPDU 即 err-disable）<br><br>+ Root Guard (介面啟用：spanning-tree guard root) <br>+ Loop Guard (全域啟用： spanning-tree loopguard default)'],
+    ['RSTP 收斂機制？','Proposal/Agreement 握手 <br>+ Alternate Port 即時備援，數秒內收斂'],
     ['RSTP port角色與狀態？','角色：Root/Designated/Alternate/Backup； <br> 狀態三態：Discarding/Learning/Forwarding'],
-    ['VLAN Trunk 封裝重點？','僅支援 802.1Q；Native VLAN 不打標籤明文穿越，兩端必須一致 <br> （建議改閒置 VLAN 999）'],
-    ['EtherChannel LACP 匹配矩陣？','active↔active/passive 可成； <br> on 只能↔on； <br> desirable/auto 是 PAgP 專屬； <br> LACP 不理 PAgP'],
+    ['VLAN Trunk 封裝重點？','僅支援 802.1Q；Native VLAN 不打標籤明文穿越，兩端必須一致 <br> （建議改未使用的閒置 VLAN 如VLAN 999）'],
+    ['EtherChannel 協定匹配矩陣？','<b>LACP：</b>active ↔ active/passive 可成<br><b>PAgP：</b>desirable ↔ desirable/auto 可成<br><b>Static：</b>on 只能 ↔ on<br><b>跨協定：</b>LACP 不理 PAgP（兩端同協定且不可雙被動）'],
     ['Port Security 三種違規模式？','protect：靜默丟棄違規封包，無任何紀錄； <br> restrict：丟棄違規封包 + 計數 violation counter + 發 SNMP trap/syslog 記錄； <br> shutdown（預設）：err-disabled，需手動 shutdown/no shutdown 或 errdisable recovery 恢復'],
     ['MAC Address Table vs ARP Table？','MAC Table：L2 交換器「MAC→埠」； <br> ARP Cache：L3 設備「IP→MAC」，不同設備不同層級'],
-    ['CDP vs LLDP？','CDP 是 Cisco 專屬且預設啟用； <br> LLDP 是 IEEE 802.1AB 開放標準，跨廠牌必用'],
+    ['CDP vs LLDP？','CDP 是 Cisco 專屬且預設啟用； <br> LLDP 是 IEEE 802.1AB 開放標準，跨廠牌必用 <br><br> <b>全域啟用：</b>分別為 `cdp run` 與 `lldp run`；<b>介面控制：</b>為 `cdp enable` 與 `lldp transmit/receive`；<br><b>安全考量：</b>面對外網或非信任網段時，應關閉鄰居發現以防拓樸外洩。'],
     ['Lightweight AP 架構？','透過 CAPWAP 連回 WLC，Split-MAC 分工； <br> Autonomous AP 適合小型 1–3 台獨立設定'],
-    ['WPA2 vs WPA3？','WPA2-PSK 可離線字典攻擊、AES-CCMP；WPA3-SAE（Dragonfly 握手）抗攻擊、AES-GCMP、強制 PMF'],
+    ['WPA2 vs WPA3？','WPA2-PSK 可離線字典攻擊、AES-CCMP；<br> WPA3-SAE（Dragonfly 握手）抗攻擊、AES-GCMP、強制 PMF'],
     ['2.4 GHz vs 5 GHz 無線通道？','2.4 GHz 僅 Channel 1、6、11 互不重疊； <br> 5 GHz 快但穿牆弱、覆蓋小'],
     ['交換器三大轉發行為？','學習（記錄來源 MAC）、 <br> 轉發（查表送出）、 <br> 過濾（同埠不重複發送）； <br> 未知單播才 Flood']
   ]],
   ['IP Connectivity（25%）',[
     ['OSPF Cost 公式？','Cost = 參考頻寬 ÷ 介面頻寬，預設參考值 100 Mbps； <br> FastE=1、GigE=1（≥100Mbps 全算 1 造成次優路徑風險）； <br> 建議全域調整：auto-cost reference-bandwidth 100000'],
-    ['OSPFv2 鄰居狀態？','Down→Init→2-Way（此階段選 DR/BDR）→ExStart（協商 DD 序號）→Exchange→Loading（LSR/LSU）→Full； <br> 卡在 ExStart 多為 MTU 不符；DROther 與 DROther 之間停在 2-Way 屬正常行為；<br> 穩定目標為 FULL'],
+    ['OSPFv2 鄰居狀態？','Down→Init→2-Way（此階段選 DR/BDR）<br> →ExStart（協商 DD 序號）→Exchange <br>→Loading（LSR/LSU）→Full； <br><br> 卡在 ExStart 多為 MTU 不符；DROther 與 DROther 之間停在 2-Way 屬正常行為；<br> 穩定目標為 FULL'],
     ['OSPF DR/BDR 選舉特性？','不具搶佔性（先到先得）；Priority 0 不參選； <br> 順序：① 最高 Priority → ② 最高 Router ID； <br> 多播位址：224.0.0.5（AllSPF）／224.0.0.6（DRothers→DR/BDR）'],
     ['OSPF 網路類型與計時器？','Broadcast/P2P：Hello 10/Dead 40； <br> NBMA：30/120 <br> （陷阱！）；P2P 免選舉 DR/BDR'],
     ['OSPF 區域類型與 Router ID？','Backbone Area 0 必須存在；ABR 連接區域；Router ID 順序：手動 router-id > 最高 loopback > 最高物理介面'],
@@ -2762,36 +2762,35 @@ const ktModules = [
     ['靜態路由出介面 vs 下一跳？','乙太網是多接取網路必寫下一跳 IP；Serial/P2P 才可用純出介面寫法'],
     ['ACL 放置黃金法則？','Standard 靠近目的地、 <br> Extended 靠近來源端； <br> 結尾隱含 deny any；「先細後粗、先拒後允」'],
     ['Standard vs Extended ACL 編號？','Standard：1–99, 1300–1999（僅比對來源 IP）；Extended：100–199, 2000–2699（五元組）'],
-    ['NAT 三種類型比較？','Static NAT 1對1固定發布伺服器；Dynamic NAT 多對多位址池；PAT 多對一（overload=PAT）'],
-    ['HSRP 角色？','Active/Standby 提供預設閘道冗餘，Virtual IP 由主機當 Gateway；預設 Priority 100，需 preempt 才能搶回； <br> HSRP 為 Cisco 專屬（v1 群組 0–255）；開放標準對應 VRRP（RFC 5798）'],
-    ['SVI vs Router-on-a-Stick？','三層交換器用 interface vlan X（SVI）；單臂路由用子介面 + encapsulation dot1q'],
+    ['NAT 三種類型比較？','Static NAT 1對1固定發布伺服器；<br> Dynamic NAT 多對多位址池；PAT 多對一（overload=PAT）'],
+    ['HSRP 角色？','Active/Standby 提供預設閘道冗餘，Virtual IP 由主機當 Gateway；<br> 預設 Priority 100，需 preempt 才能搶回； <br> HSRP 為 Cisco 專屬（v1 群組 0–255）；<br> 開放標準對應 VRRP（RFC 5798）'],
+    ['SVI vs Router-on-a-Stick？','三層交換器MLS 用 interface vlan X（SVI）；<br> 單臂路由Router-on-a-Stick 用子介面 + encapsulation dot1q'],
     ['VLAN 間路由驗證指令？','show ip interface brief（子介面 up/up）、show vlan brief、跨 VLAN ping 通即成功']
   ]],
 
   ['IP Services（10%）',[
     ['DHCP DORA 四步驟？','Discover→Offer→Request→Acknowledge；Discover/Request 由 Client 廣播；跨網段需 ip helper-address 轉換為單播轉發'],
-    ['Syslog 嚴重度範圍？','0(emergency) 最嚴重 → 7(debugging) 最輕微； <br> 🍦口訣：「Every Awesome Cisco Engineer Will Need Ice cream Daily」（7級對應7字）； <br> logging trap 設定傳送等級門檻；logging host 指定伺服器'],
-    ['SSH vs Telnet？','SSH：TCP 22 加密（需 crypto key generate rsa + login local）；Telnet：TCP 23 全文字串明文傳輸不安全'],
-    ['NTP stratum 意義？','數字越小越接近權威源（stratum 0 為原子鐘/GPS）；驗證 show ntp status 看 synchronized、show ntp associations 看狀態'],
-    ['CoS vs DSCP？','CoS 在 Layer 2（802.1Q Tag 內 3-bit，0–7）；DSCP 在 Layer 3（TOS/Traffic Class 內 6-bit，0–63）；語音建議最高優先級 EF(46)；信任邊界設在第一跳（Access Switch）'],
-    ['SNMP v2c vs v3？','v2c 用 Community String（ro/rw）明文；v3 支援認證+加密 authPriv（唯一具加密版本）；Trap 為主動不可靠告警，Inform 為需確認之可靠告警'],
+    ['Syslog 嚴重度範圍？','0(emergency) 最嚴重 → 7(debugging) 最輕微； <br> 🍦口訣：「Every Awesome Cisco Engineer Will Need Ice cream Daily」（7級對應7字）； <br> logging trap 設定傳送等級門檻；<br>logging host 指定伺服器'],
+    ['SSH vs Telnet？','SSH：TCP 22 加密（需 crypto key generate rsa + login local）；<br> Telnet：TCP 23 全文字串明文傳輸不安全'],
+    ['NTP stratum 意義？','數字越小越接近權威源（stratum 0 為原子鐘/GPS）；<br> <b>驗證：</b> show ntp status 看 synchronized、<br> show ntp associations 看狀態'],
+    ['CoS vs DSCP？','CoS 在 Layer 2（802.1Q Tag 內 3-bit，0–7）；<br> DSCP 在 Layer 3（TOS/Traffic Class 內 6-bit，0–63）；<br> 語音建議最高優先級 EF(46)；信任邊界設在第一跳（Access Switch）'],
+    ['SNMP v2c vs v3？','v2c 用 Community String（ro/rw）明文；<br> v3 支援認證+加密 authPriv（唯一具加密版本）；<br> Trap 為主動不可靠告警，Inform 為需確認之可靠告警'],
     ['IPv6 動態地址分配 <br>（SLAAC vs Stateful）？','純 SLAAC：M=0, O=0，自動算地址與gateway；<br> Stateless DHCPv6：M=0, O=1，SLAAC 地址 + 伺服器給 DNS；<br> Stateful DHCPv6：M=1, O=1，伺服器全權分配地址與 DNS；<br> 注意：gateway 一律透過 Link-Local (FE80::) 獲取']
   ]],
 
   ['Security Fundamentals（15%）',[
-    ['Site-to-Site vs Remote Access VPN？','Site-to-Site：閘道器間網路對網路、使用者無感免客戶端；Remote Access：個別裝置需登入'],
-    ['DHCP Snooping / DAI / IPSG 防禦目標？','Snooping 防 Rogue DHCP Server；DAI 防 ARP Spoofing；IPSG 防 IP Spoofing；Snooping 建 Binding Table 供 DAI 使用'],
-    ['實體安全與密碼強化？','service password-encryption 加密明文密碼；enable secret 優於 enable password；閒置port shutdown 或設 Black Hole VLAN'],
-    ['Telnet/SSH 安全遠端管理配置順序？','hostname → ip domain-name → crypto key generate rsa → username secret → line vty login local + transport input ssh'],
-    ['802.1X 三角色？','Supplicant（用戶端）/ Authenticator（交換器/AP，走 EAPoL）/ Authentication Server（RADIUS 如 ISE）；認證前埠只放行 EAPoL'],
-    ['TACACS+ vs RADIUS？','TACACS+：TCP 49、全程加密、三功能分離、逐指令授權（設備管理首選）；RADIUS：UDP 1812/1813、僅加密密碼欄位（網路接入常用）'],
-    ['WEP/WPA/WPA2/WPA3 演進？','WEP 已破解禁用（RC4）；WPA=TKIP 過渡；WPA2=AES-CCMP；WPA3=SAE+GCMP+強制 PMF；企業版一律 802.1X'],
-    ['IDS vs IPS？','IDS：promiscuous 被動偵測告警（旁掛）；IPS：inline 即時阻擋；Signature 偵測已知攻擊、Anomaly 偵測未知行為'],
-    ['Stateful Firewall 特性？','維護連線狀態表、自動允許回程流量；Router ACL 是無狀態過濾需手動放行雙向'],
+    ['Site-to-Site vs Remote Access VPN？','Site-to-Site：閘道器間網路對網路、使用者無感免客戶端；<br> Remote Access：個別裝置需登入'],
+    ['DHCP Snooping / DAI / IPSG 防禦目標？','DHCP Snooping 防 Rogue DHCP Server；<br> DAI 防 ARP Spoofing；IPSG 防 IP Spoofing；Snooping 建 Binding Table 供 DAI 使用'],
+    ['實體安全與密碼強化？','service password-encryption 加密明文密碼；<br> enable secret 優於 enable password；<br> 閒置port shutdown 或設 Black Hole VLAN'],
+    ['Telnet/SSH 安全遠端管理配置順序？','hostname <br> → ip domain-name <br> → crypto key generate rsa <br> → username secret <br> → line vty login local + transport input ssh'],
+    ['802.1X 三角色？','Supplicant（用戶端）/ <br> Authenticator（交換器/AP，走 EAPoL）/ <br> Authentication Server（RADIUS 如 ISE）；認證前埠只放行 EAPoL'],
+    ['TACACS+ vs RADIUS？','TACACS+：TCP 49、全程加密、三功能分離、逐指令授權（設備管理首選）；<br> RADIUS：UDP 1812/1813、僅加密密碼欄位（網路接入常用）'],
+    ['WEP/WPA/WPA2/WPA3 演進？','WEP 已破解禁用（RC4）；<br> WPA=TKIP 過渡；WPA2=AES-CCMP；WPA3=SAE+GCMP+強制 PMF；企業版一律 802.1X'],
+    ['IDS vs IPS？','IDS：promiscuous 被動監測告警（旁掛）；<br> IPS：inline 即時阻擋； <br>Signature 偵測已知攻擊、Anomaly 偵測未知行為'],    ['Stateful Firewall 特性？','維護連線狀態表、自動允許回程流量；Router ACL 是無狀態過濾需手動放行雙向'],
     ['對稱 vs 非對稱加密？','對稱（AES）：同一把金鑰、快；非對稱（RSA）：公私鑰對、解決金鑰交換；實務混用（如 TLS 握手）'],
     ['雜湊完整性驗證？','SHA-256 取代 MD5/CRC32；驗證 IOS 映像防篡改；雜湊不可逆、非加密'],
-    ['社會工程與威脅分類？','Phishing 假頁面騙憑證；Ransomware 加密勒索；DoS 打可用性；Worm 自主散播 vs Virus 需宿主檔案；防社工靠資安意識訓練'],
-    ['AAA 三要素？','Authentication 認證（你是誰）、Authorization 授權（你能做什麼）、Accounting 記錄（你做了什麼）']
+    ['社會工程與威脅分類？','Phishing 假頁面騙憑證；<br> Ransomware 加密勒索；<br> DoS 打可用性；<br> Worm 自主散播 vs Virus 需宿主檔案；防社工靠資安意識訓練'],
+    ['AAA 三要素？','Authentication 認證（你是誰）、<br> Authorization 授權（你能做什麼）、<br> Accounting 記錄（你做了什麼）']
   ]],
   ['Automation & Programmability（10%）',[
     ['SDN Controller-based 架構？','管理平面集中於 Controller；<br> Northbound API 對上層應用（REST）、<br> Southbound API 對底層設備（NETCONF/OpenFlow）；<br> DNA Center 為 Cisco 實作'],
@@ -4363,7 +4362,7 @@ const quiz=[
  a:1,
  e:'Class 0≈15.4W；Class 4=PoE+（802.3at）PSE 端 30W／PD 端 25.5W；51W(PD)/60W(PSE) 屬 802.3bt Type 3，bt 最高可達 90W(PSE)。'},
 
-// ══════════ Module 1: Network Access（40題）══════════
+// ══════════ Module 1: Network Access（）══════════
 {m:1,q:'Which two settings must match on both ends of an 802.1Q trunk for proper operation? (Choose two)',
  o:['The allowed VLAN list','The native VLAN','The port-security maximum count','The CDP holdtime'],
  a:[0,1],
@@ -4612,7 +4611,7 @@ const quiz=[
 {m:1,q:'Which command restores an err-disabled port caused by port security immediately?',o:['shutdown then no shutdown on the interface','clear port-security all','reload the switch','errdisable recovery cause psecure-violation only'],a:0,e:'最快方式 shutdown/no shutdown；errdisable recovery 是設定自動恢復計時器的做法。'},
 {m:1,q:'What is the benefit of configuring static MAC addresses on a switch port?',o:['Prevents flooding of that destination','Binds a MAC to a port so unknown sources cannot spoof it','Increases bandwidth','Enables trunking'],a:1,e:'靜態 MAC 表項不會老化且固定綁定port，可防來源欺騙與洪泛。'},
 
-// ══════════ Module 2: IP Connectivity（50題）══════════
+// ══════════ Module 2: IP Connectivity（）══════════
 {m:2,q:'Which three values must match for two routers to become OSPF neighbors? (Choose three)',
  o:['Area ID','Hello and Dead timers','Subnet/IP network on the shared link','Router ID'],
  a:[0,1,2],
