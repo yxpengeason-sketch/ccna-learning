@@ -1,0 +1,6 @@
+{
+  "name": "CCNA 200-301 全真考場與隨機抽題模擬考試系統",
+  "description": "CCNA 200-301 認證全真考場模擬系統，支援考綱比例隨機抽題、全真計時防作弊考場模式、弱點分析診斷與智慧錯題本攻克。",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
